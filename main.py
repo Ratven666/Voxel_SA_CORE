@@ -10,7 +10,7 @@ def main():
 
 
     time0 = time()
-    scan = ScanDB("Kucha")
+    scan = ScanDB("Bala")
     print(scan)
     print(time() - time0)
 
