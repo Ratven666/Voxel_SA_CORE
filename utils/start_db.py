@@ -25,4 +25,3 @@ def create_db():
         db_metadata.create_all(engine)
     else:
         logger.info("Такая БД уже есть!")
-        # print("Такая БД уже есть!")

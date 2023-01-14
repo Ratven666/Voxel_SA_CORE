@@ -25,4 +25,4 @@ class TableInitializer(metaclass=SingletonMeta):
         self.points_db_table = create_points_db_table(self.db_metadata)
         self.scans_db_table = create_scans_db_table(self.db_metadata)
         self.points_scans_db_table = create_points_scans_db_table(self.db_metadata)
-        self.imported_files_table = create_imported_files_table(self.db_metadata)
+        self.imported_files_db_table = create_imported_files_table(self.db_metadata)
