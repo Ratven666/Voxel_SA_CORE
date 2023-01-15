@@ -4,11 +4,12 @@ from sqlalchemy import Table, Column, Integer, String, Float, ForeignKey
 def create_voxel_models_db_table(metadata):
     voxel_models_db_table = Table("voxel_models", metadata,
                                   Column("id", Integer, primary_key=True),
-                                  Column("vm_name", String, nullable=False, unique=True),
+                                  Column("vm_name", String, nullable=False, unique=True, index=True),
                                   Column("step", Float, nullable=False),
                                   Column("len", Integer, default=0),
                                   Column("X_count", Integer, default=0),
                                   Column("Y_count", Integer, default=0),
+                                  Column("Z_count", Integer, default=0),
                                   Column("min_X", Float),
                                   Column("max_X", Float),
                                   Column("min_Y", Float),
