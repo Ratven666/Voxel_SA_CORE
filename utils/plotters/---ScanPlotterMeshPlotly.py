@@ -1,33 +1,28 @@
 import logging
-from abc import ABC, abstractmethod
 
-from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
+import plotly.express as px
+import plotly.graph_objects as go
+
+from CONFIG import LOGGER, MAX_POINT_SCAN_PLOT
+from utils.plotters.PlotterABC import PlotterABC
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 
-class PlotterABC(ABC):
-    """
-    Абстрактный класс плоттера данных
-    """
-
-    __logger = logging.getLogger(LOGGER)
+class _ScanPlotterMeshPlotly(PlotterABC):
+    # __logger = logging.getLogger(LOGGER)
 
     def __init__(self, sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT)):
-        self.__sampler = sampler
+        super().__init__(sampler)
+        # self.__sampler = sampler
 
-    def __str__(self):
-        return f"Плоттер типа: {self.__class__.__name__}"
-
-    @abstractmethod
-    def plot(self, scan):
-        pass
-
-    def calk_plot_limits(self, scan):
+    def __calk_plot_limits(self, scan):
         """
         Рассчитывает область построения скана для сохранения пропорций вдоль осей
         :param scan: скан который будет отрисовываться
         :return: Словарь с пределами построения модель вдоль трех осей
         """
+
+
         min_x, min_y, min_z = scan.min_X, scan.min_Y, scan.min_Z
         max_x, max_y, max_z = scan.max_X, scan.max_Y, scan.max_Z
         try:
@@ -44,7 +39,7 @@ class PlotterABC(ABC):
         z_lim = [((min_z + max_z) / 2) - length, ((min_z + max_z) / 2) + length]
         return {"X_lim": x_lim, "Y_lim": y_lim, "Z_lim": z_lim}
 
-    def sample_data(self, scan):
+    def plot(self, scan):
         if self.__sampler is not None:
             scan = self.__sampler.do_sampling(scan)
         x_lst, y_lst, z_lst, c_lst = [], [], [], []
@@ -52,6 +47,22 @@ class PlotterABC(ABC):
             x_lst.append(point.X)
             y_lst.append(point.Y)
             z_lst.append(point.Z)
-            # c_lst.append([point.R / 255.0, point.G / 255.0, point.B / 255.0])
-            c_lst.append([point.R, point.G, point.B])
-        return {"x": x_lst, "y": y_lst, "z": z_lst, "color": c_lst, "scan": scan}
+        fig = go.Figure(data=[go.Mesh3d(x=x_lst,
+                                        y=y_lst,
+                                        z=z_lst,
+                                        opacity=0.7,
+                                        cmin=scan.min_Z,
+                                        cmax=scan.max_Z,
+                                        colorscale="Earth",
+                                        contour=go.mesh3d.Contour(color="red", show=True, width=5)
+                                        )])
+
+        pl = self.__calk_plot_limits(scan)
+        fig.update_layout(
+            scene=dict(
+                xaxis=dict(range=pl["X_lim"], ),
+                yaxis=dict(range=pl["Y_lim"], ),
+                zaxis=dict(range=pl["Z_lim"], ), ),
+            margin=dict(r=10, l=10, b=10, t=10))
+
+        fig.show()

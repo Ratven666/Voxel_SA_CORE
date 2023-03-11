@@ -1,6 +1,11 @@
 from time import time
 
 from classes.VoxelModelDB import VoxelModelDB
+
+from utils.plotters.ScanPlotterMPL import ScanPlotterMPL
+from utils.plotters.ScanPlotterPlotly import ScanPlotterMeshPlotly, ScanPlotterPlotly
+from utils.plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly
+from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 from utils.start_db import create_db, engine, Tables
 
 from classes.ScanDB import ScanDB
@@ -20,27 +25,13 @@ def main():
     print(time() - time0)
 
 
-    # time0 = time()
-    # for point in scan:
-    #     pass
-    # print(time() - time0)
-
     time0 = time()
-    vm = VoxelModelDB(scan, 0.05, is_2d_vxl_mdl=False)
-    # print(vm)
-    # print(time() - time0)
-    #
-    # iter(vm)
-    # time0 = time()
-    scan.plot()
+    # vm = VoxelModelDB(scan, 0.05, is_2d_vxl_mdl=False)
+
+    # scan.plot(plotter=ScanPlotterMPL(point_size=5))
+    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=TotalPointCountScanSampler(10_000)))
+    scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(1_000)))
     print(time() - time0)
-
-    coont = 0
-    for v in vm:
-        # print(v)
-        coont += 1
-
-    print(coont)
 
 
 if __name__ == "__main__":
