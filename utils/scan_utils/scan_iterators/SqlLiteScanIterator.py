@@ -6,7 +6,10 @@ from classes.Point import Point
 
 
 class SqlLiteScanIterator:
-
+    """
+    Иттератор скана из БД SQLite
+    Реализован через стандартную библиотеку sqlite3
+    """
     def __init__(self, scan):
         self.__path = os.path.join("data_bases", DATABASE_NAME)
         self.scan_id = scan.id

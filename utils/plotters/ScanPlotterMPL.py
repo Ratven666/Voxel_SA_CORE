@@ -2,13 +2,17 @@ import logging
 
 import matplotlib.pyplot as plt
 
-from CONFIG import MAX_POINT_SCAN_PLOT
+from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
 from utils.plotters.PlotterABC import PlotterABC
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 
 class ScanPlotterMPL(PlotterABC):
-    __logger = logging.getLogger("console")
+    """
+    Отрисовка скана в 3D через библиотеку matplotlib
+    """
+
+    __logger = logging.getLogger(LOGGER)
 
     def __init__(self, sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT)):
         super().__init__()
@@ -17,6 +21,11 @@ class ScanPlotterMPL(PlotterABC):
         self.__sampler = sampler
 
     def __calk_plot_limits(self, scan):
+        """
+        Рассчитывает область построения скана для сохранения пропорций вдоль осей
+        :param scan: скан который будет отрисовываться
+        :return: Словарь с пределами построения модель вдоль трех осей
+        """
         min_x, min_y, min_z = scan.min_X, scan.min_Y, scan.min_Z
         max_x, max_y, max_z = scan.max_X, scan.max_Y, scan.max_Z
         try:
@@ -34,6 +43,11 @@ class ScanPlotterMPL(PlotterABC):
         return {"X_lim": x_lim, "Y_lim": y_lim, "Z_lim": z_lim}
 
     def __set_plot_limits(self, plot_limits):
+        """
+        Устанавливает в графике области построения в соответствии с переданными значениями
+        :param plot_limits: словарь с границами области построения
+        :return: None
+        """
         try:
             self.__ax.set_xlim(*plot_limits["X_lim"])
             self.__ax.set_ylim(*plot_limits["Y_lim"])
@@ -42,6 +56,11 @@ class ScanPlotterMPL(PlotterABC):
             self.__logger.critical(f"Переданны некорректные лимиты области модели.")
 
     def plot(self, scan):
+        """
+        Отрисовка скана в 3D
+        :param scan: скан который будет отрисовываться
+        :return: None
+        """
         self.__fig = plt.figure()
         self.__ax = self.__fig.add_subplot(projection="3d")
         if self.__sampler is not None:

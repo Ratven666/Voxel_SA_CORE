@@ -4,6 +4,9 @@ from utils.start_db import engine
 
 
 class ScanIterator:
+    """
+    Фабрика иттераторов сканов для сканов из БД
+    """
 
     def __init__(self, scan):
         self.__scan_iterator = None
@@ -19,4 +22,3 @@ class ScanIterator:
 
     def __iter__(self):
         return iter(self.__scan_iterator)
-

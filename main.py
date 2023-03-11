@@ -27,12 +27,12 @@ def main():
 
     time0 = time()
     vm = VoxelModelDB(scan, 0.05, is_2d_vxl_mdl=False)
-    print(vm)
-    print(time() - time0)
-
-    iter(vm)
+    # print(vm)
+    # print(time() - time0)
+    #
+    # iter(vm)
     # time0 = time()
-    # scan.plot()
+    scan.plot()
     print(time() - time0)
 
     coont = 0

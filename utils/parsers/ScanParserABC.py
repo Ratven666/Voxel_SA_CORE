@@ -6,6 +6,7 @@ from utils.start_db import engine, Tables
 
 
 class ScanParserABC(ABC):
+    """Абстрактный класс парсера данных для скана"""
 
     def __str__(self):
         return f"Парсер типа: {self.__class__.__name__}"
@@ -15,6 +16,12 @@ class ScanParserABC(ABC):
 
     @staticmethod
     def _check_file_extension(file_name, __supported_file_extensions__):
+        """
+        Проверяет соответствует ли расширение файла длпустимому для парсера
+        :param file_name: имя и путь до файла, который будет загружаться
+        :param __supported_file_extensions__: список допустимых расширений для выбранного парсера
+        :return:
+        """
         file_extension = f".{file_name.split('.')[-1]}"
         if file_extension not in __supported_file_extensions__:
             raise TypeError(f"Неправильный для парсера тип файла. "
@@ -22,6 +29,10 @@ class ScanParserABC(ABC):
 
     @staticmethod
     def _get_last_point_id():
+        """
+        Возвращает последний id для точки в таблице БД points
+        :return: последний id для точки в таблице БД points
+        """
         with engine.connect() as db_connection:
             stmt = (select(Tables.points_db_table.c.id).order_by(desc("id")))
             last_point_id = db_connection.execute(stmt).first()
@@ -32,4 +43,9 @@ class ScanParserABC(ABC):
 
     @abstractmethod
     def parse(self, file_name: str):
+        """
+        Запускает процедуру парсинга
+        :param file_name: имя и путь до файла, который будет загружаться
+        :return:
+        """
         pass

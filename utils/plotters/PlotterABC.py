@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class PlotterABC(ABC):
+    """
+    Абстрактный класс плоттера данных
+    """
     @abstractmethod
     def __init__(self):
         pass

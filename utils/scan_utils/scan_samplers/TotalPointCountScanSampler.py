@@ -2,7 +2,10 @@ from utils.scan_utils.scan_samplers.ScanSamplerABC import ScanSamplerABC
 
 
 class TotalPointCountScanSampler(ScanSamplerABC):
-
+    """
+    Разрядитель плотности точек в скане, который оставляет в результирующем скане
+    количество точек не превышающее переданное значение total_point_count
+    """
     def __init__(self, total_point_count):
         super().__init__()
         self.__total_point_count = total_point_count

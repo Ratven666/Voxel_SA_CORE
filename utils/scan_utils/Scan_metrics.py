@@ -1,11 +1,16 @@
 from sqlalchemy import and_, select, update
 from sqlalchemy import func
 
-# from classes.ScanDB import ScanDB
 from utils.start_db import engine, Tables
 
 
 def calc_scan_metrics(scan):
+    """
+    Рассчитывает значения метрик скана по точкам загруженным в БД
+    средствами SQL и обновляет их в самом скане
+    :param scan: скан для которого рассчитываются и в котором обновляются метрики
+    :return: скан с обновленными  метриками
+    """
     with engine.connect() as db_connection:
         stmt = select(func.count(Tables.points_db_table.c.id).label("len"),
                       func.min(Tables.points_db_table.c.X).label("min_X"),
@@ -27,6 +32,11 @@ def calc_scan_metrics(scan):
 
 
 def update_scan_in_db(updated_scan):
+    """
+    Обновляет значения метрик скана в БД
+    :param updated_scan: Объект скана для которого обновляются метрики
+    :return:
+    """
     with engine.connect() as db_connection:
         stmt = update(Tables.scans_db_table)\
             .where(Tables.scans_db_table.c.id == updated_scan.id)\

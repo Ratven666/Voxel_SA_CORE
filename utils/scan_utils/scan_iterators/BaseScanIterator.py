@@ -5,6 +5,10 @@ from utils.start_db import engine, Tables
 
 
 class BaseScanIterator:
+    """
+    Универсальный иттератор для сканов из БД
+    Реализован средствами sqlalchemy
+    """
 
     def __init__(self, scan):
         self.__scan = scan

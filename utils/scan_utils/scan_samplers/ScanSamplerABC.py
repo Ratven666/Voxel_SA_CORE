@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 
 
 class ScanSamplerABC(ABC):
+    """
+    Абстрактный разрядитель плотности точек в скане
+    """
     @abstractmethod
     def __init__(self):
         pass
@@ -11,4 +14,9 @@ class ScanSamplerABC(ABC):
 
     @abstractmethod
     def do_sampling(self, scan):
+        """
+        Запускает процедуру разряжения плотности точек в скане
+        :param scan: скан который требуется разрядить
+        :return: разряженный скан типа ScanLite (в оперативной памяти)
+        """
         pass

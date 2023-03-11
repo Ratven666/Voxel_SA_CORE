@@ -1,13 +1,18 @@
 import logging
 
-from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT
+from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT, LOGGER
 from utils.parsers.ScanParserABC import ScanParserABC
 
 
 class ScanTxtParser(ScanParserABC):
+    """
+    Парсер точек из текстового txt формата
+    Формат данных:
+        4.2517 -14.2273 33.4113 208 195 182 -0.023815 -0.216309 0.976035
+          X        Y       Z     R   G   B      nX nY nZ (не обязательны и пока игнорируются)
+    """
     __supported_file_extension__ = [".txt"]
-    __logger = logging.getLogger("console")
-
+    __logger = logging.getLogger(LOGGER)
 
     def __init__(self, chunk_count=POINTS_CHUNK_COUNT):
         self.__chunk_count = chunk_count

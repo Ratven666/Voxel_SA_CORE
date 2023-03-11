@@ -3,6 +3,10 @@ from classes.abc_classes.ScanABC import ScanABC
 
 
 class ScanLite(ScanABC):
+    """
+    Скан не связанный с базой данных
+    Все данные, включая точки при переборе берутся из оперативной памяти
+    """
 
     def __init__(self, scan_name):
         super().__init__(scan_name)
@@ -21,6 +25,13 @@ class ScanLite(ScanABC):
 
     @classmethod
     def create_from_another_scan(cls, scan, copy_with_points=True):
+        """
+        Создает скан типа ScanLite и копирует в него данные из другого скана
+        :param scan: копируемый скан
+        :param copy_with_points: определяет нужно ли копировать скан вместе с точками
+       :type copy_with_points: bool
+        :return:
+        """
         scan_lite = cls(scan.scan_name)
         scan_lite.id = scan.id
         scan_lite.len = 0

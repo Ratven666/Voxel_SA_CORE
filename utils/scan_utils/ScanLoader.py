@@ -1,5 +1,6 @@
 import logging
 
+from CONFIG import LOGGER
 from classes.ImportedFileDB import ImportedFileDB
 from utils.parsers.ScanParserABC import ScanParserABC
 from utils.parsers.ScanTxtParser import ScanTxtParser
@@ -8,12 +9,26 @@ from utils.start_db import Tables, engine
 
 
 class ScanLoader:
-    __logger = logging.getLogger("console")
+    __logger = logging.getLogger(LOGGER)
 
     def __init__(self, scan_parser=ScanTxtParser()):
         self.__scan_parser = scan_parser
 
     def load_data(self, scan, file_name: str):
+        """
+        Загрузка данных из файла в базу данных
+
+        :param scan: скан в который загружаются данные из файла
+        :type scan: ScanDB
+        :param file_name: путь до файла с данными
+        :type file_name: str
+        :return: None
+
+        При выполнении проверяется был ли ранее произведен импорт в этот скан из этого файла.
+        Если файл ранее не импортировался - происходит загрузка.
+        Полсле загрузки данных рассчитываются новые метрики скана, которые обновляют его свойства в БД
+        Файл с данными записывается в таблицу imported_files
+        """
         imp_file = ImportedFileDB(file_name)
 
         if imp_file.is_file_already_imported_into_scan(scan):
@@ -27,11 +42,19 @@ class ScanLoader:
             db_connection.commit()
         scan = calc_scan_metrics(scan)
         update_scan_in_db(scan)
-        imp_file._insert_in_db(scan)
-
+        imp_file.insert_in_db(scan)
 
     @staticmethod
     def __get_points_scans_list(scan, points):
+        """
+        Собирает список словарей для пакетной загрузки в таблицу points_scans_db_table
+
+        :param scan: скан в который загружаются данные из файла
+        :type scan: ScanDB
+        :param points: список точек полученный из парсера
+        :type points: list
+        :return: список словарей для пакетной загрузки в таблицу points_scans_db_table
+        """
         points_scans = []
         for point in points:
             points_scans.append({"point_id": point["id"], "scan_id": scan.id})
@@ -39,6 +62,13 @@ class ScanLoader:
 
     @staticmethod
     def __insert_to_db(points, points_scans, db_engine_connection):
+        """
+        Загружает данные о точках и их связях со сканами в БД
+        :param points: список словарей для пакетной загрузки в таблицу points_db_table
+        :param points_scans: список словарей для пакетной загрузки в таблицу points_scans_db_table
+        :param db_engine_connection: открытое соединение с БД
+        :return: None
+        """
         db_engine_connection.execute(Tables.points_db_table.insert(), points)
         db_engine_connection.execute(Tables.points_scans_db_table.insert(), points_scans)
 
