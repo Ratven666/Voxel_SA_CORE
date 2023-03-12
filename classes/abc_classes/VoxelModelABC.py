@@ -1,9 +1,12 @@
+import logging
 from abc import ABC, abstractmethod
 
+from CONFIG import LOGGER
 from classes.abc_classes.ScanABC import ScanABC
 
 
 class VoxelModelABC(ABC):
+    logger = logging.getLogger(LOGGER)
 
     def __init__(self, scan: ScanABC, step, is_2d_vxl_mdl=True):
         self.id = None
@@ -19,7 +22,7 @@ class VoxelModelABC(ABC):
 
     def __name_generator(self, scan):
         vm_type = "2D" if self.is_2d_vxl_mdl else "3D"
-        return f"VM_Sc_{vm_type}:{scan.scan_name}_st:{self.step}"
+        return f"VM_{vm_type}_Sc:{scan.scan_name}_st:{self.step}"
 
     def __str__(self):
         return f"{self.__class__.__name__} " \

@@ -4,7 +4,7 @@ from CONFIG import LOGGER
 from classes.ImportedFileDB import ImportedFileDB
 from utils.parsers.ScanParserABC import ScanParserABC
 from utils.parsers.ScanTxtParser import ScanTxtParser
-from utils.scan_utils.Scan_metrics import calc_scan_metrics, update_scan_in_db
+from utils.scan_utils.Scan_metrics import update_scan_metrics, update_scan_in_db_from_scan
 from utils.start_db import Tables, engine
 
 
@@ -40,8 +40,8 @@ class ScanLoader:
                 points_scans = self.__get_points_scans_list(scan, points)
                 self.__insert_to_db(points, points_scans, db_connection)
             db_connection.commit()
-        scan = calc_scan_metrics(scan)
-        update_scan_in_db(scan)
+        scan = update_scan_metrics(scan)
+        update_scan_in_db_from_scan(scan)
         imp_file.insert_in_db(scan)
 
     @staticmethod

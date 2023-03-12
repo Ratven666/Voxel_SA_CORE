@@ -29,7 +29,7 @@ class ScanPlotterMPL(PlotterABC):
             self.__ax.set_ylim(*plot_limits["Y_lim"])
             self.__ax.set_zlim(*plot_limits["Z_lim"])
         except TypeError:
-            self.__logger.critical(f"Переданны некорректные лимиты области модели.")
+            self.logger.critical(f"Переданны некорректные лимиты области модели.")
 
     @staticmethod
     def __calk_mpl_colors(plot_data):

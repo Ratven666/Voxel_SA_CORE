@@ -15,7 +15,7 @@ def main():
 
 
     time0 = time()
-    scan = ScanDB("Kucha")
+    scan = ScanDB("Tank")
     print(scan)
     print(time() - time0)
 
@@ -26,11 +26,11 @@ def main():
 
 
     time0 = time()
-    # vm = VoxelModelDB(scan, 0.05, is_2d_vxl_mdl=False)
-
-    # scan.plot(plotter=ScanPlotterMPL(point_size=5))
-    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=TotalPointCountScanSampler(10_000)))
-    scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(1_000)))
+    vm = VoxelModelDB(scan, 1, is_2d_vxl_mdl=True)
+    print(vm)
+    scan.plot(plotter=ScanPlotterMPL(point_size=5))
+    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=TotalPointCountScanSampler(50_000)))
+    # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(1_000)))
     print(time() - time0)
 
 

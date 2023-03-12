@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert
+from sqlalchemy import select, insert, delete
 
 from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT
 from classes.abc_classes.ScanABC import ScanABC
@@ -21,6 +21,13 @@ class ScanDB(ScanABC):
     def __iter__(self):
         """Иттератор скана берет точки из БД"""
         return iter(ScanIterator(self))
+
+    @staticmethod
+    def delete_scan(scan_id):
+        with engine.connect() as db_connection:
+            stmt = delete(Tables.scans_db_table).where(Tables.scans_db_table.c.id == scan_id)
+            db_connection.execute(stmt)
+            db_connection.commit()
 
     def load_scan_from_file(self,
                             scan_loader=ScanLoader(scan_parser=ScanTxtParser(chunk_count=POINTS_CHUNK_COUNT)),

@@ -1,5 +1,5 @@
 
-class VMBaseIterator:
+class VMFullBaseIterator:
     def __init__(self, vxl_mdl):
         self.vxl_mdl = vxl_mdl
         self.x = 0

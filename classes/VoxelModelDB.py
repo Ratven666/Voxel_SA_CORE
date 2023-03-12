@@ -1,10 +1,15 @@
-from sqlalchemy import select, insert
+from os import remove
 
+from sqlalchemy import select, insert, desc
+
+from CONFIG import POINTS_CHUNK_COUNT
+from classes.ScanDB import ScanDB
 from classes.VoxelDB import VoxelDB
 from classes.abc_classes.ScanABC import ScanABC
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
+from utils.scan_utils.Scan_metrics import calk_scan_metrics, update_scan_in_db_from_scan_metrics
 from utils.start_db import Tables, engine
-from utils.voxel_utils.voxel_model_iterators.VMBaseIterator import VMBaseIterator
+from utils.voxel_utils.voxel_model_iterators.VMFullBaseIterator import VMFullBaseIterator
 
 
 class VoxelModelDB(VoxelModelABC):
@@ -16,17 +21,8 @@ class VoxelModelDB(VoxelModelABC):
 
     def __iter__(self):
         if self.vxl_model is None:
-            self.__create_vxl_struct()
-        return iter(VMBaseIterator(self))
-
-    def __create_vxl_struct(self):
-        self.vxl_model = [[[VoxelDB(self.min_X + x * self.step,
-                                    self.min_Y + y * self.step,
-                                    self.min_Z + z * self.step,
-                                    self.step, self.id)
-                            for x in range(self.X_count)]
-                           for y in range(self.Y_count)]
-                          for z in range(self.Z_count)]
+            self.__create_full_vxl_struct()
+        return iter(VMFullBaseIterator(self))
 
     def __init_vxl_mdl(self, scan):
         select_ = select(Tables.voxel_models_db_table).where(Tables.voxel_models_db_table.c.vm_name == self.vm_name)
@@ -54,7 +50,13 @@ class VoxelModelDB(VoxelModelABC):
                                                                    )
                 db_connection.execute(stmt)
                 db_connection.commit()
-                self.__init_vxl_mdl(scan)
+                stmt = (select(Tables.voxel_models_db_table.c.id).order_by(desc("id")))
+                self.id = db_connection.execute(stmt).first()[0]
+                self.__create_full_vxl_struct()
+                self.logger.info(f"Структура {self.vm_name} создана")
+                self.__separate_scan_to_vxl(scan)
+                self.logger.info(f"Разбиение скана {scan.scan_name} в {self.vm_name} законченно")
+                self.__calk_scan_metrics_in_voxels()
 
     def __calc_vxl_md_metric(self, scan):
         if len(scan) == 0:
@@ -89,3 +91,55 @@ class VoxelModelDB(VoxelModelABC):
             self.is_2d_vxl_mdl = True
         else:
             self.is_2d_vxl_mdl = False
+
+    def __create_full_vxl_struct(self):
+        self.vxl_model = [[[VoxelDB(self.min_X + x * self.step,
+                                    self.min_Y + y * self.step,
+                                    self.min_Z + z * self.step,
+                                    self.step, self.id)
+                            for x in range(self.X_count)]
+                           for y in range(self.Y_count)]
+                          for z in range(self.Z_count)]
+
+    def __write_temp_points_scans_file(self, scan):
+        with open("temp_file.txt", "w", encoding="UTF-8") as file:
+            for point in scan:
+                vxl_md_X = int((point.X - self.min_X) // self.step)
+                vxl_md_Y = int((point.Y - self.min_Y) // self.step)
+                if self.is_2d_vxl_mdl:
+                    vxl_md_Z = 0
+                else:
+                    vxl_md_Z = int((point.Z - self.min_Z) // self.step)
+                scan_id = self.vxl_model[vxl_md_Z][vxl_md_Y][vxl_md_X].scan_id
+                file.write(f"{point.id}, {scan_id}\n")
+
+    @staticmethod
+    def __parse_temp_points_scans_file():
+        points_scans = []
+        with open("temp_file.txt", "r", encoding="UTF-8") as file:
+            for line in file:
+                data = [int(p_ps) for p_ps in line.strip().split(",")]
+                points_scans.append({"point_id": data[0], "scan_id": data[1]})
+                if len(points_scans) == POINTS_CHUNK_COUNT:
+                    yield points_scans
+                    points_scans = []
+        remove("temp_file.txt")
+        yield points_scans
+
+    def __separate_scan_to_vxl(self, scan):
+        self.__write_temp_points_scans_file(scan)
+        with engine.connect() as db_connection:
+            for data in self.__parse_temp_points_scans_file():
+                db_connection.execute(Tables.points_scans_db_table.insert(), data)
+                self.logger.info(f"Пакет точек загружен в БД")
+            db_connection.commit()
+
+    def __calk_scan_metrics_in_voxels(self):
+        for voxel in iter(VMFullBaseIterator(self)):
+            scan_metrics = calk_scan_metrics(voxel.scan_id)
+            if scan_metrics["len"] == 0:
+                VoxelDB.delete_voxel(voxel.id)
+                ScanDB.delete_scan(voxel.scan_id)
+            else:
+                update_scan_in_db_from_scan_metrics(scan_metrics)
+        self.logger.info(f"Расчет метрик сканов завершен и загружен в БД")

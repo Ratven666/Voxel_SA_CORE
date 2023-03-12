@@ -12,7 +12,6 @@ class ScanTxtParser(ScanParserABC):
           X        Y       Z     R   G   B      nX nY nZ (не обязательны и пока игнорируются)
     """
     __supported_file_extension__ = [".txt"]
-    __logger = logging.getLogger(LOGGER)
 
     def __init__(self, chunk_count=POINTS_CHUNK_COUNT):
         self.__chunk_count = chunk_count
@@ -33,7 +32,7 @@ class ScanTxtParser(ScanParserABC):
                              "R": line[3], "G": line[4], "B": line[5]
                              }
                 except IndexError:
-                    self.__logger.critical(f"Структура \"{file_name}\" некорректна - \"{line}\"")
+                    self.logger.critical(f"Структура \"{file_name}\" некорректна - \"{line}\"")
                     return
                 points.append(point)
                 if len(points) == self.__chunk_count:

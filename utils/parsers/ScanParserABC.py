@@ -1,12 +1,15 @@
+import logging
 from abc import ABC, abstractmethod
 
 from sqlalchemy import select, desc
 
+from CONFIG import LOGGER
 from utils.start_db import engine, Tables
 
 
 class ScanParserABC(ABC):
     """Абстрактный класс парсера данных для скана"""
+    logger = logging.getLogger(LOGGER)
 
     def __str__(self):
         return f"Парсер типа: {self.__class__.__name__}"

@@ -10,7 +10,7 @@ class PlotterABC(ABC):
     Абстрактный класс плоттера данных
     """
 
-    __logger = logging.getLogger(LOGGER)
+    logger = logging.getLogger(LOGGER)
 
     def __init__(self, sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT)):
         self.__sampler = sampler
@@ -35,7 +35,7 @@ class PlotterABC(ABC):
                       max_y - min_y,
                       max_z - min_z]
         except TypeError:
-            self.__logger.critical(f"Не рассчитаны значения границ в скане \"{scan.scan_name}\". "
+            self.logger.critical(f"Не рассчитаны значения границ в скане \"{scan.scan_name}\". "
                                    f"Невозможно рассчитать область построения модели.")
             return
         length = max(limits) / 2
@@ -52,6 +52,5 @@ class PlotterABC(ABC):
             x_lst.append(point.X)
             y_lst.append(point.Y)
             z_lst.append(point.Z)
-            # c_lst.append([point.R / 255.0, point.G / 255.0, point.B / 255.0])
             c_lst.append([point.R, point.G, point.B])
         return {"x": x_lst, "y": y_lst, "z": z_lst, "color": c_lst, "scan": scan}

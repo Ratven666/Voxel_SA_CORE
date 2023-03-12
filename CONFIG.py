@@ -1,7 +1,7 @@
 
 DATABASE_NAME = "test.sqlite"
 
-FILE_NAME = "src/K_1000.txt"
+FILE_NAME = "src/Chemical_Plant_Tank.txt"
 
 POINTS_CHUNK_COUNT = 100_000
 
