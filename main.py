@@ -2,20 +2,17 @@ from time import time
 
 from classes.VoxelModelDB import VoxelModelDB
 
-from utils.plotters.ScanPlotterMPL import ScanPlotterMPL
-from utils.plotters.ScanPlotterPlotly import ScanPlotterMeshPlotly, ScanPlotterPlotly
-from utils.plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly
-from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
-from utils.start_db import create_db, engine, Tables
+from utils.start_db import create_db
 
 from classes.ScanDB import ScanDB
+
 
 def main():
     create_db()
 
 
     time0 = time()
-    scan = ScanDB("Tank")
+    scan = ScanDB("KuchaRGB")
     print(scan)
     print(time() - time0)
 
@@ -26,13 +23,17 @@ def main():
 
 
     time0 = time()
-    vm = VoxelModelDB(scan, 1, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 1, is_2d_vxl_mdl=False)
     print(vm)
-    scan.plot(plotter=ScanPlotterMPL(point_size=5))
+    # for idx, v in enumerate(vm):
+    #     print(idx, v)
+    # scan.plot(plotter=ScanPlotterMPL(point_size=5))
     # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=TotalPointCountScanSampler(50_000)))
-    # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(1_000)))
+    # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(10_000)))
     print(time() - time0)
 
+    # vm.plot(VoxelModelPlotter())
+    vm.plot()
 
 if __name__ == "__main__":
     main()

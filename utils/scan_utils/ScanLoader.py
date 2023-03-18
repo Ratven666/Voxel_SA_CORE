@@ -43,6 +43,8 @@ class ScanLoader:
         scan = update_scan_metrics(scan)
         update_scan_in_db_from_scan(scan)
         imp_file.insert_in_db(scan)
+        self.__logger.info(f"Точки из файла \"{file_name}\" успешно"
+                           f" загружены в скан \"{scan.scan_name}\"")
 
     @staticmethod
     def __get_points_scans_list(scan, points):

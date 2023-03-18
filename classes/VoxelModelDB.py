@@ -7,9 +7,13 @@ from classes.ScanDB import ScanDB
 from classes.VoxelDB import VoxelDB
 from classes.abc_classes.ScanABC import ScanABC
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
-from utils.scan_utils.Scan_metrics import calk_scan_metrics, update_scan_in_db_from_scan_metrics
+from utils.scan_utils.Scan_metrics import update_scan_borders, \
+    update_scan_in_db_from_scan
 from utils.start_db import Tables, engine
+from utils.voxel_utils.Voxel_metrics import update_voxel_in_db_from_voxel
+from utils.voxel_utils.Voxel_model_metrics import update_voxel_model_in_db_from_voxel_model
 from utils.voxel_utils.voxel_model_iterators.VMFullBaseIterator import VMFullBaseIterator
+from utils.voxel_utils.voxel_model_iterators.VMRawIterator import VMRawIterator
 
 
 class VoxelModelDB(VoxelModelABC):
@@ -20,9 +24,7 @@ class VoxelModelDB(VoxelModelABC):
         self.vxl_model = None
 
     def __iter__(self):
-        if self.vxl_model is None:
-            self.__create_full_vxl_struct()
-        return iter(VMFullBaseIterator(self))
+        return iter(VMRawIterator(self))
 
     def __init_vxl_mdl(self, scan):
         select_ = select(Tables.voxel_models_db_table).where(Tables.voxel_models_db_table.c.vm_name == self.vm_name)
@@ -112,6 +114,9 @@ class VoxelModelDB(VoxelModelABC):
                     vxl_md_Z = int((point.Z - self.min_Z) // self.step)
                 scan_id = self.vxl_model[vxl_md_Z][vxl_md_Y][vxl_md_X].scan_id
                 file.write(f"{point.id}, {scan_id}\n")
+                self.__update_scan_data(self.vxl_model[vxl_md_Z][vxl_md_Y][vxl_md_X].scan,
+                                        point)
+                self.__update_voxel_data(self.vxl_model[vxl_md_Z][vxl_md_Y][vxl_md_X], point)
 
     @staticmethod
     def __parse_temp_points_scans_file():
@@ -134,12 +139,28 @@ class VoxelModelDB(VoxelModelABC):
                 self.logger.info(f"Пакет точек загружен в БД")
             db_connection.commit()
 
+    @staticmethod
+    def __update_scan_data(scan, point):
+        scan.len += 1
+        update_scan_borders(scan, point)
+
+    @staticmethod
+    def __update_voxel_data(voxel: VoxelDB, point):
+        voxel.R = (voxel.R * voxel.len + point.R) / (voxel.len + 1)
+        voxel.G = (voxel.G * voxel.len + point.G) / (voxel.len + 1)
+        voxel.B = (voxel.B * voxel.len + point.B) / (voxel.len + 1)
+        voxel.len += 1
+
     def __calk_scan_metrics_in_voxels(self):
+        voxel_counter = 0
         for voxel in iter(VMFullBaseIterator(self)):
-            scan_metrics = calk_scan_metrics(voxel.scan_id)
-            if scan_metrics["len"] == 0:
+            if len(voxel) == 0:
                 VoxelDB.delete_voxel(voxel.id)
                 ScanDB.delete_scan(voxel.scan_id)
             else:
-                update_scan_in_db_from_scan_metrics(scan_metrics)
+                update_scan_in_db_from_scan(voxel.scan)
+                update_voxel_in_db_from_voxel(voxel)
+                voxel_counter += 1
+        self.len = voxel_counter
+        update_voxel_model_in_db_from_voxel_model(self)
         self.logger.info(f"Расчет метрик сканов завершен и загружен в БД")

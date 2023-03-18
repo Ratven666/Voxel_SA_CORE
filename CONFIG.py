@@ -1,7 +1,7 @@
 
-DATABASE_NAME = "test.sqlite"
+DATABASE_NAME = "Kucha.sqlite"
 
-FILE_NAME = "src/Chemical_Plant_Tank.txt"
+FILE_NAME = "src/KuchaRGB.txt"
 
 POINTS_CHUNK_COUNT = 100_000
 

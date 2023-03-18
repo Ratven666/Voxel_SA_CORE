@@ -76,20 +76,21 @@ def update_scan_in_db_from_scan(updated_scan):
         db_connection.execute(stmt)
         db_connection.commit()
 
-# def check_scan_borders(scan: Scan, point_data: dict):
-#     if scan.min_X is None:
-#         scan.min_X, scan.max_X = point_data["X"], point_data["X"]
-#         scan.min_Y, scan.max_Y = point_data["Y"], point_data["Y"]
-#         scan.min_Z, scan.max_Z = point_data["Z"], point_data["Z"]
-#     if point_data["X"] < scan.min_X:
-#         scan.min_X = point_data["X"]
-#     if point_data["X"] > scan.max_X:
-#         scan.max_X = point_data["X"]
-#     if point_data["Y"] < scan.min_Y:
-#         scan.min_Y = point_data["Y"]
-#     if point_data["Y"] > scan.max_Y:
-#         scan.max_Y = point_data["Y"]
-#     if point_data["Z"] < scan.min_Z:
-#         scan.min_Z = point_data["Z"]
-#     if point_data["Z"] > scan.max_Z:
-#         scan.max_Z = point_data["Z"]
+
+def update_scan_borders(scan, point):
+    if scan.min_X is None:
+        scan.min_X, scan.max_X = point.X, point.X
+        scan.min_Y, scan.max_Y = point.Y, point.Y
+        scan.min_Z, scan.max_Z = point.Z, point.Z
+    if point.X < scan.min_X:
+        scan.min_X = point.X
+    if point.X > scan.max_X:
+        scan.max_X = point.X
+    if point.Y < scan.min_Y:
+        scan.min_Y = point.Y
+    if point.Y > scan.max_Y:
+        scan.max_Y = point.Y
+    if point.Z < scan.min_Z:
+        scan.min_Z = point.Z
+    if point.Z > scan.max_Z:
+        scan.max_Z = point.Z

@@ -44,6 +44,16 @@ class ScanDB(ScanABC):
         """
         scan_loader.load_data(self, file_name)
 
+    @classmethod
+    def get_scan_from_id(cls, scan_id: int):
+        select_ = select(Tables.scans_db_table).where(Tables.scans_db_table.c.id == scan_id)
+        with engine.connect() as db_connection:
+            db_scan_data = db_connection.execute(select_).mappings().first()
+            if db_scan_data is not None:
+                return cls(db_scan_data["scan_name"])
+            else:
+                raise ValueError("Нет скана с таким id!!!")
+
     def __init_scan(self):
         """
         Инициализирует скан при запуске

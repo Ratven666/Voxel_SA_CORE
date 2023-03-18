@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 from CONFIG import LOGGER
 from classes.abc_classes.ScanABC import ScanABC
+from utils.voxel_utils.voxel_model_plotters.Voxel_model_plotter import VoxelModelPlotter
 
 
 class VoxelModelABC(ABC):
@@ -19,6 +20,7 @@ class VoxelModelABC(ABC):
         self.min_Y, self.max_Y = None, None
         self.min_Z, self.max_Z = None, None
         self.base_scan_id = None
+
 
     def __name_generator(self, scan):
         vm_type = "2D" if self.is_2d_vxl_mdl else "3D"
@@ -39,5 +41,5 @@ class VoxelModelABC(ABC):
     def __iter__(self):
         pass
 
-    def plot(self, plotter):
+    def plot(self, plotter=VoxelModelPlotter()):
         plotter.plot(self)

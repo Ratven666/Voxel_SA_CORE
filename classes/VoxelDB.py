@@ -1,21 +1,16 @@
 from sqlalchemy import select, insert, delete
 
 from classes.ScanDB import ScanDB
+from classes.abc_classes.VoxelABC import VoxelABC
 from utils.start_db import Tables, engine
 
 
-class VoxelDB:
-    __slots__ = ["id", "X", "Y", "Z", "step", "scan_id", "vxl_mdl_id", "vxl_name"]
+class VoxelDB(VoxelABC):
+    __slots__ = ["id", "X", "Y", "Z", "step", "vxl_mdl_id", "vxl_name", "scan_id", "len", "R", "G", "B", "scan"]
 
     def __init__(self, X, Y, Z, step, vxl_mdl_id):
-        self.id = None
-        self.X = X
-        self.Y = Y
-        self.Z = Z
-        self.step = step
-        self.scan_id = None
-        self.vxl_mdl_id = vxl_mdl_id
-        self.vxl_name = self.__name_generator()
+        super().__init__(X, Y, Z, step, vxl_mdl_id)
+        self.scan = None
         self.__init_voxel()
 
     @staticmethod
@@ -25,13 +20,6 @@ class VoxelDB:
             db_connection.execute(stmt)
             db_connection.commit()
 
-    def __name_generator(self):
-        return (f"VXL_VM:{self.vxl_mdl_id}_s{self.step}_"
-                f"X:{round(self.X, 5)}_"
-                f"Y:{round(self.Y, 5)}_"
-                f"Z:{round(self.Z, 5)}"
-                )
-
     def __init_voxel(self):
         select_ = select(Tables.voxels_db_table).where(Tables.voxels_db_table.c.vxl_name == self.vxl_name)
 
@@ -39,12 +27,13 @@ class VoxelDB:
             db_voxel_data = db_connection.execute(select_).mappings().first()
             if db_voxel_data is not None:
                 self.__copy_voxel_data(db_voxel_data)
+                self.scan = ScanDB(f"SC_{self.vxl_name}")
             else:
                 scan = ScanDB(f"SC_{self.vxl_name}")
                 stmt = insert(Tables.voxels_db_table).values(vxl_name=self.vxl_name,
-                                                             x0=self.X,
-                                                             y0=self.Y,
-                                                             z0=self.Z,
+                                                             X=self.X,
+                                                             Y=self.Y,
+                                                             Z=self.Z,
                                                              step=self.step,
                                                              scan_id=scan.id,
                                                              vxl_mdl_id=self.vxl_mdl_id,
@@ -52,16 +41,18 @@ class VoxelDB:
                 db_connection.execute(stmt)
                 db_connection.commit()
                 self.__init_voxel()
+        # self.scan = ScanDB(f"SC_{self.vxl_name}")
 
     def __copy_voxel_data(self, db_voxel_data: dict):
         self.id = db_voxel_data["id"]
+        self.X = db_voxel_data["X"]
+        self.Y = db_voxel_data["Y"]
+        self.Z = db_voxel_data["Z"]
+        self.step = db_voxel_data["step"]
+        self.vxl_mdl_id = db_voxel_data["vxl_mdl_id"]
+        self.vxl_name = db_voxel_data["vxl_name"]
         self.scan_id = db_voxel_data["scan_id"]
-
-    def __str__(self):
-        return (f"{self.__class__.__name__} "
-                f"[id: {self.id},\tName: {self.vxl_name}\t\t"
-                f"X: {round(self.X, 5)}\tY: {round(self.Y, 5)}\tZ: {round(self.Z, 5)}]"
-                )
-
-    def __repr__(self):
-        return f"{self.__class__.__name__} [ID: {self.id}]"
+        self.len = db_voxel_data["len"]
+        self.R = db_voxel_data["R"]
+        self.G = db_voxel_data["G"]
+        self.B = db_voxel_data["B"]
