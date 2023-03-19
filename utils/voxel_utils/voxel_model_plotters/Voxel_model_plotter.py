@@ -25,8 +25,23 @@ class VoxelModelPlotter:
         ax = plt.figure().add_subplot(projection='3d')
         self.__set_plot_limits(ax, self.__calk_plot_limits(self.voxel_model))
         ax.voxels(area, facecolors=colors)
-
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.set_zlabel("Z")
+        self.__set_ax_ticks(ax, self.__calk_ax_ticks())
         plt.show()
+
+    def __calk_ax_ticks(self):
+        x_ticks = [self.voxel_model.min_X + idx*self.voxel_model.step for idx in range(self.voxel_model.X_count + 1)]
+        y_ticks = [self.voxel_model.min_Y + idx*self.voxel_model.step for idx in range(self.voxel_model.Y_count + 1)]
+        z_ticks = [self.voxel_model.min_Z + idx*self.voxel_model.step for idx in range(self.voxel_model.Z_count + 1)]
+        return {"x_ticks": x_ticks, "y_ticks": y_ticks, "z_ticks": z_ticks}
+
+    @staticmethod
+    def __set_ax_ticks(ax, ax_ticks: dict):
+        ax.set_xticks(np.arange(len(ax_ticks["x_ticks"])), labels=ax_ticks["x_ticks"])
+        ax.set_yticks(np.arange(len(ax_ticks["y_ticks"])), labels=ax_ticks["y_ticks"])
+        ax.set_zticks(np.arange(len(ax_ticks["z_ticks"])), labels=ax_ticks["z_ticks"])
 
     def __calk_indexes(self, voxel):
         x0 = self.voxel_model.min_X
@@ -37,15 +52,13 @@ class VoxelModelPlotter:
         k = int((voxel.Z - z0) / self.voxel_model.step)
         return i, j, k
 
-    def __calk_plot_limits(self, vxl_mdl):
+    @staticmethod
+    def __calk_plot_limits(vxl_mdl):
         """
         Рассчитывает область построения скана для сохранения пропорций вдоль осей
         :param scan: скан который будет отрисовываться
         :return: Словарь с пределами построения модель вдоль трех осей
         """
-        min_x, min_y, min_z = vxl_mdl.min_X, vxl_mdl.min_Y, vxl_mdl.min_Z
-        max_x, max_y, max_z = vxl_mdl.max_X, vxl_mdl.max_Y, vxl_mdl.max_Z
-
         limits = [vxl_mdl.X_count,
                   vxl_mdl.Y_count,
                   vxl_mdl.Z_count]
@@ -55,40 +68,14 @@ class VoxelModelPlotter:
         z_lim = [0, length]
         return {"X_lim": x_lim, "Y_lim": y_lim, "Z_lim": z_lim}
 
-    # def __calk_plot_limits(self, vxl_mdl):
-    #     """
-    #     Рассчитывает область построения скана для сохранения пропорций вдоль осей
-    #     :param scan: скан который будет отрисовываться
-    #     :return: Словарь с пределами построения модель вдоль трех осей
-    #     """
-    #     min_x, min_y, min_z = vxl_mdl.min_X, vxl_mdl.min_Y, vxl_mdl.min_Z
-    #     max_x, max_y, max_z = vxl_mdl.max_X, vxl_mdl.max_Y, vxl_mdl.max_Z
-    #     try:
-    #         limits = [max_x - min_x,
-    #                   max_y - min_y,
-    #                   max_z - min_z]
-    #     except TypeError:
-    #         self.logger.critical(f"Не рассчитаны значения границ в скане \"{vxl_mdl.vm_name}\". "
-    #                                f"Невозможно рассчитать область построения модели.")
-    #         return
-    #     length = max(limits) / 2
-    #     x_lim = [((min_x + max_x) / 2) - length - self.voxel_model.min_X,
-    #              ((min_x + max_x) / 2) + length - self.voxel_model.min_X]
-    #     y_lim = [((min_y + max_y) / 2) - length - self.voxel_model.min_Y,
-    #              ((min_y + max_y) / 2) + length - self.voxel_model.min_Y]
-    #     z_lim = [((min_z + max_z) / 2) - length - self.voxel_model.min_Z,
-    #              ((min_z + max_z) / 2) + length - self.voxel_model.min_Z]
-    #     return {"X_lim": x_lim, "Y_lim": y_lim, "Z_lim": z_lim}
-
-    def __set_plot_limits(self, ax, plot_limits):
+    @staticmethod
+    def __set_plot_limits(ax, plot_limits):
         """
         Устанавливает в графике области построения в соответствии с переданными значениями
         :param plot_limits: словарь с границами области построения
         :return: None
         """
-        try:
-            ax.set_xlim(*plot_limits["X_lim"])
-            ax.set_ylim(*plot_limits["Y_lim"])
-            ax.set_zlim(*plot_limits["Z_lim"])
-        except TypeError:
-            self.logger.critical(f"Переданны некорректные лимиты области модели.")
+        ax.set_xlim(*plot_limits["X_lim"])
+        ax.set_ylim(*plot_limits["Y_lim"])
+        ax.set_zlim(*plot_limits["Z_lim"])
+

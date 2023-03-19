@@ -23,7 +23,7 @@ def main():
 
 
     time0 = time()
-    vm = VoxelModelDB(scan, 1, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 2, is_2d_vxl_mdl=False)
     print(vm)
     # for idx, v in enumerate(vm):
     #     print(idx, v)

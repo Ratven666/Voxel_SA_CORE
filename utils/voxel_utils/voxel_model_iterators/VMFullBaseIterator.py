@@ -15,7 +15,7 @@ class VMFullBaseIterator:
             for vxl_y in range(self.y, self.Y_count):
                 for vxl_x in range(self.x, self.X_count):
                     self.x += 1
-                    return self.vxl_mdl.vxl_model[vxl_z][vxl_y][vxl_x]
+                    return self.vxl_mdl.voxel_structure[vxl_z][vxl_y][vxl_x]
                 self.y += 1
                 self.x = 0
             self.z += 1
