@@ -21,6 +21,9 @@ class SingletonMeta(type):
 
 
 class TableInitializer(metaclass=SingletonMeta):
+    """
+    Объект инициализирующий и создающий таблицы в БД
+    """
 
     def __init__(self, metadata):
         self.__db_metadata = metadata

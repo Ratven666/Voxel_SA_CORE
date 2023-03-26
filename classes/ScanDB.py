@@ -24,6 +24,11 @@ class ScanDB(ScanABC):
 
     @staticmethod
     def delete_scan(scan_id):
+        """
+        Удаляет запись скана из БД
+        :param scan_id: id скана который требуется удалить из БД
+        :return: None
+        """
         with engine.connect() as db_connection:
             stmt = delete(Tables.scans_db_table).where(Tables.scans_db_table.c.id == scan_id)
             db_connection.execute(stmt)
@@ -37,7 +42,7 @@ class ScanDB(ScanABC):
         Ведется запись в БД
         Обновляются метрики скана в БД
         :param scan_loader: объект определяющий логику работы с БД при загрузке точек (
-        принимает в себя парсер определяющий логику работты с конкретным типом файлов)
+        принимает в себя парсер определяющий логику работы с конкретным типом файлов)
         :type scan_loader: ScanLoader
         :param file_name: путь до файла из которого будут загружаться данные
         :return: None
@@ -46,6 +51,11 @@ class ScanDB(ScanABC):
 
     @classmethod
     def get_scan_from_id(cls, scan_id: int):
+        """
+        Возвращает объект скана по id
+        :param scan_id: id скана который требуется загрузить и вернуть из БД
+        :return: объект ScanDB с заданным id
+        """
         select_ = select(Tables.scans_db_table).where(Tables.scans_db_table.c.id == scan_id)
         with engine.connect() as db_connection:
             db_scan_data = db_connection.execute(select_).mappings().first()
@@ -75,9 +85,9 @@ class ScanDB(ScanABC):
 
     def __copy_scan_data(self, db_scan_data: dict):
         """
-        Копирует данные из записи из БД в атрибуты оскана
+        Копирует данные записи из БД в атрибуты скана
         :param db_scan_data: Результат запроса к БД
-        :return:
+        :return: None
         """
         self.id = db_scan_data["id"]
         self.scan_name = db_scan_data["scan_name"]

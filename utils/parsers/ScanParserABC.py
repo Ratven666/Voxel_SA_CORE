@@ -20,10 +20,10 @@ class ScanParserABC(ABC):
     @staticmethod
     def _check_file_extension(file_name, __supported_file_extensions__):
         """
-        Проверяет соответствует ли расширение файла длпустимому для парсера
+        Проверяет соответствует ли расширение файла допустимому для парсера
         :param file_name: имя и путь до файла, который будет загружаться
         :param __supported_file_extensions__: список допустимых расширений для выбранного парсера
-        :return:
+        :return: None
         """
         file_extension = f".{file_name.split('.')[-1]}"
         if file_extension not in __supported_file_extensions__:

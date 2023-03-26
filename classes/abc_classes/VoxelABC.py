@@ -5,6 +5,8 @@ from CONFIG import LOGGER
 
 
 class VoxelABC(ABC):
+    """Абстрактный класс вокселя"""
+
     logger = logging.getLogger(LOGGER)
 
     def __init__(self, X, Y, Z, step, vxl_mdl_id):

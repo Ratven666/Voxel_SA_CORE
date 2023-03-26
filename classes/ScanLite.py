@@ -15,7 +15,15 @@ class ScanLite(ScanABC):
     def __iter__(self):
         return iter(self.__points)
 
+    def __len__(self):
+        return len(self.__points)
+
     def add_point(self, point):
+        """
+        Добавляет точку в скан
+        :param point: объект класса Point
+        :return: None
+        """
         if isinstance(point, PointABC):
             self.__points.append(point)
             self.len += 1
@@ -29,8 +37,8 @@ class ScanLite(ScanABC):
         Создает скан типа ScanLite и копирует в него данные из другого скана
         :param scan: копируемый скан
         :param copy_with_points: определяет нужно ли копировать скан вместе с точками
-       :type copy_with_points: bool
-        :return:
+        :type copy_with_points: bool
+        :return: объект класса ScanLite
         """
         scan_lite = cls(scan.scan_name)
         scan_lite.id = scan.id

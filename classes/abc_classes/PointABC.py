@@ -2,6 +2,8 @@ from abc import ABC
 
 
 class PointABC(ABC):
+    """Абстрактный класс точки"""
+
     __slots__ = ["id", "X", "Y", "Z", "R", "G", "B"]
 
     def __init__(self, X, Y, Z, R, G, B, id_=None):

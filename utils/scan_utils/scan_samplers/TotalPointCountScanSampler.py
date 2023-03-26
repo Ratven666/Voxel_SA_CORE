@@ -11,6 +11,11 @@ class TotalPointCountScanSampler(ScanSamplerABC):
         self.__total_point_count = total_point_count
 
     def do_sampling(self, scan):
+        """
+        Запускает рпоцедуру разряжения
+        :param scan: Исходный скан
+        :return: объкет ScanLite с метриками базового скана и оставшимися точками
+        """
         from classes.ScanLite import ScanLite
 
         sample_scan = ScanLite.create_from_another_scan(scan, copy_with_points=False)

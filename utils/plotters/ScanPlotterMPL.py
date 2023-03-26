@@ -3,13 +3,13 @@ import logging
 import matplotlib.pyplot as plt
 
 from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
-from utils.plotters.PlotterABC import PlotterABC
+from utils.plotters.ScanPlotterABC import ScanPlotterABC
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 
-class ScanPlotterMPL(PlotterABC):
+class ScanScanPlotterMPL(ScanPlotterABC):
     """
-    Отрисовка скана в 3D через библиотеку matplotlib
+    Отрисовка скана в виде облака точек через библиотеку matplotlib
     """
     def __init__(self, sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT), point_size=5):
         super().__init__()
@@ -33,6 +33,11 @@ class ScanPlotterMPL(PlotterABC):
 
     @staticmethod
     def __calk_mpl_colors(plot_data):
+        """
+        пересчитывает данные цвета точек в формат для библиотеки matplotlib
+        :param plot_data: данные для которых нужно пересчитать цвета
+        :return: Список с цветами в формате для библиотеки matplotlib
+        """
         c_lst = []
         for point_color in plot_data["color"]:
             color = [color / 255.0 for color in point_color]
@@ -48,7 +53,7 @@ class ScanPlotterMPL(PlotterABC):
         self.__fig = plt.figure()
         self.__ax = self.__fig.add_subplot(projection="3d")
 
-        plot_data = self.sample_data(scan)
+        plot_data = self.get_sample_data(scan)
         c_lst = self.__calk_mpl_colors(plot_data)
         self.__set_plot_limits(self.calk_plot_limits(scan))
         self.__ax.scatter(plot_data["x"], plot_data["y"], plot_data["z"],

@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 
 from CONFIG import MAX_POINT_SCAN_PLOT
-from utils.plotters.ScanPlotterMPL import ScanPlotterMPL
+from utils.plotters.ScanPlotterMPL import ScanScanPlotterMPL
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 
 class ScanABC(ABC):
+    """Абстрактный класс скана"""
 
     def __init__(self, scan_name):
         self.id = None
@@ -29,5 +30,5 @@ class ScanABC(ABC):
     def __iter__(self):
         pass
 
-    def plot(self, plotter=ScanPlotterMPL(sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT))):
+    def plot(self, plotter=ScanScanPlotterMPL(sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT))):
         plotter.plot(self)

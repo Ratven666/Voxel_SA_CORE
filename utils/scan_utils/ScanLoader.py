@@ -9,6 +9,9 @@ from utils.start_db import Tables, engine
 
 
 class ScanLoader:
+    """
+    Класс, определяющий логику загрузки точек в БД
+    """
     __logger = logging.getLogger(LOGGER)
 
     def __init__(self, scan_parser=ScanTxtParser()):

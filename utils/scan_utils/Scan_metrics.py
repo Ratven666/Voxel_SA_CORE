@@ -5,6 +5,11 @@ from utils.start_db import engine, Tables
 
 
 def calk_scan_metrics(scan_id):
+    """
+    Рассчитывает метрики скана средствами SQL
+    :param scan_id: id скана для которого будет выполняться расчет метрик
+    :return: словарь с метриками скана
+    """
     with engine.connect() as db_connection:
         stmt = select(func.count(Tables.points_db_table.c.id).label("len"),
                       func.min(Tables.points_db_table.c.X).label("min_X"),
@@ -13,10 +18,10 @@ def calk_scan_metrics(scan_id):
                       func.max(Tables.points_db_table.c.Y).label("max_Y"),
                       func.min(Tables.points_db_table.c.Z).label("min_Z"),
                       func.max(Tables.points_db_table.c.Z).label("max_Z")).where(and_(
-            Tables.points_scans_db_table.c.point_id == Tables.points_db_table.c.id,
-            Tables.points_scans_db_table.c.scan_id == Tables.scans_db_table.c.id,
-            Tables.scans_db_table.c.id == scan_id
-        ))
+                               Tables.points_scans_db_table.c.point_id == Tables.points_db_table.c.id,
+                               Tables.points_scans_db_table.c.scan_id == Tables.scans_db_table.c.id,
+                               Tables.scans_db_table.c.id == scan_id
+                      ))
         scan_metrics = dict(db_connection.execute(stmt).mappings().first())
         scan_metrics["id"] = scan_id
         return scan_metrics
@@ -39,10 +44,10 @@ def update_scan_metrics(scan):
 
 def update_scan_in_db_from_scan_metrics(scan_metrics: dict):
     """
-        Обновляет значения метрик скана в БД
-        :param scan_metrics: Объект скана для которого обновляются метрики   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        :return:
-        """
+    Обновляет значения метрик скана в БД
+    :param scan_metrics: словарь с метриками скана
+    :return: None
+    """
     with engine.connect() as db_connection:
         stmt = update(Tables.scans_db_table) \
             .where(Tables.scans_db_table.c.id == scan_metrics["id"]) \
@@ -61,7 +66,7 @@ def update_scan_in_db_from_scan(updated_scan):
     """
     Обновляет значения метрик скана в БД
     :param updated_scan: Объект скана для которого обновляются метрики
-    :return:
+    :return: None
     """
     with engine.connect() as db_connection:
         stmt = update(Tables.scans_db_table) \
@@ -78,6 +83,13 @@ def update_scan_in_db_from_scan(updated_scan):
 
 
 def update_scan_borders(scan, point):
+    """
+    Проверяет положение в точки в существующих границах скана
+    и меняет их при выходе точки за их пределы
+    :param scan: скан
+    :param point: точка
+    :return: None
+    """
     if scan.min_X is None:
         scan.min_X, scan.max_X = point.X, point.X
         scan.min_Y, scan.max_Y = point.Y, point.Y

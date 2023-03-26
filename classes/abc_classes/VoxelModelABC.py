@@ -7,6 +7,8 @@ from utils.voxel_utils.voxel_model_plotters.Voxel_model_plotter import VoxelMode
 
 
 class VoxelModelABC(ABC):
+    """Абстрактный класс воксельной модели"""
+
     logger = logging.getLogger(LOGGER)
 
     def __init__(self, scan: ScanABC, step, is_2d_vxl_mdl=True):

@@ -1,14 +1,12 @@
 from sqlalchemy import select
 
-from classes.Point import Point
-from classes.VoxelDB import VoxelDB
 from classes.VoxelLite import VoxelLite
 from utils.start_db import engine, Tables
 
 
 class VMRawIterator:
     """
-    Универсальный иттератор для сканов из БД
+    Универсальный иттератор вокселльной модели из БД
     Реализован средствами sqlalchemy
     """
 

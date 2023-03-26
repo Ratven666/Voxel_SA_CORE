@@ -5,7 +5,7 @@ from utils.start_db import Tables, engine
 
 class ImportedFileDB:
     """
-    класс определяющий логику контроля повторной загрузки файла с данными
+    Класс определяющий логику контроля повторной загрузки файла с данными
     """
 
     def __init__(self, file_name):

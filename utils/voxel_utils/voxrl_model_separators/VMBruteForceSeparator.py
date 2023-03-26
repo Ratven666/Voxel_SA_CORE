@@ -12,31 +12,50 @@ from utils.voxel_utils.voxrl_model_separators.VMSeparatorABC import VMSeparatorA
 
 
 class VMBruteForceSeparator(VMSeparatorABC):
-
+    """Сепоратор воксельной модели через создание полной воксельной структуры"""
     def __init__(self):
         self.voxel_model = None
         self.voxel_structure = None
 
     def separate_voxel_model(self, voxel_model, scan):
+        """
+        Общая логика разбиения воксельной модели
+        :param voxel_model: воксельная модель
+        :param scan: скан
+        :return: None
+        1. Создается полная воксельная структура
+        2. Скан разбивается на отделььные воксели
+        3. Обновляет метрики сканов и вокселей, и удаляет пустые
+        """
         self.__create_full_vxl_struct(voxel_model)
         voxel_model.logger.info(f"Структура {voxel_model.vm_name} создана")
         self.__separate_scan_to_vxl(scan)
         voxel_model.logger.info(f"Разбиение скана {scan.scan_name} в {voxel_model.vm_name} законченно")
-        self.__calk_scan_metrics_in_voxels()
+        self.__update_scan_and_voxel_data_in_db()
         voxel_model.logger.info(f"Расчет метрик сканов завершен и загружен в БД")
 
     def __create_full_vxl_struct(self, voxel_model):
+        """
+        Создается полная воксельная структура с записью каждого вокселя в БД
+        :param voxel_model: воксельная модель
+        :return: None
+        """
         self.voxel_model = voxel_model
         self.voxel_structure = [[[VoxelDB(voxel_model.min_X + x * voxel_model.step,
-                                  voxel_model.min_Y + y * voxel_model.step,
-                                  voxel_model.min_Z + z * voxel_model.step,
-                                  voxel_model.step, voxel_model.id)
+                                          voxel_model.min_Y + y * voxel_model.step,
+                                          voxel_model.min_Z + z * voxel_model.step,
+                                          voxel_model.step, voxel_model.id)
                                 for x in range(voxel_model.X_count)]
                                 for y in range(voxel_model.Y_count)]
                                 for z in range(voxel_model.Z_count)]
         self.voxel_model.voxel_structure = self.voxel_structure
 
     def __separate_scan_to_vxl(self, scan):
+        """
+        Разбивает базовый скан но отдельные сканы внутри каждого вокселя
+        :param scan: базовый скан
+        :return: None
+        """
         self.__write_temp_points_scans_file(scan)
         with engine.connect() as db_connection:
             for data in self.__parse_temp_points_scans_file():
@@ -45,6 +64,13 @@ class VMBruteForceSeparator(VMSeparatorABC):
             db_connection.commit()
 
     def __write_temp_points_scans_file(self, scan):
+        """
+        Записывает временный файл, определяющий связь точек со сканом вокселя
+        :param scan: базовый скан
+        :return: None
+        Рассчитывает и записывает во временный файл пару id точки и скана в вокселе
+        Обновляет занчения метрик скана и вокселя в который попадает текущая точка
+        """
         with open("temp_file.txt", "w", encoding="UTF-8") as file:
             for point in scan:
                 vxl_md_X = int((point.X - self.voxel_model.min_X) // self.voxel_model.step)
@@ -61,11 +87,23 @@ class VMBruteForceSeparator(VMSeparatorABC):
 
     @staticmethod
     def __update_scan_data(scan, point):
+        """
+        Обновляет значения метрик скана (количество точек и границы)
+        :param scan: обновляемый скан
+        :param point: добавляемая в скан точка
+        :return: None
+        """
         scan.len += 1
         update_scan_borders(scan, point)
 
     @staticmethod
     def __update_voxel_data(voxel: VoxelDB, point):
+        """
+        Обновляет значения метрик вокселя (цвет и количество точек)
+        :param voxel: обновляемый воксель
+        :param point: точка, попавшая в воксель
+        :return:
+        """
         voxel.R = (voxel.R * voxel.len + point.R) / (voxel.len + 1)
         voxel.G = (voxel.G * voxel.len + point.G) / (voxel.len + 1)
         voxel.B = (voxel.B * voxel.len + point.B) / (voxel.len + 1)
@@ -73,6 +111,12 @@ class VMBruteForceSeparator(VMSeparatorABC):
 
     @staticmethod
     def __parse_temp_points_scans_file():
+        """
+        Читает временный файл, определяющий связь точек со сканом вокселя,
+        выдает пакетами данные для загрузки их в БД
+        в конце удаляет временный файл
+        :return: пакеты точек для загрузки в БД
+        """
         points_scans = []
         try:
             with open("temp_file.txt", "r", encoding="UTF-8") as file:
@@ -89,7 +133,12 @@ class VMBruteForceSeparator(VMSeparatorABC):
             except FileNotFoundError:
                 pass
 
-    def __calk_scan_metrics_in_voxels(self):
+    def __update_scan_and_voxel_data_in_db(self):
+        """
+        Обновляет значения метрик сканов и вокселей в БД
+        и удаляет из БД пустые сканы и вокскли
+        :return: None
+        """
         voxel_counter = 0
         for voxel in iter(VMFullBaseIterator(self.voxel_model)):
             if len(voxel) == 0:

@@ -5,11 +5,10 @@ from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 
-class PlotterABC(ABC):
+class ScanPlotterABC(ABC):
     """
-    Абстрактный класс плоттера данных
+    Абстрактный класс плоттера скана
     """
-
     logger = logging.getLogger(LOGGER)
 
     def __init__(self, sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT)):
@@ -44,7 +43,13 @@ class PlotterABC(ABC):
         z_lim = [((min_z + max_z) / 2) - length, ((min_z + max_z) / 2) + length]
         return {"X_lim": x_lim, "Y_lim": y_lim, "Z_lim": z_lim}
 
-    def sample_data(self, scan):
+    def get_sample_data(self, scan):
+        """
+        Запускает процедуру разряжения скана если задан атрибут __sampler
+        возвращает словарь с данными для визуализации разреженных данных
+        :param scan: скан, который требуется разрядить и подготовить к визуализации
+        :return: словарь с данными для визуализации
+        """
         if self.__sampler is not None:
             scan = self.__sampler.do_sampling(scan)
         x_lst, y_lst, z_lst, c_lst = [], [], [], []

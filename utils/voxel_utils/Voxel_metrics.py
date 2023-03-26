@@ -5,9 +5,9 @@ from utils.start_db import engine, Tables
 
 def update_voxel_in_db_from_voxel(updated_voxel):
     """
-    Обновляет значения метрик скана в БД
-    :param updated_scan: Объект скана для которого обновляются метрики
-    :return:
+    Обновляет значения метрик вокселя в БД
+    :param updated_voxel: Объект вокселя для которого обновляются метрики
+    :return: None
     """
     with engine.connect() as db_connection:
         stmt = update(Tables.voxels_db_table) \

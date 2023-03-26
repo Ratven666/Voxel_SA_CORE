@@ -3,6 +3,9 @@ from classes.abc_classes.VoxelABC import VoxelABC
 
 
 class VoxelLite(VoxelABC):
+    """
+    Воксель не связанный с базой данных
+    """
     __slots__ = ["id", "X", "Y", "Z", "step", "vxl_mdl_id", "vxl_name", "scan_id", "len", "R", "G", "B"]
 
     def __init__(self, X, Y, Z, step, vxl_mdl_id):

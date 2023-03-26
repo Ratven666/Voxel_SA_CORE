@@ -4,8 +4,6 @@ import os
 from sqlalchemy import create_engine, MetaData
 
 from CONFIG import DATABASE_NAME
-
-import utils.logs.console_log_config
 import db_models
 
 path = os.path.join("data_bases", DATABASE_NAME)
@@ -20,6 +18,10 @@ logger = logging.getLogger("console")
 
 
 def create_db():
+    """
+    Создает базу данных при ее отстутсвии
+    :return: None
+    """
     db_is_created = os.path.exists(path)
     if not db_is_created:
         db_metadata.create_all(engine)

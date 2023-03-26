@@ -18,6 +18,13 @@ class ScanTxtParser(ScanParserABC):
         self.__last_point_id = None
 
     def parse(self, file_name=FILE_NAME):
+        """
+        Запускает процедуру парсинга файла и возвращает списки словарей с данными для загрузки в БД
+        размером не превышающим POINTS_CHUNK_COUNT
+        При запуске выполняется процедурка проверки расширения файла
+        :param file_name: путь до файла из которго будут загружаться данные
+        :return: список точек готовый к загрузке в БД
+        """
         self._check_file_extension(file_name, self.__supported_file_extension__)
         self.__last_point_id = self._get_last_point_id()
 

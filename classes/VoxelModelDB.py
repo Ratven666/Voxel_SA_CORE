@@ -8,6 +8,9 @@ from utils.voxel_utils.voxrl_model_separators.VMBruteForceSeparator import VMBru
 
 
 class VoxelModelDB(VoxelModelABC):
+    """
+    Воксельная модель связанная с базой данных
+    """
 
     def __init__(self, scan: ScanABC, step, is_2d_vxl_mdl=True, voxel_model_separator=VMBruteForceSeparator()):
         super().__init__(scan, step, is_2d_vxl_mdl)
@@ -19,6 +22,13 @@ class VoxelModelDB(VoxelModelABC):
         return iter(VMRawIterator(self))
 
     def __init_vxl_mdl(self, scan):
+        """
+        Инициализирует воксельную модель при запуске
+        Если воксельная модеьл с таким именем уже есть в БД - запускает копирование данных из БД в атрибуты модели
+        Если такой воксельной модели нет - создает новую запись в БД и запускает процедуру рабиения скана на воксели
+        по логике переданного в конструкторе воксельной модели разделителя voxel_model_separator
+        :return: None
+        """
         select_ = select(Tables.voxel_models_db_table).where(Tables.voxel_models_db_table.c.vm_name == self.vm_name)
 
         with engine.connect() as db_connection:
@@ -49,6 +59,12 @@ class VoxelModelDB(VoxelModelABC):
                 self.voxel_model_separator.separate_voxel_model(self, scan)
 
     def __calc_vxl_md_metric(self, scan):
+        """
+        Рассчитывает границы воксельной модели и максимальное количество вокселей
+        исходя из размера вокселя и границ скана
+        :param scan: скан на основе которого рассчитываются границы модели
+        :return: None
+        """
         if len(scan) == 0:
             return None
         self.min_X = scan.min_X // self.step * self.step
@@ -68,6 +84,11 @@ class VoxelModelDB(VoxelModelABC):
         self.len = self.X_count * self.Y_count * self.Z_count
 
     def __copy_vm_data(self, db_vm_data: dict):
+        """
+        Копирует данные записи из БД в атрибуты вокселбной модели
+        :param db_vm_data: Результат запроса к БД
+        :return: None
+        """
         self.id = db_vm_data["id"]
         self.vm_name = db_vm_data["vm_name"]
         self.step = db_vm_data["step"]
