@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from CONFIG import MAX_POINT_SCAN_PLOT
-from utils.plotters.ScanPlotterMPL import ScanScanPlotterMPL
+from utils.scan_utils.scan_plotters.ScanPlotterMPL import ScanScanPlotterMPL
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 

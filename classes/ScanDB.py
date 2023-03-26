@@ -3,9 +3,9 @@ from sqlalchemy import select, insert, delete
 from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT
 from classes.abc_classes.ScanABC import ScanABC
 from utils.scan_utils.ScanLoader import ScanLoader
-from utils.parsers.ScanTxtParser import ScanTxtParser
 from utils.scan_utils.scan_iterators.ScanIterator import ScanIterator
-from utils.start_db import engine, Tables
+from utils.scan_utils.scan_parsers.ScanTxtParser import ScanTxtParser
+from utils.start_db import Tables, engine
 
 
 class ScanDB(ScanABC):

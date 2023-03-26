@@ -2,10 +2,10 @@ import logging
 
 from CONFIG import LOGGER
 from classes.ImportedFileDB import ImportedFileDB
-from utils.parsers.ScanParserABC import ScanParserABC
-from utils.parsers.ScanTxtParser import ScanTxtParser
 from utils.scan_utils.Scan_metrics import update_scan_metrics, update_scan_in_db_from_scan
-from utils.start_db import Tables, engine
+from utils.scan_utils.scan_parsers.ScanParserABC import ScanParserABC
+from utils.scan_utils.scan_parsers.ScanTxtParser import ScanTxtParser
+from utils.start_db import engine, Tables
 
 
 class ScanLoader:
@@ -35,7 +35,7 @@ class ScanLoader:
         imp_file = ImportedFileDB(file_name)
 
         if imp_file.is_file_already_imported_into_scan(scan):
-            self.__logger.warning(f"Файл \"{file_name}\" уже загружен в скан \"{scan.scan_name}\"")
+            self.__logger.info(f"Файл \"{file_name}\" уже загружен в скан \"{scan.scan_name}\"")
             return
 
         with engine.connect() as db_connection:

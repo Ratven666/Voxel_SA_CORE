@@ -1,9 +1,7 @@
-import logging
-
 import matplotlib.pyplot as plt
 
-from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
-from utils.plotters.ScanPlotterABC import ScanPlotterABC
+from CONFIG import MAX_POINT_SCAN_PLOT
+from utils.scan_utils.scan_plotters.ScanPlotterABC import ScanPlotterABC
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 

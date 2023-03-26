@@ -8,7 +8,7 @@ from utils.start_db import engine, Tables
 from utils.voxel_utils.Voxel_metrics import update_voxel_in_db_from_voxel
 from utils.voxel_utils.Voxel_model_metrics import update_voxel_model_in_db_from_voxel_model
 from utils.voxel_utils.voxel_model_iterators.VMFullBaseIterator import VMFullBaseIterator
-from utils.voxel_utils.voxrl_model_separators.VMSeparatorABC import VMSeparatorABC
+from utils.voxel_utils.voxel_model_separators.VMSeparatorABC import VMSeparatorABC
 
 
 class VMBruteForceSeparator(VMSeparatorABC):

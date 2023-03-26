@@ -1,7 +1,5 @@
-import logging
-
-from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT, LOGGER
-from utils.parsers.ScanParserABC import ScanParserABC
+from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT
+from utils.scan_utils.scan_parsers.ScanParserABC import ScanParserABC
 
 
 class ScanTxtParser(ScanParserABC):
