@@ -42,6 +42,7 @@ class ScanLoader:
             for points in self.__scan_parser.parse(file_name):
                 points_scans = self.__get_points_scans_list(scan, points)
                 self.__insert_to_db(points, points_scans, db_connection)
+                self.__logger.info(f"Пакет точек загружен в БД")
             db_connection.commit()
         scan = update_scan_metrics(scan)
         update_scan_in_db_from_scan(scan)

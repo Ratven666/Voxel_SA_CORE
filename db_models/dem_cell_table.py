@@ -1,0 +1,12 @@
+from sqlalchemy import Table, Column, Integer, String, Float, ForeignKey
+
+
+def create_dem_cell_db_table(metadata):
+    dem_cell_db_table = Table("dem_cells", metadata,
+                              Column("voxel_id", Integer,
+                                     ForeignKey("voxels.id", ondelete="CASCADE"),
+                                     primary_key=True),
+                              Column("Avr_Z", Float),
+                              Column("MSE", Float, default=None)
+                              )
+    return dem_cell_db_table
