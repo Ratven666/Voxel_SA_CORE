@@ -51,9 +51,9 @@ class PlaneModelDB(SegmentedModelABC):
         self.__calk_mse(base_scan)
 
     def __fit_planes(self, base_scan):
-        self.logger.info(f"Начат расчет элементов материцы нормальных коэфициентов завершен")
+        self.logger.info(f"Начат расчет элементов матрицы нормальных коэфициентов завершен")
         self.__calk_matrix_params(base_scan)
-        self.logger.info(f"Рассчет элементов материцы нормальных коэфициентов завершен")
+        self.logger.info(f"Рассчет элементов матрицы нормальных коэфициентов завершен")
         self.logger.info(f"Начат расчет параметров вписываемых плоскостей завершен")
         for cell in self._model_structure.values():
             m_a = np.array([[cell.a1, cell.b1, cell.c1],
@@ -108,7 +108,10 @@ class PlaneModelDB(SegmentedModelABC):
             if len(cell.voxel) <= 3:
                 cell.mse = None
             else:
-                cell.mse = (cell.vv / (len(cell.voxel) - 3)) ** 0.5
+                try:
+                    cell.mse = (cell.vv / (len(cell.voxel) - 3)) ** 0.5
+                except AttributeError:
+                    cell.mse = None
         self.logger.info(f"Расчет СКП высот завершен")
 
     def _copy_model_data(self, db_model_data: dict):

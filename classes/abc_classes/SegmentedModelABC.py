@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from CONFIG import LOGGER
 from utils.segmented_mdl_utils.segmented_models_iterators.SegmentedModelFilteredByVoxelLenIterator import \
     SegmentedModelFilteredByVoxelLenIterator
+from utils.segmented_mdl_utils.segmented_models_plotters.MsePlotterPlotly import MsePlotterPlotly
 
 
 class SegmentedModelABC(ABC):
@@ -21,7 +22,7 @@ class SegmentedModelABC(ABC):
 
     def __create_model_structure(self, element_class):
         for voxel in self.voxel_model:
-            model_key = f"{voxel.X}_{voxel.Y}_{voxel.Z}"
+            model_key = f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
             self._model_structure[model_key] = element_class(voxel)
 
     def get_model_element_for_point(self, point):
@@ -31,7 +32,7 @@ class SegmentedModelABC(ABC):
             Z = point.Z // self.voxel_model.step * self.voxel_model.step
         else:
             Z = self.voxel_model.min_Z
-        model_key = f"{X}_{Y}_{Z}"
+        model_key = f"{X:.5f}_{Y:.5f}_{Z:.5f}"
         return self._model_structure[model_key]
 
     @abstractmethod
@@ -41,6 +42,9 @@ class SegmentedModelABC(ABC):
     @abstractmethod
     def plot(self, plotter):
         pass
+
+    def plot_mse(self, plotter=MsePlotterPlotly()):
+        plotter.plot(self)
 
     @abstractmethod
     def _copy_model_data(self, db_model_data: dict):
