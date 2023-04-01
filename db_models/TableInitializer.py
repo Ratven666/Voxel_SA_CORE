@@ -3,6 +3,8 @@ from threading import Lock
 from db_models.dem_cell_table import create_dem_cell_db_table
 from db_models.dem_models_table import create_dem_models_db_table
 from db_models.imported_files_table import create_imported_files_table
+from db_models.plane_cell_table import create_plane_cell_db_table
+from db_models.plane_models_table import create_plane_models_db_table
 from db_models.points_scans_table import create_points_scans_db_table
 from db_models.points_table import create_points_db_table
 from db_models.scans_table import create_scans_db_table
@@ -37,3 +39,5 @@ class TableInitializer(metaclass=SingletonMeta):
         self.voxels_db_table = create_voxels_db_table(self.__db_metadata)
         self.dem_models_db_table = create_dem_models_db_table(self.__db_metadata)
         self.dem_cell_db_table = create_dem_cell_db_table(self.__db_metadata)
+        self.plane_models_db_table = create_plane_models_db_table(self.__db_metadata)
+        self.plane_cell_db_table = create_plane_cell_db_table(self.__db_metadata)

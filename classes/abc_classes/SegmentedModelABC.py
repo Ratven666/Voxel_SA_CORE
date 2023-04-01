@@ -2,16 +2,22 @@ import logging
 from abc import ABC, abstractmethod
 
 from CONFIG import LOGGER
+from utils.segmented_mdl_utils.segmented_models_iterators.SegmentedModelFilteredByVoxelLenIterator import \
+    SegmentedModelFilteredByVoxelLenIterator
 
 
 class SegmentedModelABC(ABC):
 
     logger = logging.getLogger(LOGGER)
 
-    def __init__(self, voxel_model, element_class):
+    def __init__(self, voxel_model, element_class, min_voxel_len=0):
         self.voxel_model = voxel_model
         self._model_structure = {}
+        self.min_voxel_len = min_voxel_len
         self.__create_model_structure(element_class)
+
+    def __iter__(self):
+        return SegmentedModelFilteredByVoxelLenIterator(self)
 
     def __create_model_structure(self, element_class):
         for voxel in self.voxel_model:
@@ -35,3 +41,15 @@ class SegmentedModelABC(ABC):
     @abstractmethod
     def plot(self, plotter):
         pass
+
+    @abstractmethod
+    def _copy_model_data(self, db_model_data: dict):
+        pass
+
+    def _load_cell_data_from_db(self, db_connection):
+        for cell in self._model_structure.values():
+            cell._load_cell_data_from_db(db_connection)
+
+    def _save_cell_data_in_db(self, db_connection):
+        for cell in self._model_structure.values():
+            cell._save_cell_data_in_db(db_connection)

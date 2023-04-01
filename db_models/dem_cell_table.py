@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Table, Column, Integer, Float, ForeignKey
 
 
 def create_dem_cell_db_table(metadata):
