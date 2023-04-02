@@ -1,5 +1,5 @@
 
-DATABASE_NAME = "Kucha.sqlite"
+DATABASE_NAME = "K.sqlite"
 
 FILE_NAME = "src/KuchaRGB.txt"
 

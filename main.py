@@ -1,3 +1,4 @@
+from classes.BiModelDB import BiModelDB
 from classes.DemModelDB import DemModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.VoxelModelDB import VoxelModelDB
@@ -23,7 +24,7 @@ def main():
     scan.load_scan_from_file()
     print(scan)
 
-    vm = VoxelModelDB(scan, 0.5, is_2d_vxl_mdl=True,
+    vm = VoxelModelDB(scan, 0.1, is_2d_vxl_mdl=True,
                       voxel_model_separator=VMBruteForceSeparatorWithoutVoxelScansPoints())
     print(vm)
 
@@ -31,14 +32,19 @@ def main():
     # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(10_000)))
     # scan.plot()
     # vm.plot(VoxelModelPlotter())
-    dem_model = DemModelDB(vm, min_voxel_len=1000)
-    plane_model = PlaneModelDB(vm, min_voxel_len=1000)
-    # print(dem_model)
+    dem_model = DemModelDB(vm, min_voxel_len=1)
+    plane_model = PlaneModelDB(vm, min_voxel_len=1)
+    bi_dem_model = BiModelDB(dem_model, min_voxel_len=1)
+    bi_plane_model = BiModelDB(plane_model, min_voxel_len=1)
 
 
     dem_model.plot_mse()
+    bi_dem_model.plot_mse()
+    bi_plane_model.plot_mse()
     plane_model.plot_mse()
 
+    bi_dem_model.plot()
+    bi_plane_model.plot()
     dem_model.plot(plotter=SegmentModelPlotly())
     plane_model.plot(plotter=SegmentModelPlotly())
     # plane_model.plot()

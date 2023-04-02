@@ -1,9 +1,10 @@
 from sqlalchemy import select, insert
 
+from classes.abc_classes.CellABC import CellABC
 from utils.start_db import Tables
 
 
-class DemCellDB:
+class DemCellDB(CellABC):
 
     def __init__(self, voxel):
         self.voxel = voxel
@@ -23,7 +24,7 @@ class DemCellDB:
                  .where(Tables.dem_cell_db_table.c.voxel_id == self.voxel.id)
         db_dem_cell_data = db_connection.execute(select_).mappings().first()
         if db_dem_cell_data is not None:
-            self._copy_dem_cell_data(db_dem_cell_data)
+            self._copy_cell_data(db_dem_cell_data)
 
     def _save_cell_data_in_db(self, db_connection):
         stmt = insert(Tables.dem_cell_db_table).values(voxel_id=self.voxel.id,
@@ -32,7 +33,7 @@ class DemCellDB:
                                                        )
         db_connection.execute(stmt)
 
-    def _copy_dem_cell_data(self, db_dem_cell_data):
+    def _copy_cell_data(self, db_dem_cell_data):
         self.voxel_id = db_dem_cell_data["voxel_id"]
         self.avr_z = db_dem_cell_data["Avr_Z"]
         self.mse = db_dem_cell_data["MSE"]

@@ -1,5 +1,7 @@
 from threading import Lock
 
+from db_models.bi_cell_table import create_bi_cell_db_table
+from db_models.bi_models_table import create_bi_models_db_table
 from db_models.dem_cell_table import create_dem_cell_db_table
 from db_models.dem_models_table import create_dem_models_db_table
 from db_models.imported_files_table import create_imported_files_table
@@ -41,3 +43,6 @@ class TableInitializer(metaclass=SingletonMeta):
         self.dem_cell_db_table = create_dem_cell_db_table(self.__db_metadata)
         self.plane_models_db_table = create_plane_models_db_table(self.__db_metadata)
         self.plane_cell_db_table = create_plane_cell_db_table(self.__db_metadata)
+        self.bi_models_db_table = create_bi_models_db_table(self.__db_metadata)
+        self.bi_cell_db_table = create_bi_cell_db_table(self.__db_metadata)
+
