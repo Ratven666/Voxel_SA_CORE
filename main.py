@@ -4,6 +4,7 @@ from classes.VoxelModelDB import VoxelModelDB
 from utils.logs.console_log_config import console_logger
 from utils.scan_utils.scan_plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly, ScanPlotterMeshPlotly
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
+from utils.segmented_mdl_utils.segmented_models_plotters.SegmentModelPlotly import SegmentModelPlotly
 
 from utils.start_db import create_db
 
@@ -31,13 +32,15 @@ def main():
     # scan.plot()
     # vm.plot(VoxelModelPlotter())
     dem_model = DemModelDB(vm, min_voxel_len=1000)
-    plane_model = PlaneModelDB(vm, min_voxel_len=1)
+    plane_model = PlaneModelDB(vm, min_voxel_len=1000)
     # print(dem_model)
 
 
     dem_model.plot_mse()
+    plane_model.plot_mse()
 
-    dem_model.plot()
+    dem_model.plot(plotter=SegmentModelPlotly())
+    plane_model.plot(plotter=SegmentModelPlotly())
     # plane_model.plot()
 
 if __name__ == "__main__":

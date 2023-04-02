@@ -4,7 +4,6 @@ import numpy as np
 from classes.PlaneCellDB import PlaneCellDB
 from classes.ScanDB import ScanDB
 from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
-from utils.segmented_mdl_utils.segmented_models_plotters.PlaneModelPlotterMPL import PlaneModelPlotterMPL
 from utils.start_db import Tables, engine
 
 
@@ -19,9 +18,6 @@ class PlaneModelDB(SegmentedModelABC):
         self.model_name = f"PLANE_from_{self.voxel_model.vm_name}"
         self.mse_data = None
         self.__init_plane_mdl()
-
-    def plot(self, plotter=PlaneModelPlotterMPL()):
-        plotter.plot(self)
 
     def __init_plane_mdl(self):
         select_ = select(Tables.plane_models_db_table) \

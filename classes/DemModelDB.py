@@ -15,12 +15,9 @@ class DemModelDB(SegmentedModelABC):
     def __init__(self, voxel_model, min_voxel_len=1):
         super().__init__(voxel_model, DemCellDB, min_voxel_len)
         self.base_voxel_model_id = voxel_model.id
-        self.dem_model_name = f"DEM_from_{self.voxel_model.vm_name}"
+        self.model_name = f"DEM_from_{self.voxel_model.vm_name}"
         self.mse_data = None
         self.__init_dem_mdl()
-
-    def plot(self, plotter=DemModelPlotterMPL()):
-        plotter.plot(self)
 
     def __init_dem_mdl(self):
         select_ = select(Tables.dem_models_db_table) \
@@ -34,7 +31,7 @@ class DemModelDB(SegmentedModelABC):
                 self.logger.info(f"Загрузка DEM модели завершена")
             else:
                 stmt = insert(Tables.dem_models_db_table).values(base_voxel_model_id=self.voxel_model.id,
-                                                                 dem_model_name=self.dem_model_name,
+                                                                 dem_model_name=self.model_name,
                                                                  MSE_data=self.mse_data
                                                                  )
                 db_connection.execute(stmt)
@@ -76,5 +73,5 @@ class DemModelDB(SegmentedModelABC):
 
     def _copy_model_data(self, db_model_data: dict):
         self.base_voxel_model_id = db_model_data["base_voxel_model_id"]
-        self.dem_model_name = db_model_data["dem_model_name"]
+        self.model_name = db_model_data["dem_model_name"]
         self.mse_data = db_model_data["MSE_data"]

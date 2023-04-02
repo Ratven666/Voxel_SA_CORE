@@ -11,12 +11,19 @@ class DemCellDB:
         self.avr_z = 0
         self.mse = 0
 
+    def get_z_from_xy(self, x, y):
+        try:
+            z = self.avr_z
+        except TypeError:
+            z = None
+        return z
+
     def _load_cell_data_from_db(self, db_connection):
         select_ = select(Tables.dem_cell_db_table) \
                  .where(Tables.dem_cell_db_table.c.voxel_id == self.voxel.id)
         db_dem_cell_data = db_connection.execute(select_).mappings().first()
         if db_dem_cell_data is not None:
-            self.__copy_dem_cell_data(db_dem_cell_data)
+            self._copy_dem_cell_data(db_dem_cell_data)
 
     def _save_cell_data_in_db(self, db_connection):
         stmt = insert(Tables.dem_cell_db_table).values(voxel_id=self.voxel.id,
@@ -25,7 +32,7 @@ class DemCellDB:
                                                        )
         db_connection.execute(stmt)
 
-    def __copy_dem_cell_data(self, db_dem_cell_data):
+    def _copy_dem_cell_data(self, db_dem_cell_data):
         self.voxel_id = db_dem_cell_data["voxel_id"]
         self.avr_z = db_dem_cell_data["Avr_Z"]
         self.mse = db_dem_cell_data["MSE"]

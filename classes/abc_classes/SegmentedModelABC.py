@@ -5,6 +5,7 @@ from CONFIG import LOGGER
 from utils.segmented_mdl_utils.segmented_models_iterators.SegmentedModelFilteredByVoxelLenIterator import \
     SegmentedModelFilteredByVoxelLenIterator
 from utils.segmented_mdl_utils.segmented_models_plotters.MsePlotterPlotly import MsePlotterPlotly
+from utils.segmented_mdl_utils.segmented_models_plotters.SegmentModelPlotly import SegmentModelPlotly
 
 
 class SegmentedModelABC(ABC):
@@ -39,9 +40,8 @@ class SegmentedModelABC(ABC):
     def _calk_segment_model(self):
         pass
 
-    @abstractmethod
-    def plot(self, plotter):
-        pass
+    def plot(self, plotter=SegmentModelPlotly()):
+        plotter.plot(self)
 
     def plot_mse(self, plotter=MsePlotterPlotly()):
         plotter.plot(self)
