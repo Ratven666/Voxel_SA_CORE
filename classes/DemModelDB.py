@@ -12,8 +12,8 @@ class DemModelDB(SegmentedModelABC):
     """
     db_table = Tables.dem_models_db_table
 
-    def __init__(self, voxel_model, min_voxel_len=1):
-        super().__init__(voxel_model, DemCellDB, min_voxel_len)
+    def __init__(self, voxel_model):
+        super().__init__(voxel_model, DemCellDB)
         self.model_name = f"DEM_from_{self.voxel_model.vm_name}"
         self.mse_data = None
         self.__init_dem_mdl()
@@ -35,11 +35,12 @@ class DemModelDB(SegmentedModelABC):
                                                     )
                 db_connection.execute(stmt)
                 db_connection.commit()
+                self.id = self._get_last_model_id()
                 self._calk_segment_model()
+                self._calk_model_mse(db_connection)
                 self._save_cell_data_in_db(db_connection)
                 db_connection.commit()
                 self.logger.info(f"Расчет DEM модели завершен и загружен в БД")
-                self.id = self._get_last_model_id()
 
     def _calk_segment_model(self):
         base_scan = ScanDB.get_scan_from_id(self.voxel_model.base_scan_id)
@@ -66,11 +67,9 @@ class DemModelDB(SegmentedModelABC):
                 dem_cell.vv += (point.Z - dem_cell.avr_z) ** 2
             except AttributeError:
                 dem_cell.vv = (point.Z - dem_cell.avr_z) ** 2
-        for dem_cell in self._model_structure.values():
-            try:
-                dem_cell.mse = (dem_cell.vv / (dem_cell.len - 1)) ** 0.5
-            except ZeroDivisionError:
-                dem_cell.mse = None
+        for dem_cell in self:
+            if dem_cell.r > 0:
+                dem_cell.mse = (dem_cell.vv / dem_cell.r) ** 0.5
         self.logger.info(f"Расчет СКП высот завершен")
 
     def _copy_model_data(self, db_model_data: dict):

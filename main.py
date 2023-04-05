@@ -18,36 +18,38 @@ from utils.voxel_utils.voxel_model_separators.VMBruteForceSeparatorWithoutVoxelS
 def main():
     create_db()
 
-    scan = ScanDB("Tank")
+    scan = ScanDB("Etna")
     print(scan)
 
     scan.load_scan_from_file()
-    print(scan)
 
-    vm = VoxelModelDB(scan, 0.1, is_2d_vxl_mdl=True,
+    # scan.plot()
+    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=TotalPointCountScanSampler(100_000)))
+    # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(20_000)))
+
+    vm = VoxelModelDB(scan, 100, is_2d_vxl_mdl=True,
                       voxel_model_separator=VMBruteForceSeparatorWithoutVoxelScansPoints())
     print(vm)
 
-    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=TotalPointCountScanSampler(50_000)))
-    # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(10_000)))
-    # scan.plot()
     # vm.plot(VoxelModelPlotter())
-    dem_model = DemModelDB(vm, min_voxel_len=1)
-    plane_model = PlaneModelDB(vm, min_voxel_len=1)
-    bi_dem_model = BiModelDB(dem_model, min_voxel_len=1)
-    bi_plane_model = BiModelDB(plane_model, min_voxel_len=1)
 
-
-    dem_model.plot_mse()
-    bi_dem_model.plot_mse()
-    bi_plane_model.plot_mse()
-    plane_model.plot_mse()
-
-    bi_dem_model.plot()
-    bi_plane_model.plot()
-    dem_model.plot(plotter=SegmentModelPlotly())
-    plane_model.plot(plotter=SegmentModelPlotly())
+    dem_model = DemModelDB(vm)
+    plane_model = PlaneModelDB(vm)
+    bi_dem_model = BiModelDB(dem_model)
+    bi_plane_model = BiModelDB(plane_model)
+    #
+    #
+    # dem_model.plot_mse()
+    # bi_dem_model.plot_mse()
+    # plane_model.plot_mse()
+    # bi_plane_model.plot_mse()
+    #
+    # dem_model.plot(plotter=SegmentModelPlotly())
     # plane_model.plot()
+    # bi_dem_model.plot()
+    bi_plane_model.plot()
+
+
 
 if __name__ == "__main__":
     main()

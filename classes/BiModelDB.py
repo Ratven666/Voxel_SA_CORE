@@ -13,9 +13,9 @@ class BiModelDB(SegmentedModelABC):
     """
     db_table = Tables.bi_models_db_table
 
-    def __init__(self, segment_model, min_voxel_len=1):
+    def __init__(self, segment_model):
         self.segment_model = segment_model
-        super().__init__(segment_model.voxel_model, BiCellDB, min_voxel_len)
+        super().__init__(segment_model.voxel_model, BiCellDB)
         self.model_name = f"BI_from_{self.segment_model.model_name}"
         self.mse_data = None
         self.__init_bi_mdl()
@@ -40,6 +40,7 @@ class BiModelDB(SegmentedModelABC):
                 db_connection.commit()
                 self.id = self._get_last_model_id()
                 self._calk_segment_model()
+                self._calk_model_mse(db_connection)
                 self._save_cell_data_in_db(db_connection)
                 db_connection.commit()
                 self.logger.info(f"Расчет BI модели завершен и загружен в БД")
@@ -122,18 +123,19 @@ class BiModelDB(SegmentedModelABC):
             try:
                 cell = self.get_model_element_for_point(point)
                 cell_z = cell.get_z_from_xy(point.X, point.Y)
+                if cell_z is None:
+                    continue
             except AttributeError:
                 continue
             try:
                 cell.vv += (point.Z - cell_z) ** 2
             except AttributeError:
                 cell.vv = (point.Z - cell_z) ** 2
+
         for cell in self._model_structure.values():
-            if len(cell.voxel) <= 4:
-                cell.mse = None
-            else:
+            if cell.r > 0:
                 try:
-                    cell.mse = (cell.vv / (len(cell.voxel) - 4)) ** 0.5
+                    cell.mse = (cell.vv / cell.r) ** 0.5
                 except AttributeError:
                     cell.mse = None
         self.logger.info(f"Расчет СКП высот завершен")

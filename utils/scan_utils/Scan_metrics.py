@@ -62,22 +62,27 @@ def update_scan_in_db_from_scan_metrics(scan_metrics: dict):
         db_connection.commit()
 
 
-def update_scan_in_db_from_scan(updated_scan):
+def update_scan_in_db_from_scan(updated_scan, db_connection=None):
     """
     Обновляет значения метрик скана в БД
     :param updated_scan: Объект скана для которого обновляются метрики
+    :param db_connection: Открытое соединение с БД
     :return: None
     """
-    with engine.connect() as db_connection:
-        stmt = update(Tables.scans_db_table) \
-            .where(Tables.scans_db_table.c.id == updated_scan.id) \
-            .values(len=updated_scan.len,
-                    min_X=updated_scan.min_X,
-                    max_X=updated_scan.max_X,
-                    min_Y=updated_scan.min_Y,
-                    max_Y=updated_scan.max_Y,
-                    min_Z=updated_scan.min_Z,
-                    max_Z=updated_scan.max_Z)
+    stmt = update(Tables.scans_db_table) \
+        .where(Tables.scans_db_table.c.id == updated_scan.id) \
+        .values(len=updated_scan.len,
+                min_X=updated_scan.min_X,
+                max_X=updated_scan.max_X,
+                min_Y=updated_scan.min_Y,
+                max_Y=updated_scan.max_Y,
+                min_Z=updated_scan.min_Z,
+                max_Z=updated_scan.max_Z)
+    if db_connection is None:
+        with engine.connect() as db_connection:
+            db_connection.execute(stmt)
+            db_connection.commit()
+    else:
         db_connection.execute(stmt)
         db_connection.commit()
 

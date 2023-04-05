@@ -17,6 +17,7 @@ def create_bi_cell_db_table(metadata):
                              Column("MSE_lu", Float),
                              Column("MSE_rd", Float),
                              Column("MSE_ru", Float),
+                             Column("r", Integer),
                              Column("MSE", Float, default=None)
                              )
     return bi_cell_db_table

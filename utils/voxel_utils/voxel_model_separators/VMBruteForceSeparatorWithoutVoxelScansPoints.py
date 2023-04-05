@@ -1,6 +1,7 @@
 from classes.ScanDB import ScanDB
 from classes.VoxelDB import VoxelDB
 from utils.scan_utils.Scan_metrics import update_scan_borders, update_scan_in_db_from_scan
+from utils.start_db import engine
 from utils.voxel_utils.Voxel_metrics import update_voxel_in_db_from_voxel
 from utils.voxel_utils.Voxel_model_metrics import update_voxel_model_in_db_from_voxel_model
 from utils.voxel_utils.voxel_model_iterators.VMFullBaseIterator import VMFullBaseIterator
@@ -41,13 +42,14 @@ class VMBruteForceSeparatorWithoutVoxelScansPoints(VMSeparatorABC):
         :return: None
         """
         self.voxel_model = voxel_model
-        self.voxel_structure = [[[VoxelDB(voxel_model.min_X + x * voxel_model.step,
-                                          voxel_model.min_Y + y * voxel_model.step,
-                                          voxel_model.min_Z + z * voxel_model.step,
-                                          voxel_model.step, voxel_model.id)
-                                  for x in range(voxel_model.X_count)]
-                                 for y in range(voxel_model.Y_count)]
-                                for z in range(voxel_model.Z_count)]
+        with engine.connect() as db_connection:
+            self.voxel_structure = [[[VoxelDB(voxel_model.min_X + x * voxel_model.step,
+                                              voxel_model.min_Y + y * voxel_model.step,
+                                              voxel_model.min_Z + z * voxel_model.step,
+                                              voxel_model.step, voxel_model.id, db_connection)
+                                      for x in range(voxel_model.X_count)]
+                                     for y in range(voxel_model.Y_count)]
+                                    for z in range(voxel_model.Z_count)]
         self.voxel_model.voxel_structure = self.voxel_structure
 
     def __update_scan_and_voxel_data(self, scan):
@@ -93,13 +95,14 @@ class VMBruteForceSeparatorWithoutVoxelScansPoints(VMSeparatorABC):
         :return: None
         """
         voxel_counter = 0
-        for voxel in iter(VMFullBaseIterator(self.voxel_model)):
-            if len(voxel) == 0:
-                VoxelDB.delete_voxel(voxel.id)
-                ScanDB.delete_scan(voxel.scan_id)
-            else:
-                update_scan_in_db_from_scan(voxel.scan)
-                update_voxel_in_db_from_voxel(voxel)
-                voxel_counter += 1
-        self.voxel_model.len = voxel_counter
-        update_voxel_model_in_db_from_voxel_model(self.voxel_model)
+        with engine.connect() as db_connection:
+            for voxel in iter(VMFullBaseIterator(self.voxel_model)):
+                if len(voxel) == 0:
+                    VoxelDB.delete_voxel(voxel.id, db_connection)
+                    ScanDB.delete_scan(voxel.scan_id, db_connection)
+                else:
+                    update_scan_in_db_from_scan(voxel.scan, db_connection)
+                    update_voxel_in_db_from_voxel(voxel, db_connection)
+                    voxel_counter += 1
+            self.voxel_model.len = voxel_counter
+            update_voxel_model_in_db_from_voxel_model(self.voxel_model, db_connection)

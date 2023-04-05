@@ -13,8 +13,8 @@ class PlaneModelDB(SegmentedModelABC):
     """
     db_table = Tables.plane_models_db_table
 
-    def __init__(self, voxel_model, min_voxel_len=3):
-        super().__init__(voxel_model, PlaneCellDB, min_voxel_len=min_voxel_len)
+    def __init__(self, voxel_model):
+        super().__init__(voxel_model, PlaneCellDB)
         self.model_name = f"PLANE_from_{self.voxel_model.vm_name}"
         self.mse_data = None
         self.__init_plane_mdl()
@@ -36,11 +36,12 @@ class PlaneModelDB(SegmentedModelABC):
                                                     )
                 db_connection.execute(stmt)
                 db_connection.commit()
+                self.id = self._get_last_model_id()
                 self._calk_segment_model()
+                self._calk_model_mse(db_connection)
                 self._save_cell_data_in_db(db_connection)
                 db_connection.commit()
                 self.logger.info(f"Расчет PLANE модели завершен и загружен в БД")
-                self.id = self._get_last_model_id()
 
     def _calk_segment_model(self):
         base_scan = ScanDB.get_scan_from_id(self.voxel_model.base_scan_id)
@@ -52,14 +53,18 @@ class PlaneModelDB(SegmentedModelABC):
         self.__calk_matrix_params(base_scan)
         self.logger.info(f"Рассчет элементов матрицы нормальных коэфициентов завершен")
         self.logger.info(f"Начат расчет параметров вписываемых плоскостей завершен")
-        for cell in self._model_structure.values():
-            m_a = np.array([[cell.a1, cell.b1, cell.c1],
-                            [cell.b1, cell.b2, cell.c2],
-                            [cell.c1, cell.c2, cell.c3]])
-            m_d = np.array([cell.d1, cell.d2, cell.d3])
+        for cell in self:
+            try:
+                m_a = np.array([[cell.a1, cell.b1, cell.c1],
+                                [cell.b1, cell.b2, cell.c2],
+                                [cell.c1, cell.c2, cell.c3]])
+                m_d = np.array([cell.d1, cell.d2, cell.d3])
+            except AttributeError:
+                continue
             try:
                 abc = np.linalg.solve(m_a, m_d)
             except np.linalg.LinAlgError:
+                cell.r = -1
                 continue
             cell.a = float(abc[0])
             cell.b = float(abc[1])
@@ -93,22 +98,16 @@ class PlaneModelDB(SegmentedModelABC):
     def __calk_mse(self, base_scan):
         for point in base_scan:
             cell = self.get_model_element_for_point(point)
-            try:
-                cell_z = cell.a * point.X + cell.b * point.Y + cell.d
-            except TypeError:
+            cell_z = cell.get_z_from_xy(point.X, point.Y)
+            if cell_z is None:
                 continue
             try:
                 cell.vv += (point.Z - cell_z) ** 2
             except AttributeError:
                 cell.vv = (point.Z - cell_z) ** 2
         for cell in self._model_structure.values():
-            if len(cell.voxel) <= 3:
-                cell.mse = None
-            else:
-                try:
-                    cell.mse = (cell.vv / (len(cell.voxel) - 3)) ** 0.5
-                except AttributeError:
-                    cell.mse = None
+            if cell.r > 0:
+                cell.mse = (cell.vv / cell.r) ** 0.5
         self.logger.info(f"Расчет СКП высот завершен")
 
     def _copy_model_data(self, db_model_data: dict):

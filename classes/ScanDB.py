@@ -14,23 +14,28 @@ class ScanDB(ScanABC):
     Точки при переборе скана берутся напрямую из БД
     """
 
-    def __init__(self, scan_name):
+    def __init__(self, scan_name, db_connection=None):
         super().__init__(scan_name)
-        self.__init_scan()
+        self.__init_scan(db_connection)
 
     def __iter__(self):
         """Иттератор скана берет точки из БД"""
         return iter(ScanIterator(self))
 
     @staticmethod
-    def delete_scan(scan_id):
+    def delete_scan(scan_id, db_connection=None):
         """
         Удаляет запись скана из БД
         :param scan_id: id скана который требуется удалить из БД
+        :param db_connection: Открытое соединение с БД
         :return: None
         """
-        with engine.connect() as db_connection:
-            stmt = delete(Tables.scans_db_table).where(Tables.scans_db_table.c.id == scan_id)
+        stmt = delete(Tables.scans_db_table).where(Tables.scans_db_table.c.id == scan_id)
+        if db_connection is None:
+            with engine.connect() as db_connection:
+                db_connection.execute(stmt)
+                db_connection.commit()
+        else:
             db_connection.execute(stmt)
             db_connection.commit()
 
@@ -64,24 +69,30 @@ class ScanDB(ScanABC):
             else:
                 raise ValueError("Нет скана с таким id!!!")
 
-    def __init_scan(self):
+    def __init_scan(self, db_connection=None):
         """
         Инициализирует скан при запуске
         Если скан с таким именем уже есть в БД - запускает копирование данных из БД в атрибуты скана
         Если такого скана нет - создает новую запись в БД
+        :param db_connection: Открытое соединение с БД
         :return: None
         """
-        select_ = select(Tables.scans_db_table).where(Tables.scans_db_table.c.scan_name == self.scan_name)
-
-        with engine.connect() as db_connection:
-            db_scan_data = db_connection.execute(select_).mappings().first()
+        def init_logic(db_conn):
+            select_ = select(Tables.scans_db_table).where(Tables.scans_db_table.c.scan_name == self.scan_name)
+            db_scan_data = db_conn.execute(select_).mappings().first()
             if db_scan_data is not None:
                 self.__copy_scan_data(db_scan_data)
             else:
                 stmt = insert(Tables.scans_db_table).values(scan_name=self.scan_name)
-                db_connection.execute(stmt)
-                db_connection.commit()
-                self.__init_scan()
+                db_conn.execute(stmt)
+                db_conn.commit()
+                self.__init_scan(db_conn)
+
+        if db_connection is None:
+            with engine.connect() as db_connection:
+                init_logic(db_connection)
+        else:
+            init_logic(db_connection)
 
     def __copy_scan_data(self, db_scan_data: dict):
         """

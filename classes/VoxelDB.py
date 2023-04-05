@@ -12,39 +12,44 @@ class VoxelDB(VoxelABC):
 
     __slots__ = ["id", "X", "Y", "Z", "step", "vxl_mdl_id", "vxl_name", "scan_id", "len", "R", "G", "B", "scan"]
 
-    def __init__(self, X, Y, Z, step, vxl_mdl_id):
+    def __init__(self, X, Y, Z, step, vxl_mdl_id, db_connection=None):
         super().__init__(X, Y, Z, step, vxl_mdl_id)
         self.scan = None
-        self.__init_voxel()
+        self.__init_voxel(db_connection)
 
     @staticmethod
-    def delete_voxel(voxel_id):
+    def delete_voxel(voxel_id, db_connection=None):
         """
         Удаляет запись вокселя из БД
         :param voxel_id: id вокселя который требуется удалить из БД
+        :param db_connection: Открытое соединение с БД
         :return: None
         """
-        with engine.connect() as db_connection:
-            stmt = delete(Tables.voxels_db_table).where(Tables.voxels_db_table.c.id == voxel_id)
+        stmt = delete(Tables.voxels_db_table).where(Tables.voxels_db_table.c.id == voxel_id)
+        if db_connection is None:
+            with engine.connect() as db_connection:
+                db_connection.execute(stmt)
+                db_connection.commit()
+        else:
             db_connection.execute(stmt)
             db_connection.commit()
 
-    def __init_voxel(self):
+    def __init_voxel(self, db_connection=None):
         """
         Инициализирует воксель при запуске
         Если воксель с таким именем уже есть в БД - запускает копирование данных из БД в атрибуты скана
         Если такого вокселя нет - создает новую запись в БД
+        :param db_connection: Открытое соединение с БД
         :return: None
         """
-        select_ = select(Tables.voxels_db_table).where(Tables.voxels_db_table.c.vxl_name == self.vxl_name)
-
-        with engine.connect() as db_connection:
-            db_voxel_data = db_connection.execute(select_).mappings().first()
+        def init_logic(db_conn):
+            select_ = select(Tables.voxels_db_table).where(Tables.voxels_db_table.c.vxl_name == self.vxl_name)
+            db_voxel_data = db_conn.execute(select_).mappings().first()
             if db_voxel_data is not None:
                 self.__copy_voxel_data(db_voxel_data)
-                self.scan = ScanDB(f"SC_{self.vxl_name}")
+                self.scan = ScanDB(f"SC_{self.vxl_name}", db_conn)
             else:
-                scan = ScanDB(f"SC_{self.vxl_name}")
+                scan = ScanDB(f"SC_{self.vxl_name}", db_conn)
                 stmt = insert(Tables.voxels_db_table).values(vxl_name=self.vxl_name,
                                                              X=self.X,
                                                              Y=self.Y,
@@ -53,9 +58,15 @@ class VoxelDB(VoxelABC):
                                                              scan_id=scan.id,
                                                              vxl_mdl_id=self.vxl_mdl_id,
                                                              )
-                db_connection.execute(stmt)
-                db_connection.commit()
-                self.__init_voxel()
+                db_conn.execute(stmt)
+                db_conn.commit()
+                self.__init_voxel(db_conn)
+
+        if db_connection is None:
+            with engine.connect() as db_connection:
+                init_logic(db_connection)
+        else:
+            init_logic(db_connection)
 
     def __copy_voxel_data(self, db_voxel_data: dict):
         """
