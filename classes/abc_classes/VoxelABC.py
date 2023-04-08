@@ -5,7 +5,9 @@ from CONFIG import LOGGER
 
 
 class VoxelABC(ABC):
-    """Абстрактный класс вокселя"""
+    """
+    Абстрактный класс вокселя
+    """
 
     logger = logging.getLogger(LOGGER)
 
@@ -22,6 +24,10 @@ class VoxelABC(ABC):
         self.R, self.G, self.B = 0, 0, 0
 
     def __name_generator(self):
+        """
+        Конструктор имени вокселя
+        :return: None
+        """
         return (f"VXL_VM:{self.vxl_mdl_id}_s{self.step}_"
                 f"X:{round(self.X, 5)}_"
                 f"Y:{round(self.Y, 5)}_"

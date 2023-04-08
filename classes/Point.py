@@ -2,7 +2,9 @@ from classes.abc_classes.PointABC import PointABC
 
 
 class Point(PointABC):
-    """Класс точки"""
+    """
+    Класс точки
+    """
 
     __slots__ = []
 

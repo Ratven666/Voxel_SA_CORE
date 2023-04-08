@@ -4,7 +4,6 @@ from classes.abc_classes.ScanABC import ScanABC
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
 from utils.start_db import Tables, engine
 from utils.voxel_utils.voxel_model_iterators.VMRawIterator import VMRawIterator
-from utils.voxel_utils.voxel_model_separators.VMBruteForceSeparator import VMBruteForceSeparator
 from utils.voxel_utils.voxel_model_separators.VMBruteForceSeparatorWithoutVoxelScansPoints import \
     VMBruteForceSeparatorWithoutVoxelScansPoints
 

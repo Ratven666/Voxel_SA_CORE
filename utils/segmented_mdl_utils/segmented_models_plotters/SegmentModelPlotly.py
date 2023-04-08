@@ -48,7 +48,7 @@ class SegmentModelPlotly:
                                  y=y,
                                  z=z,
                                  surfacecolor=z,
-                                 colorscale="Rainbow"))
+                                 colorscale="Rainbow_r"))
 
         button_layer_1_height = 1.02
         fig.update_layout(

@@ -1,13 +1,19 @@
-from sqlalchemy import select, insert
+from sqlalchemy import insert
 
 from classes.abc_classes.CellABC import CellABC
 from utils.start_db import Tables
 
 
 class PlaneCellDB(CellABC):
+    """
+    Класс ячейки модели с апроксимацией точек полскостью
+    """
 
-    def __init__(self, voxel):
+    db_table = Tables.plane_cell_db_table
+
+    def __init__(self, voxel, dem_model):
         self.voxel = voxel
+        self.dem_model = dem_model
         self.voxel_id = None
         self.a = None
         self.b = None
@@ -16,20 +22,25 @@ class PlaneCellDB(CellABC):
         self.mse = None
 
     def get_z_from_xy(self, x, y):
+        """
+        Рассчитывает отметку точки (x, y) в ячейке
+        :param x: координата x
+        :param y: координата y
+        :return: координата z для точки (x, y)
+        """
         if self.r >= 0:
             z = self.a * x + self.b * y + self.d
             return z
         return None
 
-    def _load_cell_data_from_db(self, db_connection):
-        select_ = select(Tables.plane_cell_db_table) \
-                 .where(Tables.plane_cell_db_table.c.voxel_id == self.voxel.id)
-        db_plane_cell_data = db_connection.execute(select_).mappings().first()
-        if db_plane_cell_data is not None:
-            self._copy_cell_data(db_plane_cell_data)
-
     def _save_cell_data_in_db(self, db_connection):
+        """
+        Сохраняет данные ячейки из модели в БД
+        :param db_connection: открытое соединение с БД
+        :return: None
+        """
         stmt = insert(Tables.plane_cell_db_table).values(voxel_id=self.voxel.id,
+                                                         base_model_id=self.dem_model.id,
                                                          A=self.a,
                                                          B=self.b,
                                                          D=self.d,
@@ -39,7 +50,13 @@ class PlaneCellDB(CellABC):
         db_connection.execute(stmt)
 
     def _copy_cell_data(self, db_cell_data):
+        """
+        Копирует данные из записи БД в атрибуты ячейки
+        :param db_cell_data: загруженные из БД данные
+        :return: None
+        """
         self.voxel_id = db_cell_data["voxel_id"]
+        self.base_model_id = db_cell_data["base_model_id"]
         self.a = db_cell_data["A"]
         self.b = db_cell_data["B"]
         self.d = db_cell_data["D"]

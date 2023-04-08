@@ -19,7 +19,9 @@ class ScanDB(ScanABC):
         self.__init_scan(db_connection)
 
     def __iter__(self):
-        """Иттератор скана берет точки из БД"""
+        """
+        Иттератор скана берет точки из БД
+        """
         return iter(ScanIterator(self))
 
     @staticmethod

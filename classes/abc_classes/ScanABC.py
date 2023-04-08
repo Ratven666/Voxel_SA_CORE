@@ -6,7 +6,9 @@ from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPoint
 
 
 class ScanABC(ABC):
-    """Абстрактный класс скана"""
+    """
+    Абстрактный класс скана
+    """
 
     def __init__(self, scan_name):
         self.id = None
@@ -31,4 +33,9 @@ class ScanABC(ABC):
         pass
 
     def plot(self, plotter=ScanScanPlotterMPL(sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT))):
+        """
+        Вывод отображения скана
+        :param plotter: объект определяющий логику отображения скана
+        :return: None
+        """
         plotter.plot(self)

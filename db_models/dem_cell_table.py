@@ -6,6 +6,9 @@ def create_dem_cell_db_table(metadata):
                               Column("voxel_id", Integer,
                                      ForeignKey("voxels.id", ondelete="CASCADE"),
                                      primary_key=True),
+                              Column("base_model_id", Integer,
+                                     ForeignKey("dem_models.id", ondelete="CASCADE"),
+                                     primary_key=True),
                               Column("Avr_Z", Float),
                               Column("r", Integer),
                               Column("MSE", Float, default=None)

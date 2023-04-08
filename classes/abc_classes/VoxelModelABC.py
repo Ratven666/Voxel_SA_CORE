@@ -7,7 +7,9 @@ from utils.voxel_utils.voxel_model_plotters.Voxel_model_plotter import VoxelMode
 
 
 class VoxelModelABC(ABC):
-    """Абстрактный класс воксельной модели"""
+    """
+    Абстрактный класс воксельной модели
+    """
 
     logger = logging.getLogger(LOGGER)
 
@@ -23,8 +25,12 @@ class VoxelModelABC(ABC):
         self.min_Z, self.max_Z = None, None
         self.base_scan_id = None
 
-
     def __name_generator(self, scan):
+        """
+        Конструктор имени воксельной модели
+        :param scan: базовый скан, по которому создается модель
+        :return: None
+        """
         vm_type = "2D" if self.is_2d_vxl_mdl else "3D"
         return f"VM_{vm_type}_Sc:{scan.scan_name}_st:{self.step}"
 
@@ -44,4 +50,9 @@ class VoxelModelABC(ABC):
         pass
 
     def plot(self, plotter=VoxelModelPlotter()):
+        """
+        Вывод отображения djrctkmyjq модели
+        :param plotter: объект определяющий логику отображения модели
+        :return: None
+        """
         plotter.plot(self)
