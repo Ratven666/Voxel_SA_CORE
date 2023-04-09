@@ -28,9 +28,11 @@ class PlaneCellDB(CellABC):
         :param y: координата y
         :return: координата z для точки (x, y)
         """
-        if self.r >= 0:
+        try:
             z = self.a * x + self.b * y + self.d
             return z
+        except TypeError:
+            pass
         return None
 
     def _save_cell_data_in_db(self, db_connection):

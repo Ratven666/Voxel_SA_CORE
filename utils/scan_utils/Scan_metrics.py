@@ -51,7 +51,8 @@ def update_scan_in_db_from_scan_metrics(scan_metrics: dict):
     with engine.connect() as db_connection:
         stmt = update(Tables.scans_db_table) \
             .where(Tables.scans_db_table.c.id == scan_metrics["id"]) \
-            .values(len=scan_metrics["len"],
+            .values(scan_name=scan_metrics["scan_name"],
+                    len=scan_metrics["len"],
                     min_X=scan_metrics["min_X"],
                     max_X=scan_metrics["max_X"],
                     min_Y=scan_metrics["min_Y"],
@@ -71,7 +72,8 @@ def update_scan_in_db_from_scan(updated_scan, db_connection=None):
     """
     stmt = update(Tables.scans_db_table) \
         .where(Tables.scans_db_table.c.id == updated_scan.id) \
-        .values(len=updated_scan.len,
+        .values(scan_name=updated_scan.scan_name,
+                len=updated_scan.len,
                 min_X=updated_scan.min_X,
                 max_X=updated_scan.max_X,
                 min_Y=updated_scan.min_Y,

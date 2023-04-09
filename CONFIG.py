@@ -1,7 +1,7 @@
 
-DATABASE_NAME = "Kucha.sqlite"
+DATABASE_NAME = "E.sqlite"
 
-FILE_NAME = "src/KuchaRGB.txt"
+FILE_NAME = "src/etna.txt"
 
 POINTS_CHUNK_COUNT = 100_000
 

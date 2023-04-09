@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from sqlalchemy import select, desc, update, insert, and_, delete
 
 from CONFIG import LOGGER
+from utils.segmented_mdl_utils.segmented_models_plotters.HistMSEPlotterPlotly import HistMSEPlotterPlotly
 from utils.segmented_mdl_utils.segmented_models_plotters.MsePlotterPlotly import MsePlotterPlotly
 from utils.segmented_mdl_utils.segmented_models_plotters.SegmentModelPlotly import SegmentModelPlotly
 from utils.start_db import engine, Tables
@@ -85,7 +86,7 @@ class SegmentedModelABC(ABC):
         stmt = update(self.db_table).values(MSE_data=self.mse_data).where(self.db_table.c.id == self.id)
         db_connection.execute(stmt)
         db_connection.commit()
-        self.logger.info(f"Расчет СКП модели {self.model_name} завершен и загружен в БД")
+        self.logger.info(f"Расчет СКП модели {self.model_name} завершен и загружен в БД\n")
 
     def plot(self, plotter=SegmentModelPlotly()):
         """
@@ -102,6 +103,19 @@ class SegmentedModelABC(ABC):
         :return: None
         """
         plotter.plot(self)
+
+    def plot_mse_hist(self, *models, plotter=HistMSEPlotterPlotly()):
+        """
+        Вывод гистограммы СКП модели
+        :param models: сегменитрованные модели которые нужно отрисовать на совместной гистограмме
+        :param plotter: объект определяющий логику отображения гистограммы модели
+        :return: None
+        """
+
+        if len(models) == 0:
+            plotter.plot(self)
+        else:
+            plotter.plot(models)
 
     def _load_cell_data_from_db(self, db_connection):
         """
@@ -204,7 +218,7 @@ class SegmentedModelABC(ABC):
                     cell.mse = (cell.vv / cell.r) ** 0.5
                 except AttributeError:
                     cell.mse = None
-        self.logger.info(f"Расчет СКП высот в ячейках модели {self.model_name} завершен\n")
+        self.logger.info(f"Расчет СКП высот в ячейках модели {self.model_name} завершен")
 
     def delete_model(self, db_connection=None):
         stmt_1 = delete(self.db_table).where(self.db_table.c.id == self.id)
