@@ -4,6 +4,7 @@ from classes.abc_classes.ScanABC import ScanABC
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
 from utils.start_db import Tables, engine
 from utils.voxel_utils.voxel_model_iterators.VMRawIterator import VMRawIterator
+from utils.voxel_utils.voxel_model_separators.FastVMSeparator import FastVMSeparator
 from utils.voxel_utils.voxel_model_separators.VMBruteForceSeparatorWithoutVoxelScansPoints import \
     VMBruteForceSeparatorWithoutVoxelScansPoints
 
@@ -14,7 +15,7 @@ class VoxelModelDB(VoxelModelABC):
     """
 
     def __init__(self, scan: ScanABC, step, is_2d_vxl_mdl=True,
-                 voxel_model_separator=VMBruteForceSeparatorWithoutVoxelScansPoints()):
+                 voxel_model_separator=FastVMSeparator()):
         super().__init__(scan, step, is_2d_vxl_mdl)
         self.voxel_model_separator = voxel_model_separator
         self.__init_vxl_mdl(scan)

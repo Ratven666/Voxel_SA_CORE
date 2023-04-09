@@ -8,7 +8,9 @@ from utils.start_db import engine, Tables
 
 
 class ScanParserABC(ABC):
-    """Абстрактный класс парсера данных для скана"""
+    """
+    Абстрактный класс парсера данных для скана
+    """
     logger = logging.getLogger(LOGGER)
 
     def __str__(self):

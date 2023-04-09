@@ -49,7 +49,6 @@ class SegmentedModelABC(ABC):
         """
         for voxel in self.voxel_model:
             model_key = f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
-            # self._model_structure[model_key] = element_class(voxel)
             self._model_structure[model_key] = element_class(voxel, self)
 
     def get_model_element_for_point(self, point):
@@ -199,13 +198,13 @@ class SegmentedModelABC(ABC):
             except AttributeError:
                 cell.vv = (point.Z - cell_z) ** 2
 
-        for cell in self._model_structure.values():
+        for cell in self:
             if cell.r > 0:
                 try:
                     cell.mse = (cell.vv / cell.r) ** 0.5
                 except AttributeError:
                     cell.mse = None
-        self.logger.info(f"Расчет СКП высот в ячейках модели {self.model_name} завершен")
+        self.logger.info(f"Расчет СКП высот в ячейках модели {self.model_name} завершен\n")
 
     def delete_model(self, db_connection=None):
         stmt_1 = delete(self.db_table).where(self.db_table.c.id == self.id)
@@ -221,4 +220,4 @@ class SegmentedModelABC(ABC):
             db_connection.commit()
             db_connection.execute(stmt_2)
             db_connection.commit()
-        self.logger.info(f"Удаление модели {self.model_name} из БД завершено")
+        self.logger.info(f"Удаление модели {self.model_name} из БД завершено\n")

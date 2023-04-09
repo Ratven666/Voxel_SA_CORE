@@ -134,7 +134,7 @@ class BiModelDB(SegmentedModelABC):
             except TypeError:
                 continue
             except ZeroDivisionError:
-                p = float("inf")
+                return z[idx], 0
             try:
                 sum_of_pz += p * z[idx]
             except TypeError:
