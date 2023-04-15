@@ -3,6 +3,7 @@ from sqlalchemy import select, desc
 from classes.VoxelLite import VoxelLite
 from utils.scan_utils.Scan_metrics import update_scan_borders, update_scan_in_db_from_scan
 from utils.start_db import engine, Tables
+from utils.voxel_utils.Voxel_model_metrics import update_voxel_model_in_db_from_voxel_model
 from utils.voxel_utils.voxel_model_iterators.VMFullBaseIterator import VMFullBaseIterator
 from utils.voxel_utils.voxel_model_separators.VMSeparatorABC import VMSeparatorABC
 
@@ -121,6 +122,7 @@ class FastVMSeparator(VMSeparatorABC):
         """
         voxels = []
         scans = []
+        voxel_counter = 0
         for voxel in iter(VMFullBaseIterator(self.voxel_model)):
             if len(voxel) == 0:
                 continue
@@ -148,7 +150,10 @@ class FastVMSeparator(VMSeparatorABC):
                            "scan_id": scan.id,
                            "vxl_mdl_id": voxel.vxl_mdl_id
                            })
+            voxel_counter += 1
         with engine.connect() as db_connection:
             db_connection.execute(Tables.scans_db_table.insert(), scans)
             db_connection.execute(Tables.voxels_db_table.insert(), voxels)
             db_connection.commit()
+        self.voxel_model.len = voxel_counter
+        update_voxel_model_in_db_from_voxel_model(self.voxel_model)

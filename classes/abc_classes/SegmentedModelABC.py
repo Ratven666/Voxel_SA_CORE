@@ -86,7 +86,7 @@ class SegmentedModelABC(ABC):
         stmt = update(self.db_table).values(MSE_data=self.mse_data).where(self.db_table.c.id == self.id)
         db_connection.execute(stmt)
         db_connection.commit()
-        self.logger.info(f"Расчет СКП модели {self.model_name} завершен и загружен в БД\n")
+        self.logger.info(f"Расчет СКП модели {self.model_name} завершен и загружен в БД")
 
     def plot(self, plotter=SegmentModelPlotly()):
         """
@@ -191,9 +191,9 @@ class SegmentedModelABC(ABC):
                 self._calk_model_mse(db_connection)
                 self._save_cell_data_in_db(db_connection)
                 db_connection.commit()
-                self.logger.info(f"Расчет модели {self.model_name} завершен и загружен в БД")
+                self.logger.info(f"Расчет модели {self.model_name} завершен и загружен в БД\n")
 
-    def _calk_mse(self, base_scan):
+    def _calk_cell_mse(self, base_scan):
         """
         Расчитываает СКП в ячейках сегментированной модели от точек базового скана
         :param base_scan: базовый скан из воксельной модели

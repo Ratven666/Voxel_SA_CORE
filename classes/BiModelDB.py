@@ -37,7 +37,7 @@ class BiModelDB(SegmentedModelABC):
         self.logger.info(f"Начат расчет модели {self.model_name}")
         base_scan = ScanDB.get_scan_from_id(self.voxel_model.base_scan_id)
         self.__calk_cells_z()
-        self._calk_mse(base_scan)
+        self._calk_cell_mse(base_scan)
 
     def __calk_cells_z(self):
         """
@@ -103,19 +103,27 @@ class BiModelDB(SegmentedModelABC):
         if n_s[0][0] is not None:
             z.append(n_s[0][0].cell.get_z_from_xy(n_s[0][0].voxel.X + n_s[0][0].voxel.step,
                                                   n_s[0][0].voxel.Y + n_s[0][0].voxel.step))
-            mse.append(n_s[0][0].cell.mse)
+            mse.append(n_s[0][0].cell.get_mse_z_from_xy(n_s[0][0].voxel.X + n_s[0][0].voxel.step,
+                                                        n_s[0][0].voxel.Y + n_s[0][0].voxel.step))
+            # mse.append(n_s[0][0].cell.mse)
         if n_s[0][1] is not None:
             z.append(n_s[0][1].cell.get_z_from_xy(n_s[0][1].voxel.X + n_s[0][1].voxel.step,
                                                   n_s[0][1].voxel.Y))
-            mse.append(n_s[0][1].cell.mse)
+            mse.append(n_s[0][1].cell.get_mse_z_from_xy(n_s[0][1].voxel.X + n_s[0][1].voxel.step,
+                                                        n_s[0][1].voxel.Y))
+            # mse.append(n_s[0][1].cell.mse)
         if n_s[1][0] is not None:
             z.append(n_s[1][0].cell.get_z_from_xy(n_s[1][0].voxel.X,
                                                   n_s[1][0].voxel.Y + n_s[1][0].voxel.step))
-            mse.append(n_s[1][0].cell.mse)
+            mse.append(n_s[1][0].cell.get_mse_z_from_xy(n_s[1][0].voxel.X,
+                                                        n_s[1][0].voxel.Y + n_s[1][0].voxel.step))
+            # mse.append(n_s[1][0].cell.mse)
         if n_s[1][1] is not None:
             z.append(n_s[1][1].cell.get_z_from_xy(n_s[1][1].voxel.X,
                                                   n_s[1][1].voxel.Y))
-            mse.append(n_s[1][1].cell.mse)
+            mse.append(n_s[1][1].cell.get_mse_z_from_xy(n_s[1][1].voxel.X,
+                                                        n_s[1][1].voxel.Y))
+            # mse.append(n_s[1][1].cell.mse)
         return z, mse
 
     @staticmethod

@@ -1,5 +1,5 @@
 
-DATABASE_NAME = "E.sqlite"
+DATABASE_NAME = "E_3.sqlite"
 
 FILE_NAME = "src/etna.txt"
 

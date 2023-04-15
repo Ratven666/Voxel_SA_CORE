@@ -12,6 +12,9 @@ def create_plane_cell_db_table(metadata):
                                 Column("A", Float),
                                 Column("B", Float),
                                 Column("D", Float),
+                                Column("mA", Float),
+                                Column("mB", Float),
+                                Column("mD", Float),
                                 Column("r", Integer),
                                 Column("MSE", Float, default=None)
                                 )

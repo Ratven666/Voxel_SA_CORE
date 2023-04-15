@@ -24,7 +24,7 @@ class DemModelDB(SegmentedModelABC):
         self.logger.info(f"Начат расчет модели {self.model_name}")
         base_scan = ScanDB.get_scan_from_id(self.voxel_model.base_scan_id)
         self.__calk_average_z(base_scan)
-        self._calk_mse(base_scan)
+        self._calk_cell_mse(base_scan)
 
     def __calk_average_z(self, base_scan):
         """

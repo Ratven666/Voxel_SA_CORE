@@ -26,7 +26,8 @@ class PlaneModelDB(SegmentedModelABC):
         self.logger.info(f"Начат расчет модели {self.model_name}")
         base_scan = ScanDB.get_scan_from_id(self.voxel_model.base_scan_id)
         self.__fit_planes(base_scan)
-        self._calk_mse(base_scan)
+        self._calk_cell_mse(base_scan)
+        self.__calk_abd_mse()
 
     def __fit_planes(self, base_scan):
         """
@@ -37,14 +38,14 @@ class PlaneModelDB(SegmentedModelABC):
         self.__calk_matrix_params(base_scan)
         for cell in self:
             try:
-                m_a = np.array([[cell.a1, cell.b1, cell.c1],
+                m_n = np.array([[cell.a1, cell.b1, cell.c1],
                                 [cell.b1, cell.b2, cell.c2],
                                 [cell.c1, cell.c2, cell.c3]])
                 m_d = np.array([cell.d1, cell.d2, cell.d3])
             except AttributeError:
                 continue
             try:
-                abc = np.linalg.solve(m_a, m_d)
+                abc = np.linalg.solve(m_n, m_d)
             except np.linalg.LinAlgError:
                 cell.r = -1
                 continue
@@ -52,6 +53,26 @@ class PlaneModelDB(SegmentedModelABC):
             cell.b = float(abc[1])
             cell.d = float(abc[2])
         self.logger.info(f"Расчет параметров вписываемых плоскостей модели {self.model_name} завершен")
+
+    def __calk_abd_mse(self):
+        for cell in self:
+            if cell.r <= 0:
+                continue
+            try:
+                m_n = np.array([[cell.a1, cell.b1, cell.c1],
+                                [cell.b1, cell.b2, cell.c2],
+                                [cell.c1, cell.c2, cell.c3]])
+            except AttributeError:
+                continue
+            try:
+                Q = np.linalg.inv(m_n)
+                D = np.diagonal(Q)
+                ABD_mse = np.sqrt(D) * cell.mse
+                cell.m_a, cell.m_b, cell.m_d = float(ABD_mse[0]), float(ABD_mse[1]), float(ABD_mse[2])
+            except np.linalg.LinAlgError:
+                continue
+            except TypeError:
+                continue
 
     def __calk_matrix_params(self, base_scan):
         """

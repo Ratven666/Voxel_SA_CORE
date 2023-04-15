@@ -41,6 +41,9 @@ class BiCellDB(CellABC):
             z = None
         return z
 
+    def get_mse_z_from_xy(self, x, y):
+        raise NotImplementedError
+
     def _save_cell_data_in_db(self, db_connection):
         """
         Сохраняет данные ячейки из модели в БД
