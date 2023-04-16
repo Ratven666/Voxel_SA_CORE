@@ -8,6 +8,7 @@ from utils.scan_utils.scan_filters.ScanFilterByCellMSE import ScanFilterByCellMS
 from utils.scan_utils.scan_filters.ScanFilterByModelMSE import ScanFilterByModelMSE
 from utils.scan_utils.scan_plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly, ScanPlotterMeshPlotly
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
+from utils.segmented_mdl_utils.segmented_models_filters.SMFilterPercentile import SMFilterPercentile
 from utils.segmented_mdl_utils.segmented_models_plotters.HistMSEPlotterPlotly import HistMSEPlotterPlotly
 from utils.segmented_mdl_utils.segmented_models_plotters.SegmentModelPlotly import SegmentModelPlotly
 
@@ -29,29 +30,25 @@ def main():
     scan.load_scan_from_file()
     print(scan)
 
-    vm_250 = VoxelModelDB(scan, 250)
-    vm_100 = VoxelModelDB(scan, 100)
     vm_50 = VoxelModelDB(scan, 50)
-    vm_25 = VoxelModelDB(scan, 25)
-    # vm_25 = VoxelModelDB(scan, 25)
-    # vm_10 = VoxelModelDB(scan, 10)
+
     #
-    # dem_model_250 = DemModelDB(vm_250)
-    # plane_model_250 = PlaneModelDB(vm_250)
-    # bi_plane_with_mse_250 = BiModelDB(vm_250, DemTypeEnum.PLANE, enable_mse=True)
-    # bi_plane_250 = BiModelDB(vm_250, DemTypeEnum.PLANE, enable_mse=False)
-    # bi_dem_with_mse_250 = BiModelDB(vm_250, DemTypeEnum.DEM, enable_mse=True)
-    # bi_dem_250 = BiModelDB(vm_250, DemTypeEnum.DEM, enable_mse=False)
-    dem_model_250 = BiModelDB(vm_250, DemTypeEnum.PLANE, enable_mse=False)
-    dem_model_100 = BiModelDB(vm_100, DemTypeEnum.PLANE, enable_mse=False)
-    dem_model_50 = BiModelDB(vm_50, DemTypeEnum.PLANE, enable_mse=False)
-    # dem_model_25 = DemModelDB(vm_25)
-    # dem_model_10 = DemModelDB(vm_10)
-    # scan = ScanFilterByModelMSE(scan, dem_model_50, k_value=2.5).filter_scan()
-    # dem_model_50.delete_model()
+    # dem_model_50 = DemModelDB(vm_50)
+    plane_model_50 = PlaneModelDB(vm_50)
+    # scan = ScanFilterByModelMSE(scan, plane_model_50, k_value=2).filter_scan()
+    # plane_model_50.delete_model()
+
+    bi_plane_with_mse_50 = BiModelDB(vm_50, DemTypeEnum.PLANE, enable_mse=True)
+    bi_plane_50 = BiModelDB(vm_50, DemTypeEnum.PLANE, enable_mse=False)
+
+    # plane_model_250 = SMFilterPercentile(plane_model_50, k_value=1.5).filter_model()
+    # dem_model_100 = SMFilterPercentile(dem_model_100).filter_model()
+    # dem_model_50 = SMFilterPercentile(dem_model_50).filter_model()
+    plane_model_50.plot()
+    bi_plane_with_mse_50.plot()
 
 
-    dem_model_100.plot_mse_hist(dem_model_250, dem_model_100, dem_model_50,
+    plane_model_50.plot_mse_hist(plane_model_50,
                                 plotter=HistMSEPlotterPlotly(bin_size=1, plot_like_probability=True))
     # dem_model_100.plot_mse_hist(dem_model_250, dem_model_100,
     #                             plotter=HistMSEPlotterPlotly(bin_size=1))

@@ -29,6 +29,13 @@ class DemCellDB(CellABC):
     def get_mse_z_from_xy(self, x, y):
         return self.mse
 
+    def get_db_raw_data(self):
+        return {"voxel_id": self.voxel.id,
+                "base_model_id": self.dem_model.id,
+                "Avr_Z": self.avr_z,
+                "r": self.r,
+                "MSE": self.mse}
+
     def _save_cell_data_in_db(self, db_connection):
         """
         Сохраняет данные ячейки из модели в БД

@@ -12,13 +12,12 @@ from utils.start_db import engine, Tables
 class ScanFilterABC(ABC):
     logger = logging.getLogger(LOGGER)
 
-    def __init__(self, scan, k_value=2.5):
+    def __init__(self, scan):
         self.scan = scan
-        self.k_value = k_value
 
     def __scan_name_generator(self):
         return f"{self.scan.scan_name}_FB_{self.__class__.__name__}" \
-               f"_FROM_{self.dem_model.model_name}_BY_k_value={self.k_value}"
+               f"_FROM_{self.dem_model.model_name}"
 
     @abstractmethod
     def _filter_logic(self, point):

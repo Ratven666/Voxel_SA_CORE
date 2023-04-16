@@ -4,8 +4,9 @@ from utils.scan_utils.scan_filters.ScanFilterABC import ScanFilterABC
 class ScanFilterByModelMSE(ScanFilterABC):
 
     def __init__(self, scan, dem_model, k_value=2.5):
-        super().__init__(scan, k_value)
+        super().__init__(scan)
         self.dem_model = dem_model
+        self.k_value = k_value
 
     def _filter_logic(self, point):
         cell = self.dem_model.get_model_element_for_point(point)

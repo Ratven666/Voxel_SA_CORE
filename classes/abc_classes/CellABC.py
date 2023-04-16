@@ -29,6 +29,10 @@ class CellABC(ABC):
         pass
 
     @abstractmethod
+    def get_db_raw_data(self):
+        pass
+
+    @abstractmethod
     def _save_cell_data_in_db(self, db_connection):
         """
         Сохраняет данные ячейки из модели в БД

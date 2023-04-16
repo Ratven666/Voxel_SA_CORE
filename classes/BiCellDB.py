@@ -44,6 +44,20 @@ class BiCellDB(CellABC):
     def get_mse_z_from_xy(self, x, y):
         raise NotImplementedError
 
+    def get_db_raw_data(self):
+        return {"voxel_id": self.voxel.id,
+                "base_model_id": self.dem_model.id,
+                "Z_ld": self.left_down["Z"],
+                "Z_lu": self.left_up["Z"],
+                "Z_rd": self.right_down["Z"],
+                "Z_ru": self.right_up["Z"],
+                "MSE_ld": self.left_down["MSE"],
+                "MSE_lu": self.left_up["MSE"],
+                "MSE_rd": self.right_down["MSE"],
+                "MSE_ru": self.right_up["MSE"],
+                "r": self.r,
+                "MSE": self.mse}
+
     def _save_cell_data_in_db(self, db_connection):
         """
         Сохраняет данные ячейки из модели в БД

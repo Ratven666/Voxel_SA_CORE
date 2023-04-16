@@ -44,6 +44,18 @@ class PlaneCellDB(CellABC):
             pass
         return None
 
+    def get_db_raw_data(self):
+        return {"voxel_id": self.voxel.id,
+                "base_model_id": self.dem_model.id,
+                "A": self.a,
+                "B": self.b,
+                "D": self.d,
+                "mA": self.m_a,
+                "mB": self.m_b,
+                "mD": self.m_d,
+                "r": self.r,
+                "MSE": self.mse}
+
     def _save_cell_data_in_db(self, db_connection):
         """
         Сохраняет данные ячейки из модели в БД
