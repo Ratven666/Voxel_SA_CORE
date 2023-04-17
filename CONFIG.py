@@ -1,7 +1,7 @@
 
-DATABASE_NAME = "E_3.sqlite"
+DATABASE_NAME = "PIT.sqlite"
 
-FILE_NAME = "src/etna.txt"
+FILE_NAME = "src/Pit.txt"
 
 POINTS_CHUNK_COUNT = 100_000
 

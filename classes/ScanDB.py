@@ -5,6 +5,7 @@ from classes.abc_classes.ScanABC import ScanABC
 from utils.scan_utils.ScanLoader import ScanLoader
 from utils.scan_utils.scan_iterators.ScanIterator import ScanIterator
 from utils.scan_utils.scan_parsers.ScanTxtParser import ScanTxtParser
+from utils.scan_utils.scan_savers.ScanTXTSaver import ScanTXTSaver
 from utils.start_db import Tables, engine
 
 
@@ -55,6 +56,9 @@ class ScanDB(ScanABC):
         :return: None
         """
         scan_loader.load_data(self, file_name)
+
+    def save_scan_in_file(self, file_name=None, scan_saver=ScanTXTSaver()):
+        scan_saver.save_scan(self, file_name)
 
     @classmethod
     def get_scan_from_id(cls, scan_id: int):
