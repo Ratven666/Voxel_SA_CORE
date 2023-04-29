@@ -1,7 +1,7 @@
 
-DATABASE_NAME = "PIT.sqlite"
+DATABASE_NAME = "PIT_Q_15.sqlite"
 
-FILE_NAME = "src/Pit.txt"
+FILE_NAME = "src/Pit_clean.txt"
 
 POINTS_CHUNK_COUNT = 100_000
 

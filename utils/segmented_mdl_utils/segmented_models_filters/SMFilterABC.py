@@ -35,8 +35,8 @@ class SMFilterABC(ABC):
             db_connection.execute(stmt)
             db_connection.execute(cell_table.insert(), cells)
             db_connection.commit()
+        self.model.__init__(self.model.voxel_model)
+        with engine.connect() as db_connection:
             self.model._calk_model_mse(db_connection=db_connection)
-        # self.model.voxel_model.len = len(cells)
-        # update_voxel_model_in_db_from_voxel_model(self.model.voxel_model)
         self.logger.info(f"Фильтрация завершена")
         return self.model
