@@ -23,6 +23,7 @@ class VoxelModelABC(ABC):
         self.min_Y, self.max_Y = None, None
         self.min_Z, self.max_Z = None, None
         self.base_scan_id = None
+        self.base_scan = scan
 
     @staticmethod
     def __dx_dy_formatter(dx, dy, dz):

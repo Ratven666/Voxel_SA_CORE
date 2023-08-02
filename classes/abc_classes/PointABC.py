@@ -20,3 +20,8 @@ class PointABC(ABC):
 
     def __repr__(self):
         return f"{self.__class__.__name__} [id: {self.id}]"
+
+    def get_dict(self):
+        return {"id": self.id,
+                "X": self.X, "Y": self.Y, "Z": self.Z,
+                "R": self.R, "G": self.G, "B": self.B}

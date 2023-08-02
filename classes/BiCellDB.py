@@ -12,7 +12,10 @@ class BiCellDB(CellABC):
 
     def __init__(self, cell, dem_model):
         self.cell = cell
-        self.voxel = cell.voxel
+        try:
+            self.voxel = cell.voxel
+        except AttributeError:
+            self.voxel = cell
         self.dem_model = dem_model
         self.voxel_id = None
         self.base_model_id = None
