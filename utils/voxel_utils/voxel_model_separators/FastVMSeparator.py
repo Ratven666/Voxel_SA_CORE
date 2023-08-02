@@ -144,9 +144,9 @@ class FastVMSeparator(VMSeparatorABC):
                            "Z": voxel.Z,
                            "step": voxel.step,
                            "len": voxel.len,
-                           "R": voxel.R,
-                           "G": voxel.G,
-                           "B": voxel.B,
+                           "R": round(voxel.R),
+                           "G": round(voxel.G),
+                           "B": round(voxel.B),
                            "scan_id": scan.id,
                            "vxl_mdl_id": voxel.vxl_mdl_id
                            })

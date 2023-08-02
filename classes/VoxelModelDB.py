@@ -14,9 +14,9 @@ class VoxelModelDB(VoxelModelABC):
     Воксельная модель связанная с базой данных
     """
 
-    def __init__(self, scan: ScanABC, step, is_2d_vxl_mdl=True,
+    def __init__(self, scan, step, dx=0.0, dy=0.0, dz=0.0, is_2d_vxl_mdl=True,
                  voxel_model_separator=FastVMSeparator()):
-        super().__init__(scan, step, is_2d_vxl_mdl)
+        super().__init__(scan, step, dx, dy, dz, is_2d_vxl_mdl)
         self.voxel_model_separator = voxel_model_separator
         self.__init_vxl_mdl(scan)
         self.voxel_structure = None
@@ -43,6 +43,9 @@ class VoxelModelDB(VoxelModelABC):
                 self.base_scan_id = scan.id
                 stmt = insert(Tables.voxel_models_db_table).values(vm_name=self.vm_name,
                                                                    step=self.step,
+                                                                   dx=self.dx,
+                                                                   dy=self.dy,
+                                                                   dz=self.dz,
                                                                    len=self.len,
                                                                    X_count=self.X_count,
                                                                    Y_count=self.Y_count,
@@ -70,13 +73,15 @@ class VoxelModelDB(VoxelModelABC):
         """
         if len(scan) == 0:
             return None
-        self.min_X = scan.min_X // self.step * self.step
-        self.min_Y = scan.min_Y // self.step * self.step
-        self.min_Z = scan.min_Z // self.step * self.step
+        self.min_X = (scan.min_X // self.step * self.step) - ((1 - self.dx) % 1 * self.step)
+        self.min_Y = (scan.min_Y // self.step * self.step) - ((1 - self.dy) % 1 * self.step)
+        self.min_Z = (scan.min_Z // self.step * self.step) - ((1 - self.dy) % 1 * self.step)
+        # self.min_Z = scan.min_Z // self.step * self.step
 
-        self.max_X = (scan.max_X // self.step + 1) * self.step
-        self.max_Y = (scan.max_Y // self.step + 1) * self.step
-        self.max_Z = (scan.max_Z // self.step + 1) * self.step
+        self.max_X = (scan.max_X // self.step + 1) * self.step + ((self.dx % 1) * self.step)
+        self.max_Y = (scan.max_Y // self.step + 1) * self.step + ((self.dy % 1) * self.step)
+        self.max_Z = (scan.max_Z // self.step + 1) * self.step + ((self.dy % 1) * self.step)
+        # self.max_Z = (scan.max_Z // self.step + 1) * self.step
 
         self.X_count = round((self.max_X - self.min_X) / self.step)
         self.Y_count = round((self.max_Y - self.min_Y) / self.step)
@@ -95,6 +100,9 @@ class VoxelModelDB(VoxelModelABC):
         self.id = db_vm_data["id"]
         self.vm_name = db_vm_data["vm_name"]
         self.step = db_vm_data["step"]
+        self.dx = db_vm_data["dx"]
+        self.dy = db_vm_data["dy"]
+        self.dz = db_vm_data["dz"]
         self.len = db_vm_data["len"]
         self.X_count, self.Y_count, self.Z_count = db_vm_data["X_count"], db_vm_data["Y_count"], db_vm_data["Z_count"]
         self.min_X, self.max_X = db_vm_data["min_X"], db_vm_data["max_X"]

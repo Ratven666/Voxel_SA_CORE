@@ -1,5 +1,5 @@
 
-DATABASE_NAME = "PIT_Q_15.sqlite"
+DATABASE_NAME = "K.sqlite"
 
 FILE_NAME = "src/Pit_clean.txt"
 

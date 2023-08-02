@@ -24,81 +24,35 @@ from utils.voxel_utils.voxel_model_separators.VMBruteForceSeparatorWithoutVoxelS
     VMBruteForceSeparatorWithoutVoxelScansPoints
 
 
-def write_mse_cells(file_name, model):
-    with open(f"{file_name}.txt", "w", encoding="utf-8") as file:
-        data = []
-        for cell in model:
-            if cell.mse is not None:
-                data.append(cell.mse)
-        data.sort()
-        for mse in data:
-            file.write(f"{mse}\n")
-
 def main():
     create_db()
 
-    scan = ScanDB("PIT")
-    # scan.load_scan_from_file(file_name="src/balakovo2021_col.txt")
-    # for step in [1, 1.5, 2, 2.5, 5, 10, 15, 20, 25, 50]:
-    #     vm = VoxelModelDB(scan, step)
-    #     dem_model = DemModelDB(vm)
-    #     # dem_file = f"{scan.scan_name}_DEM_{step}"
-    #     # write_mse_cells(dem_file, dem_model)
-    #     SMFilterPercentile(dem_model).filter_model()
-    #     # SMFilterPercentile(dem_model, k_value=1.5).filter_model()
-    #     plane_model = PlaneModelDB(vm)
-    #     SMFilterPercentile(plane_model).filter_model()
+    scan = ScanDB("TEST")
+    scan.load_scan_from_file(file_name="src/forest_full_1 m.txt")
+    # scan.plot(plotter=ScanPlotterPointsPlotly())
+    # scan.plot(plotter=ScanPlotterMeshPlotly(sampler=TotalPointCountScanSampler(1000)))
+    vm = VoxelModelDB(scan, 5, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=0.2, dy=0.2, dz=0.2, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=0.4, dy=0.4, dz=0.4, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=0.6, dy=0.6, dz=0.6, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=0.8, dy=0.8, dz=0.8, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=1, dy=1, dz=1, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=1.2, dy=1.2, dz=1.2, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 5, dx=0, dy=0, dz=0, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 5, dx=0.2, dy=0.2, dz=0.2, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 5, dx=0.4, dy=0.4, dz=0.4, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 5, dx=0.6, dy=0.6, dz=0.6, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 5, dx=0.8, dy=0.8, dz=0.8, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 5, dx=1, dy=1, dz=1, is_2d_vxl_mdl=False)
+    vm = VoxelModelDB(scan, 5, dx=1.2, dy=1.2, dz=1.2, is_2d_vxl_mdl=False)
+    # vm.plot()
+    # sm_dem = DemModelDB(vm)
+    # sm_dem = BiModelDB(vm, DemTypeEnum.DEM)
     #
-    #     # plane_file = f"{scan.scan_name}_PLANE_{step}"
-    #     # write_mse_cells(plane_file, plane_model)
-
-
-        # SMFilterByMaxPercentile(plane_model, max_percentile=0.98).filter_model()
-        # SMFilterPercentile(plane_model, k_value=1.5).filter_model()
-
-    #
-    # #
-    vm = VoxelModelDB(scan, 2)
-    plane_model = PlaneModelDB(vm)
-    # dem_model = DemModelDB(vm)
-    # plane_model.plot()
-    plane_model.plot_mse()
-    # dem_model.plot_mse()
-    # plane_model.plot_mse_hist(plane_model)
-
-
-
-
-    # print(scan)
-    # step = 50
-    # for _ in range(5):
-    #     vm = VoxelModelDB(scan, 10)
-    #     plane_model = PlaneModelDB(vm)
-    #
-    #
-    #     scan = ScanFilterForTrees(scan, plane_model, k_value=2.5).filter_scan()
-    #     plane_model.delete_model()
-    #
-    #     print(scan)
-    # scan.save_scan_in_file(file_name="src/F_N2_14.txt")
-
-    # # scan.save_scan_in_file(file_name="src/FS_Lagoninha")
-    # vm = VoxelModelDB(scan, 5)
-    # plane_model = PlaneModelDB(vm)
-    # scan = ScanFilterByModelMSE(scan, plane_model, k_value=2.5).create_new_filtered_scan()
-    # # scan.save_scan_in_file(file_name="src/FS_Lagoninha_2.txt")
-    #
-    # vm = VoxelModelDB(scan, 5)
-    # plane_model = PlaneModelDB(vm)
-    # # plane_model.plot()
-    # # plane_model.plot_mse()
-    # # plane_model.plot_mse_hist(plane_model)
-
-
-
-
-
-
+    # sm_plane = PlaneModelDB(vm)
+    # sm_plane = BiModelDB(vm, DemTypeEnum.PLANE)
+    # sm_dem.plot()
+    # sm_plane.plot()
 
 
 if __name__ == "__main__":
