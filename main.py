@@ -11,6 +11,7 @@ from utils.scan_utils.scan_plotters.ScanPlotterPlotly import ScanPlotterPointsPl
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 from utils.scan_utils.scan_serializers.ScanJsonSerializer import ScanJsonSerializer
 from utils.segmented_mdl_utils.segmented_models_expoters.DxfExporter import DxfExporter
+from utils.segmented_mdl_utils.segmented_models_expoters.PlyExporter import PlyExporter
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterByMaxMSE import SMFilterByMaxMSE
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterByMaxPercentile import SMFilterByMaxPercentile
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterPercentile import SMFilterPercentile
@@ -58,7 +59,8 @@ def main():
     # plane2.plot_mse()
     # bi_plane2 = SegmentedModelJsonSerializer.load("src\\BI_PLANE_WITH_MSE_from_VM_2D_Sc=TEST_st=10_dx=0.00_dy=0.00_dy=0.00.json")
     # print(bi_plane2)
-    dxf = DxfExporter(bi_plane, grid_densification=4).export()
+    dxf = DxfExporter(bi_plane, grid_densification=0.5).export()
+    ply = PlyExporter(bi_plane, grid_densification=0.25).export()
 
 
 if __name__ == "__main__":

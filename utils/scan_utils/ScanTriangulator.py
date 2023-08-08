@@ -7,13 +7,13 @@ from classes.ScanLite import ScanLite
 
 class ScanTriangulator:
 
-    def __init__(self, scan, sampler=None):
-        self.scan = scan
+    def __init__(self, sampler=None):
+        self.scan = None
         self.__sampler = sampler
         self.vertices = None
+        self.vertices_colors = None
         self.faces = None
         self.face_colors = None
-        self.__triangulate()
 
     def __str__(self):
         return (f"{self.__class__.__name__} "
@@ -69,7 +69,8 @@ class ScanTriangulator:
             c_lst.append([r, g, b])
         return c_lst
 
-    def __triangulate(self):
+    def triangulate(self, scan):
+        self.scan = scan
         scan_data = self.__get_sample_data(self.scan)
         self.vertices = np.vstack([scan_data["x"], scan_data["y"], scan_data["z"]]).T
         full_tri_data_dict = self.__calk_delone_triangulation(scan_data)
