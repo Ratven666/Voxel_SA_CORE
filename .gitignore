@@ -132,3 +132,11 @@ src/
 test.py
 
 *.json
+
+*.dxf
+
+*.dwl
+
+*.dwl2
+
+*.ply

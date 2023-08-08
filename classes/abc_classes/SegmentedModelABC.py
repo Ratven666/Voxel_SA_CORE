@@ -34,6 +34,14 @@ class SegmentedModelABC(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__} [ID: {self.id}]"
 
+    def get_z_from_point(self, point):
+        cell = self.get_model_element_for_point(point)
+        try:
+            z = cell.get_z_from_xy(point.X, point.Y)
+        except AttributeError:
+            z = None
+        return z
+
     @abstractmethod
     def _calk_segment_model(self):
         """
