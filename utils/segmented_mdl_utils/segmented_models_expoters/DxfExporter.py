@@ -7,8 +7,8 @@ from utils.segmented_mdl_utils.segmented_models_expoters.ExporterABC import Expo
 
 class DxfExporter(ExporterABC):
 
-    def __init__(self, segmented_model, grid_densification=1):
-        super().__init__(segmented_model, grid_densification)
+    def __init__(self, segmented_model, grid_densification=1, filtrate=True):
+        super().__init__(segmented_model, grid_densification, filtrate)
 
     def __save_dxf(self, file_path):
         doc = ezdxf.new("R2000")

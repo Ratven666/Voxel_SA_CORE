@@ -34,33 +34,18 @@ def main():
     create_db()
 
     scan = ScanDB("TEST")
-    # scan.load_scan_from_file(file_name="src/forest_full_1 m.txt")
+    scan.load_scan_from_file(file_name="src/KuchaRGB.txt")
 
 
-    vm = VoxelModelDB(scan, 10, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 0.1, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
 
     # dem = DemModelDB(vm)
     # plane = PlaneModelDB(vm)
     #
     bi_plane = BiModelDB(vm, DemTypeEnum.PLANE, enable_mse=True)
-    # bi_plane = BiModelDB(vm, DemTypeEnum.PLANE, enable_mse=False)
 
-    # SegmentedModelJsonSerializer(dem).dump(file_path="src", dump_with_full_scan=False)
-    # SegmentedModelJsonSerializer(plane).dump(file_path="src", dump_with_full_scan=False)
-    # SegmentedModelJsonSerializer(bi_plane).dump(file_path="src", dump_with_full_scan=False)
-
-    # dem2 = SegmentedModelJsonSerializer.load("src\\DEM_from_VM_2D_Sc=TEST_st=10_dx=0.00_dy=0.00_dy=0.00.json")
-    # print(dem2)
-    # dem2.plot()
-    # dem2.plot_mse()
-    # plane2 = SegmentedModelJsonSerializer.load("src\\PLANE_from_VM_2D_Sc=TEST_st=10_dx=0.00_dy=0.00_dy=0.00.json")
-    # print(plane2)
-    # plane2.plot()
-    # plane2.plot_mse()
-    # bi_plane2 = SegmentedModelJsonSerializer.load("src\\BI_PLANE_WITH_MSE_from_VM_2D_Sc=TEST_st=10_dx=0.00_dy=0.00_dy=0.00.json")
-    # print(bi_plane2)
-    dxf = DxfExporter(bi_plane, grid_densification=0.5).export()
-    ply = PlyExporter(bi_plane, grid_densification=0.25).export()
+    dxf = DxfExporter(bi_plane, grid_densification=1, filtrate=True).export()
+    ply = PlyExporter(bi_plane, grid_densification=1, filtrate=True).export()
 
 
 if __name__ == "__main__":

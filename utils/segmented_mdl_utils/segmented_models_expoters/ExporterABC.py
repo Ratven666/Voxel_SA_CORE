@@ -2,14 +2,19 @@ from abc import ABC, abstractmethod
 
 from classes.Point import Point
 from classes.ScanLite import ScanLite
-from utils.scan_utils.ScanTriangulator import ScanTriangulator
+from utils.scan_utils.scan_triangulators.ScanTriangulator import ScanTriangulator
+from utils.scan_utils.scan_triangulators.mesh_filters.MaxEdgeLengthFilter import MaxEdgeLengthFilter
 
 
 class ExporterABC(ABC):
 
-    def __init__(self, segmented_model, grid_densification, scan_triangelator=ScanTriangulator()):
+    def __init__(self, segmented_model,
+                 grid_densification,
+                 filtrate,
+                 scan_triangelator=ScanTriangulator(filters=[MaxEdgeLengthFilter()])):
         self.segmented_model = segmented_model
         self.grid_densification = grid_densification
+        self.filtrate = filtrate
         self.triangulation = scan_triangelator
         self.scan = None
 
@@ -44,9 +49,15 @@ class ExporterABC(ABC):
         for point in self._get_next_point_on_grid():
             self.scan.add_point(point)
 
+    def __set_max_edge_length(self, max_edge_length):
+        for filter_ in self.triangulation.filters:
+            if isinstance(filter_, MaxEdgeLengthFilter):
+                filter_.max_edge_length = max_edge_length
+
     def do_base_calculation(self):
         self.__create_mashed_scan()
-        self.triangulation.triangulate(self.scan)
+        self.__set_max_edge_length(self.segmented_model.voxel_model.step * 4)  #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        self.triangulation.triangulate(self.scan, filtrate=self.filtrate)
 
     @abstractmethod
     def export(self):
