@@ -8,6 +8,12 @@ class CellABC(ABC):
     Абстрактный класс ячейки сегментированной модели
     """
 
+    def __str__(self):
+        return f"{self.__class__.__name__} [id: {self.voxel_id}]"
+
+    def __repr__(self):
+        return f"{self.__class__.__name__} [id: {self.voxel_id}]"
+
     @abstractmethod
     def get_z_from_xy(self, x, y):
         """

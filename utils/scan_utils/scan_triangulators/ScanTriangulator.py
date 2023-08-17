@@ -31,13 +31,14 @@ class ScanTriangulator:
         """
         if self.__sampler is not None:
             scan = self.__sampler.do_sampling(scan)
-        x_lst, y_lst, z_lst, c_lst = [], [], [], []
+        point_id, x_lst, y_lst, z_lst, c_lst = [], [], [], [], []
         for point in scan:
+            point_id.append(point.id)
             x_lst.append(point.X)
             y_lst.append(point.Y)
             z_lst.append(point.Z)
             c_lst.append([point.R, point.G, point.B])
-        return {"x": x_lst, "y": y_lst, "z": z_lst, "color": c_lst, "scan": scan}
+        return {"id": point_id, "x": x_lst, "y": y_lst, "z": z_lst, "color": c_lst, "scan": scan}
 
     def __calk_delone_triangulation(self, scan_data):
         """
@@ -98,3 +99,4 @@ if __name__ == "__main__":
     tri = ScanTriangulator()
     tri.triangulate(scan)
     print(tri)
+    print(tri.faces)

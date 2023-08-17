@@ -21,6 +21,21 @@ class PointABC(ABC):
     def __repr__(self):
         return f"{self.__class__.__name__} [id: {self.id}]"
 
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        if not isinstance(other, PointABC):
+            raise TypeError("Операнд справа должен иметь тип производный от PointABC")
+        if hash(self) == hash(other) or self.id is None or other.id is None:
+            return (self.X == other.X) and \
+                   (self.Y == other.Y) and \
+                   (self.Z == other.Z) and \
+                   (self.R == other.R) and \
+                   (self.G == other.G) and \
+                   (self.B == other.B)
+        return False
+
     def get_dict(self):
         return {"id": self.id,
                 "X": self.X, "Y": self.Y, "Z": self.Z,

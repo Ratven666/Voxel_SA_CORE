@@ -19,9 +19,20 @@ class Point(PointABC):
 
 
 if __name__ == "__main__":
-    p1 = Point(1, 2, 3, 4, 5, 6, id_=12)
+    p1 = Point(1, 2, 3, 4, 5, 6, id_=13)
+    p4 = Point(1, 2, 3, 4, 5, 6, id_=12)
+    p5 = Point(1, 2, 3, 4, 5, 6)
     p2 = Point(10, 20, 30, 40, 50, 60)
-    print(p1)
-    print(p2)
-    point_list = [p1, p2]
-    print(point_list)
+    p3 = Point(10, 20, 30, 40, 50, 60)
+    points = [p5]
+    set_points = set()
+    set_points.add(p1)
+    # set_points.add(p2)
+    # set_points.add(p3)
+    # set_points.add(p4)
+    set_points.add(p5)
+
+    print(set_points)
+
+    print(p1 in points)
+

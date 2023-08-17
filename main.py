@@ -1,5 +1,10 @@
+import time
+
 from classes.BiModelDB import BiModelDB
 from classes.DemModelDB import DemModelDB
+from classes.MeshDB import MeshDB
+from classes.MeshLite import MeshLite
+from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from db_models.dem_models_table import DemTypeEnum
@@ -33,19 +38,41 @@ from utils.voxel_utils.voxel_model_serializers.VoxelModelJsonSerializer import V
 def main():
     create_db()
 
-    scan = ScanDB("TEST")
-    scan.load_scan_from_file(file_name="src/KuchaRGB.txt")
+    scan_for_mesh = ScanDB("KuchaRGB_05_1")
+    scan_for_mesh.load_scan_from_file(file_name="src/KuchaRGB_05.txt")
+    scan = ScanDB("KuchaRGB")
+    scan.load_scan_from_file(file_name="src/KuchaRGB_0_10.txt")
+    # print(scan)
+    # t0 = time.time()
+    # for point in scan:
+    #     p = point
+    #     # print(point)
+    # print(time.time() - t0)
+    vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
 
+    bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
+    # mesh = MeshDB(scan_for_mesh)
+    mesh = MeshLite(scan_for_mesh)
+    for t in mesh:
+        print(t)
+    # mesh_sm = MeshSegmentModelDB(vm, mesh)
+    print(mesh_sm.mse_data)
+    # for t in mesh:
+    #     for p in t:
+    #         print(p)
+    #     print(t.get_dict())
 
-    vm = VoxelModelDB(scan, 0.1, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    # mesh.delete_mesh()
+    # MeshDB.delete_mesh_by_id(1)
+    # MeshDB.delete_mesh_by_id(2)
 
     # dem = DemModelDB(vm)
     # plane = PlaneModelDB(vm)
     #
-    bi_plane = BiModelDB(vm, DemTypeEnum.PLANE, enable_mse=True)
-
-    dxf = DxfExporter(bi_plane, grid_densification=1, filtrate=True).export()
-    ply = PlyExporter(bi_plane, grid_densification=1, filtrate=True).export()
+    # bi_plane = BiModelDB(vm, DemTypeEnum.PLANE, enable_mse=True)
+    #
+    # dxf = DxfExporter(bi_plane, grid_densification=1, filtrate=True).export()
+    # ply = PlyExporter(bi_plane, grid_densification=1, filtrate=True).export()
 
 
 if __name__ == "__main__":

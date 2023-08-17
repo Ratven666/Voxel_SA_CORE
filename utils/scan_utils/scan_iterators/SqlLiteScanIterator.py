@@ -19,12 +19,21 @@ class SqlLiteScanIterator:
     def __iter__(self):
         connection = sqlite3.connect(self.__path)
         self.cursor = connection.cursor()
+        # stmt = """SELECT p.id, p.X, p.Y, p.Z,
+        #                  p.R, p.G, p.B
+        #           FROM points p
+        #           JOIN points_scans ps ON ps.point_id = p.id
+        #           WHERE ps.scan_id = (?)"""
+        stmt = """SELECT p.id, p.X, p.Y, p.Z,
+                         p.R, p.G, p.B
+                  FROM points p
+                  JOIN (SELECT ps.point_id
+                        FROM points_scans ps
+                        WHERE ps.scan_id = (?)) ps
+                  ON ps.point_id = p.id
+                          """
         self.generator = (Point.parse_point_from_db_row(data) for data in
-                          self.cursor.execute("""SELECT p.id, p.X, p.Y, p.Z,
-                                                    p.R, p.G, p.B
-                                                    FROM points p
-                                                    JOIN points_scans ps ON ps.point_id = p.id
-                                                    WHERE ps.scan_id = (?)""", (self.scan_id,)))
+                          self.cursor.execute(stmt, (self.scan_id,)))
         return self.generator
 
     def __next__(self):
