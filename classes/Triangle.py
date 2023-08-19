@@ -3,7 +3,7 @@ from classes.Point import Point
 
 class Triangle:
 
-    __slots__ = ["id", "point_0", "point_1", "point_2", "r", "mse"]
+    __slots__ = ["id", "point_0", "point_1", "point_2", "r", "mse", "vv"]
 
     def __init__(self, point_0: Point, point_1: Point, point_2: Point, r=None, mse=None, id_=None):
         self.id = id_
@@ -16,14 +16,23 @@ class Triangle:
     def __str__(self):
         return f"{self.__class__.__name__} " \
                f"[id: {self.id}\t[[Point_0: [id: {self.point_0.id},\t" \
-               f"x: {self.point_0.X} y: {self.point_0.Y} z: {self.point_0.Z},\t" \
-               f"RGB: ({self.point_0.R},{self.point_0.G},{self.point_0.B})]\n" \
+               f"x: {self.point_0.X} y: {self.point_0.Y} z: {self.point_0.Z}]\t" \
                f"\t\t [Point_1: [id: {self.point_1.id},\t" \
-               f"x: {self.point_1.X} y: {self.point_1.Y} z: {self.point_1.Z},\t" \
-               f"RGB: ({self.point_1.R},{self.point_1.G},{self.point_1.B})]\n" \
+               f"x: {self.point_1.X} y: {self.point_1.Y} z: {self.point_1.Z}]\t" \
                f"\t\t [Point_2: [id: {self.point_2.id},\t" \
-               f"x: {self.point_2.X} y: {self.point_2.Y} z: {self.point_2.Z},\t" \
-               f"RGB: ({self.point_2.R},{self.point_2.G},{self.point_2.B})]]]"
+               f"x: {self.point_2.X} y: {self.point_2.Y} z: {self.point_2.Z}]\t" \
+               f"r: {self.r},\tmse: {self.mse}"
+    # def __str__(self):
+    #     return f"{self.__class__.__name__} " \
+    #            f"[id: {self.id}\t[[Point_0: [id: {self.point_0.id},\t" \
+    #            f"x: {self.point_0.X} y: {self.point_0.Y} z: {self.point_0.Z},\t" \
+    #            f"RGB: ({self.point_0.R},{self.point_0.G},{self.point_0.B})]\n" \
+    #            f"\t\t [Point_1: [id: {self.point_1.id},\t" \
+    #            f"x: {self.point_1.X} y: {self.point_1.Y} z: {self.point_1.Z},\t" \
+    #            f"RGB: ({self.point_1.R},{self.point_1.G},{self.point_1.B})]\n" \
+    #            f"\t\t [Point_2: [id: {self.point_2.id},\t" \
+    #            f"x: {self.point_2.X} y: {self.point_2.Y} z: {self.point_2.Z},\t" \
+    #            f"RGB: ({self.point_2.R},{self.point_2.G},{self.point_2.B})]]]"
 
     def __repr__(self):
         return f"{self.__class__.__name__} [id={self.id}, points=[{self.point_0.id}-" \

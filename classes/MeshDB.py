@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select, insert
+from sqlalchemy import delete, select, insert, and_, update
 
 from classes.ScanDB import ScanDB
 from classes.abc_classes.MeshABC import MeshABC
@@ -16,15 +16,44 @@ class MeshDB(MeshABC):
 
     def __init__(self, scan, scan_triangulator=ScipyTriangulator, db_connection=None):
         super().__init__(scan, scan_triangulator)
-        # self.scan = scan
-        # self.scan_triangulator = scan_triangulator
-        # self.mesh_name = self.__name_generator()
-        # self.len = 0
         self.base_scan_id = None
         self.__init_mesh(db_connection)
 
     def __iter__(self):
         return iter(SqlLiteMeshIterator(self))
+
+    def calk_mesh_mse(self, mesh_segment_model, base_scan=None, clear_previous_mse=False):
+        if clear_previous_mse is True:
+            self.clear_mesh_mse()
+        triangles = super().calk_mesh_mse(mesh_segment_model, base_scan)
+        with engine.connect() as db_connection:
+            for triangle in triangles:
+                stmt = update(Tables.triangles_db_table)\
+                    .where(Tables.triangles_db_table.c.id == triangle.id)\
+                    .values(r=triangle.r,
+                            mse=triangle.mse)
+                db_connection.execute(stmt)
+            stmt = update(self.db_table) \
+                .where(self.db_table.c.id == self.id) \
+                .values(r=self.r,
+                        mse=self.mse)
+            db_connection.execute(stmt)
+            db_connection.commit()
+
+    def clear_mesh_mse(self):
+        with engine.connect() as db_connection:
+            for triangle in self:
+                stmt = update(Tables.triangles_db_table)\
+                    .where(Tables.triangles_db_table.c.id == triangle.id)\
+                    .values(r=None,
+                            mse=None)
+                db_connection.execute(stmt)
+            stmt = update(self.db_table) \
+                .where(self.db_table.c.id == self.id) \
+                .values(r=None,
+                        mse=None)
+            db_connection.execute(stmt)
+            db_connection.commit()
 
     def delete_mesh(self, db_connection=None):
         self.delete_mesh_by_id(self.id, db_connection=db_connection)
@@ -75,9 +104,6 @@ class MeshDB(MeshABC):
         db_conn.execute(Tables.triangles_db_table.insert(), triangle_data)
         db_conn.commit()
 
-    # def __name_generator(self):
-    #     return f"MESH_{self.scan.scan_name}"
-
     def __init_mesh(self, db_connection=None, triangulation=None):
         """
         Инициализирует поверхности при запуске
@@ -98,6 +124,8 @@ class MeshDB(MeshABC):
                 self.len = len(triangulation.faces)
                 stmt = insert(self.db_table).values(mesh_name=self.mesh_name,
                                                     len=self.len,
+                                                    r=self.r,
+                                                    mse=self.mse,
                                                     base_scan_id=self.scan.id)
                 db_conn.execute(stmt)
                 db_conn.commit()
@@ -118,4 +146,6 @@ class MeshDB(MeshABC):
         self.id = db_mesh_data["id"]
         self.scan_name = db_mesh_data["mesh_name"]
         self.len = db_mesh_data["len"]
+        self.r = db_mesh_data["r"]
+        self.mse = db_mesh_data["mse"]
         self.base_scan_id = db_mesh_data["base_scan_id"]

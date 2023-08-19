@@ -48,14 +48,41 @@ def main():
     #     p = point
     #     # print(point)
     # print(time.time() - t0)
+    # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
     vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
 
-    bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
-    # mesh = MeshDB(scan_for_mesh)
-    mesh = MeshLite(scan_for_mesh)
-    for t in mesh:
-        print(t)
-    # mesh_sm = MeshSegmentModelDB(vm, mesh)
+    # bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
+    mesh = MeshDB(scan_for_mesh)
+    # mesh = MeshLite(scan_for_mesh)
+    # for t in mesh:
+    #     print(t)
+    mesh_sm = MeshSegmentModelDB(vm, mesh)
+    mesh.clear_mesh_mse()
+    mesh.calk_mesh_mse(mesh_sm)
+    svv = 0
+    sr = 0
+    for triangle in mesh:
+        try:
+            svv += triangle.r * triangle.mse * triangle.mse
+            sr += triangle.r
+        except TypeError:
+            continue
+
+    print((svv / sr) ** 0.5)
+    print(sr)
+    svv = 0
+    sr = 0
+    for cell in mesh_sm:
+        try:
+            svv += cell.r * cell.mse * cell.mse
+            sr += cell.r
+        except TypeError:
+            continue
+    print((svv / sr) ** 0.5)
+    print(sr)
+
+    # for t in mesh:
+    #     print(t)
     print(mesh_sm.mse_data)
     # for t in mesh:
     #     for p in t:
