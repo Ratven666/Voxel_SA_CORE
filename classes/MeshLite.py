@@ -17,10 +17,15 @@ class MeshLite(MeshABC):
     def __init_mesh(self):
         triangulation = self.scan_triangulator(self.scan).triangulate()
         self.len = len(triangulation.faces)
+        fake_point_id = -1        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Подумать над последстивиями ?!?!??!?!??!?!
         for face in triangulation.faces:
             points = []
             for point_idx in face:
-                point = Point(id_=triangulation.points_id[point_idx],
+                id_ = triangulation.points_id[point_idx]
+                if triangulation.points_id[point_idx] is None:
+                    id_ = fake_point_id
+                    fake_point_id -= 1
+                point = Point(id_=id_,
                               X=triangulation.vertices[point_idx][0],
                               Y=triangulation.vertices[point_idx][1],
                               Z=triangulation.vertices[point_idx][2],

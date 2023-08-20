@@ -9,6 +9,9 @@ from classes.PlaneModelDB import PlaneModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from db_models.dem_models_table import DemTypeEnum
 from utils.logs.console_log_config import console_logger
+from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
+from utils.mesh_utils.mesh_exporters.MeshExporterABC import MeshExporterABC
+from utils.mesh_utils.mesh_exporters.PlyMeshExporter import PlyMeshExporter
 from utils.scan_utils.scan_filters.ScanFilterByCellMSE import ScanFilterByCellMSE
 from utils.scan_utils.scan_filters.ScanFilterByModelMSE import ScanFilterByModelMSE
 from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
@@ -52,42 +55,9 @@ def main():
     vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
 
     # bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
-    mesh = MeshDB(scan_for_mesh)
-    # mesh = MeshLite(scan_for_mesh)
-    # for t in mesh:
-    #     print(t)
-    mesh_sm = MeshSegmentModelDB(vm, mesh)
-    mesh.clear_mesh_mse()
-    mesh.calk_mesh_mse(mesh_sm)
-    svv = 0
-    sr = 0
-    for triangle in mesh:
-        try:
-            svv += triangle.r * triangle.mse * triangle.mse
-            sr += triangle.r
-        except TypeError:
-            continue
+    mesh = MeshLite(scan_for_mesh)
 
-    print((svv / sr) ** 0.5)
-    print(sr)
-    svv = 0
-    sr = 0
-    for cell in mesh_sm:
-        try:
-            svv += cell.r * cell.mse * cell.mse
-            sr += cell.r
-        except TypeError:
-            continue
-    print((svv / sr) ** 0.5)
-    print(sr)
-
-    # for t in mesh:
-    #     print(t)
-    print(mesh_sm.mse_data)
-    # for t in mesh:
-    #     for p in t:
-    #         print(p)
-    #     print(t.get_dict())
+    mesh_exp = PlyMeshExporter(mesh).export()
 
     # mesh.delete_mesh()
     # MeshDB.delete_mesh_by_id(1)
