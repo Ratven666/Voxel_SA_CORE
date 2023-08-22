@@ -14,7 +14,7 @@ class VoxelModelABC(ABC):
     def __init__(self, scan, step, dx, dy, dz, is_2d_vxl_mdl=True):
         self.id = None
         self.is_2d_vxl_mdl = is_2d_vxl_mdl
-        self.step = step
+        self.step = float(step)
         self.dx, self.dy, self.dz = self.__dx_dy_formatter(dx, dy, dz)
         self.vm_name: str = self.__name_generator(scan)
         self.len: int = 0

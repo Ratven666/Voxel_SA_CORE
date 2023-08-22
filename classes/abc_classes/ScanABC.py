@@ -1,6 +1,7 @@
+import logging
 from abc import ABC, abstractmethod
 
-from CONFIG import MAX_POINT_SCAN_PLOT
+from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
 from utils.scan_utils.scan_plotters.ScanPlotterMPL import ScanScanPlotterMPL
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
@@ -9,6 +10,7 @@ class ScanABC(ABC):
     """
     Абстрактный класс скана
     """
+    logger = logging.getLogger(LOGGER)
 
     def __init__(self, scan_name):
         self.id = None

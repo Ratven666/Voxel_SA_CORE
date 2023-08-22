@@ -55,12 +55,12 @@ def main():
     # plane_sm = BiModelDB(vm, DemTypeEnum.PLANE)
     # plane_sm = MeshSegmentModelDB(vm, mesh)
     sm_scan = SegmentedModelToScan(plane_sm, custom_exporter=CellCenterSegmentedModelToScan).export_to_scan()
-
+    sm_scan.save_to_db()
     # bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
-    mesh = MeshLite(sm_scan)
-
-    mesh_exp = PlyMeshExporter(mesh).export()
-    mesh_exp = DxfMeshExporter(mesh).export()
+    # mesh = MeshLite(sm_scan)
+    #
+    # mesh_exp = PlyMeshExporter(mesh).export()
+    # mesh_exp = DxfMeshExporter(mesh).export()
 
     # mesh.delete_mesh()
     # MeshDB.delete_mesh_by_id(1)

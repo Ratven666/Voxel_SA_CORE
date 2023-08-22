@@ -1,4 +1,4 @@
-from sqlalchemy import and_, select, update
+from sqlalchemy import and_, select, update, insert
 from sqlalchemy import func
 
 from utils.start_db import engine, Tables
@@ -18,10 +18,10 @@ def calk_scan_metrics(scan_id):
                       func.max(Tables.points_db_table.c.Y).label("max_Y"),
                       func.min(Tables.points_db_table.c.Z).label("min_Z"),
                       func.max(Tables.points_db_table.c.Z).label("max_Z")).where(and_(
-                               Tables.points_scans_db_table.c.point_id == Tables.points_db_table.c.id,
-                               Tables.points_scans_db_table.c.scan_id == Tables.scans_db_table.c.id,
-                               Tables.scans_db_table.c.id == scan_id
-                      ))
+            Tables.points_scans_db_table.c.point_id == Tables.points_db_table.c.id,
+            Tables.points_scans_db_table.c.scan_id == Tables.scans_db_table.c.id,
+            Tables.scans_db_table.c.id == scan_id
+        ))
         scan_metrics = dict(db_connection.execute(stmt).mappings().first())
         scan_metrics["id"] = scan_id
         return scan_metrics
@@ -80,6 +80,31 @@ def update_scan_in_db_from_scan(updated_scan, db_connection=None):
                 max_Y=updated_scan.max_Y,
                 min_Z=updated_scan.min_Z,
                 max_Z=updated_scan.max_Z)
+    if db_connection is None:
+        with engine.connect() as db_connection:
+            db_connection.execute(stmt)
+            db_connection.commit()
+    else:
+        db_connection.execute(stmt)
+        db_connection.commit()
+
+
+def insert_scan_in_db_from_scan(updated_scan, db_connection=None):
+    """
+    Добавляет переданный скан в БД
+    :param updated_scan: Добавляемый скан
+    :param db_connection: Открытое соединение с БД
+    :return: None
+    """
+    stmt = insert(Tables.scans_db_table).values(id=updated_scan.id,
+                                                scan_name=updated_scan.scan_name,
+                                                len=updated_scan.len,
+                                                min_X=updated_scan.min_X,
+                                                max_X=updated_scan.max_X,
+                                                min_Y=updated_scan.min_Y,
+                                                max_Y=updated_scan.max_Y,
+                                                min_Z=updated_scan.min_Z,
+                                                max_Z=updated_scan.max_Z)
     if db_connection is None:
         with engine.connect() as db_connection:
             db_connection.execute(stmt)
