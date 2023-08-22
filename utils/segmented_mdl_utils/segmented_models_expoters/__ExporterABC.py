@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from classes.Point import Point
 from classes.ScanLite import ScanLite
-from utils.scan_utils.scan_triangulators.ScanTriangulator import ScanTriangulator
-from utils.scan_utils.scan_triangulators.mesh_filters.MaxEdgeLengthFilter import MaxEdgeLengthFilter
+from utils.scan_utils.scan_triangulators.__ScanTriangulator import ScanTriangulator
+from utils.scan_utils.scan_triangulators.mesh_filters.__MaxEdgeLengthFilter import MaxEdgeLengthFilter
 
 
 class ExporterABC(ABC):

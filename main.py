@@ -18,8 +18,11 @@ from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
 from utils.scan_utils.scan_plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly, ScanPlotterMeshPlotly
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 from utils.scan_utils.scan_serializers.ScanJsonSerializer import ScanJsonSerializer
-from utils.segmented_mdl_utils.segmented_models_expoters.DxfExporter import DxfExporter
-from utils.segmented_mdl_utils.segmented_models_expoters.PlyExporter import PlyExporter
+from utils.segmented_mdl_utils.segmented_models_expoters.__DxfExporter import DxfExporter
+from utils.segmented_mdl_utils.segmented_models_expoters.__PlyExporter import PlyExporter
+from utils.segmented_mdl_utils.segmented_models_expoters.sm_to_scan.CellCenterSegmentedModelToScan import \
+    CellCenterSegmentedModelToScan
+from utils.segmented_mdl_utils.segmented_models_expoters.sm_to_scan.SegmentModelToScan import SegmentedModelToScan
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterByMaxMSE import SMFilterByMaxMSE
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterByMaxPercentile import SMFilterByMaxPercentile
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterPercentile import SMFilterPercentile
@@ -45,19 +48,19 @@ def main():
     scan_for_mesh.load_scan_from_file(file_name="src/KuchaRGB_05.txt")
     scan = ScanDB("KuchaRGB")
     scan.load_scan_from_file(file_name="src/KuchaRGB_0_10.txt")
-    # print(scan)
-    # t0 = time.time()
-    # for point in scan:
-    #     p = point
-    #     # print(point)
-    # print(time.time() - t0)
-    # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
-    vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 1, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+
+    mesh = MeshDB(scan_for_mesh)
+    plane_sm = DemModelDB(vm)
+    # plane_sm = BiModelDB(vm, DemTypeEnum.PLANE)
+    # plane_sm = MeshSegmentModelDB(vm, mesh)
+    sm_scan = SegmentedModelToScan(plane_sm, custom_exporter=CellCenterSegmentedModelToScan).export_to_scan()
 
     # bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
-    mesh = MeshLite(scan_for_mesh)
+    mesh = MeshLite(sm_scan)
 
     mesh_exp = PlyMeshExporter(mesh).export()
+    mesh_exp = DxfMeshExporter(mesh).export()
 
     # mesh.delete_mesh()
     # MeshDB.delete_mesh_by_id(1)

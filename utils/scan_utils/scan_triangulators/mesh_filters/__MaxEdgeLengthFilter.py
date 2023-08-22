@@ -2,8 +2,8 @@ import numpy as np
 
 from classes.Point import Point
 from classes.ScanLite import ScanLite
-from utils.scan_utils.scan_triangulators.ScanTriangulator import ScanTriangulator
-from utils.scan_utils.scan_triangulators.mesh_filters.MeshFilterABC import MeshFilterABC
+from utils.scan_utils.scan_triangulators.__ScanTriangulator import ScanTriangulator
+from utils.scan_utils.scan_triangulators.mesh_filters.__MeshFilterABC import MeshFilterABC
 
 
 class MaxEdgeLengthFilter(MeshFilterABC):

@@ -2,7 +2,7 @@ from os import path
 
 import ezdxf
 
-from utils.segmented_mdl_utils.segmented_models_expoters.ExporterABC import ExporterABC
+from utils.segmented_mdl_utils.segmented_models_expoters.__ExporterABC import ExporterABC
 
 
 class DxfExporter(ExporterABC):
