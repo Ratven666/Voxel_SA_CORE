@@ -12,6 +12,7 @@ from utils.logs.console_log_config import console_logger
 from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
 from utils.mesh_utils.mesh_exporters.MeshExporterABC import MeshExporterABC
 from utils.mesh_utils.mesh_exporters.PlyMeshExporter import PlyMeshExporter
+from utils.mesh_utils.mesh_exporters.PlyMseMeshExporter import PlyMseMeshExporter
 from utils.scan_utils.scan_filters.ScanFilterByCellMSE import ScanFilterByCellMSE
 from utils.scan_utils.scan_filters.ScanFilterByModelMSE import ScanFilterByModelMSE
 from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
@@ -48,14 +49,17 @@ def main():
     scan_for_mesh.load_scan_from_file(file_name="src/KuchaRGB_05.txt")
     scan = ScanDB("KuchaRGB")
     scan.load_scan_from_file(file_name="src/KuchaRGB_0_10.txt")
-    vm = VoxelModelDB(scan, 1, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
 
     mesh = MeshDB(scan_for_mesh)
-    plane_sm = DemModelDB(vm)
+    mesh_sm = MeshSegmentModelDB(vm, mesh)
+    mesh.calk_mesh_mse(mesh_sm)
+    PlyMseMeshExporter(mesh, min_mse=0.01, max_mse=0.05).export()
+    # plane_sm = DemModelDB(vm)
     # plane_sm = BiModelDB(vm, DemTypeEnum.PLANE)
     # plane_sm = MeshSegmentModelDB(vm, mesh)
-    sm_scan = SegmentedModelToScan(plane_sm, custom_exporter=CellCenterSegmentedModelToScan).export_to_scan()
-    sm_scan.save_to_db()
+    # sm_scan = SegmentedModelToScan(plane_sm, custom_exporter=CellCenterSegmentedModelToScan).export_to_scan()
+    # sm_scan.save_to_db()
     # bi_pl = BiModelDB(vm, DemTypeEnum.PLANE)
     # mesh = MeshLite(sm_scan)
     #

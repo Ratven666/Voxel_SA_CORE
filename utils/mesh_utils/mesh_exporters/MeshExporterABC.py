@@ -8,9 +8,9 @@ class MeshExporterABC(ABC):
         self.vertices = []
         self.vertices_colors = []
         self.faces = []
-        self.__init_base_data()
+        self._init_base_data()
 
-    def __init_base_data(self):
+    def _init_base_data(self):
         points = {}
         triangles = []
         fake_id = -1

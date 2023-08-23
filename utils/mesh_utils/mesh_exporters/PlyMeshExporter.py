@@ -39,7 +39,7 @@ class PlyMeshExporter(MeshExporterABC):
             faces_str += f"3 {face[0]} {face[1]} {face[2]}\n"
         return faces_str
 
-    def __save_ply(self, file_path):
+    def _save_ply(self, file_path):
         with open(file_path, "wb") as file:
             file.write(self.__create_header().encode("ascii"))
             file.write(self.__create_vertices_str().encode("ascii"))
@@ -47,4 +47,4 @@ class PlyMeshExporter(MeshExporterABC):
 
     def export(self, file_path="."):
         file_path = path.join(file_path, f"{self.mesh.mesh_name.replace(':', '=')}.ply")
-        self.__save_ply(file_path)
+        self._save_ply(file_path)
