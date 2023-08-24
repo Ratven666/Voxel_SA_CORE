@@ -14,10 +14,15 @@ class MeshLite(MeshABC):
     def __iter__(self):
         return iter(self.triangles)
 
+    def calk_mesh_mse(self, mesh_segment_model, base_scan=None, clear_previous_mse=False):
+        triangles = super().calk_mesh_mse(mesh_segment_model, base_scan)
+        self.triangles = list(triangles)
+
     def __init_mesh(self):
         triangulation = self.scan_triangulator(self.scan).triangulate()
         self.len = len(triangulation.faces)
         fake_point_id = -1        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Подумать над последстивиями ?!?!??!?!??!?!
+        fake_triangle_id = -1
         for face in triangulation.faces:
             points = []
             for point_idx in face:
@@ -34,4 +39,6 @@ class MeshLite(MeshABC):
                               B=triangulation.vertices_colors[point_idx][2])
                 points.append(point)
             triangle = Triangle(*points)
+            triangle.id = fake_triangle_id
+            fake_triangle_id -= 1
             self.triangles.append(triangle)

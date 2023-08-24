@@ -13,6 +13,8 @@ from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
 from utils.mesh_utils.mesh_exporters.MeshExporterABC import MeshExporterABC
 from utils.mesh_utils.mesh_exporters.PlyMeshExporter import PlyMeshExporter
 from utils.mesh_utils.mesh_exporters.PlyMseMeshExporter import PlyMseMeshExporter
+from utils.mesh_utils.mesh_filters.MaxEdgeLengthMeshFilter import MaxEdgeLengthMeshFilter
+from utils.mesh_utils.mesh_filters.MaxMseTriangleMeshFilter import MaxMseTriangleMeshFilter
 from utils.scan_utils.scan_filters.ScanFilterByCellMSE import ScanFilterByCellMSE
 from utils.scan_utils.scan_filters.ScanFilterByModelMSE import ScanFilterByModelMSE
 from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
@@ -51,10 +53,19 @@ def main():
     scan.load_scan_from_file(file_name="src/KuchaRGB_0_10.txt")
     vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
 
-    mesh = MeshDB(scan_for_mesh)
+    mesh = MeshLite(scan_for_mesh)
+    print(mesh)
     mesh_sm = MeshSegmentModelDB(vm, mesh)
     mesh.calk_mesh_mse(mesh_sm)
-    PlyMseMeshExporter(mesh, min_mse=0.01, max_mse=0.05).export()
+    print(mesh)
+
+    MaxEdgeLengthMeshFilter(mesh, max_edge_length=1.5).filter_mesh()
+    print(mesh)
+    MaxMseTriangleMeshFilter(mesh, max_mse=0.3).filter_mesh()
+    print(mesh)
+
+    # PlyMseMeshExporter(mesh, min_mse=0.01, max_mse=0.05).export()
+    PlyMeshExporter(mesh).export()
     # plane_sm = DemModelDB(vm)
     # plane_sm = BiModelDB(vm, DemTypeEnum.PLANE)
     # plane_sm = MeshSegmentModelDB(vm, mesh)

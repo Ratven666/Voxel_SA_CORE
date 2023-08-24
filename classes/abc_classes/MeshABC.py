@@ -18,6 +18,10 @@ class MeshABC:
     def __iter__(self):
         pass
 
+    def __str__(self):
+        return f"{self.__class__.__name__} " \
+               f"[mesh_name: {self.mesh_name},\tlen: {self.len} r: {self.r} mse: {self.mse}]"
+
     def __name_generator(self):
         return f"MESH_{self.scan.scan_name}"
 

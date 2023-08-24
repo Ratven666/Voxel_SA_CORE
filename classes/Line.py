@@ -15,6 +15,11 @@ class Line:
     def __repr__(self):
         return f"{self.__class__.__name__} [id: {self.id}]"
 
+    def get_distance(self):
+        return ((self.point_0.X - self.point_1.X) ** 2 +
+                (self.point_0.Y - self.point_1.Y) ** 2 +
+                (self.point_0.Z - self.point_1.Z) ** 2) ** 0.5
+
     def __get_y_by_x(self, x):
         x1, x2 = self.point_0.X, self.point_1.X
         y1, y2 = self.point_0.Y, self.point_1.Y
@@ -55,8 +60,6 @@ class Line:
         points = [Point(X=point[0], Y=point[1], Z=0,
                         R=0, G=0, B=0) for point in points]
         return points
-
-
 
 
 if __name__ == "__main__":
