@@ -11,8 +11,8 @@ class VoxelABC(ABC):
 
     logger = logging.getLogger(LOGGER)
 
-    def __init__(self, x, y, z, step, vxl_mdl_id):
-        self.id = None
+    def __init__(self, x, y, z, step, vxl_mdl_id, id_=None):
+        self.id = id_
         self.X = x
         self.Y = y
         self.Z = z

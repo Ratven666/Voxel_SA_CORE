@@ -10,10 +10,11 @@ class VoxelDB(VoxelABC):
     Воксель связанный с базой данных
     """
 
-    __slots__ = ["id", "X", "Y", "Z", "step", "vxl_mdl_id", "vxl_name", "scan_id", "len", "R", "G", "B", "scan"]
+    __slots__ = ["id", "X", "Y", "Z", "step", "vxl_mdl_id", "vxl_name",
+                 "scan_id", "len", "R", "G", "B", "scan", "container_dict"]
 
-    def __init__(self, x, y, z, step, vxl_mdl_id, db_connection=None):
-        super().__init__(x, y, z, step, vxl_mdl_id)
+    def __init__(self, x, y, z, step, vxl_mdl_id, id_=None, db_connection=None):
+        super().__init__(x, y, z, step, vxl_mdl_id, id_)
         self.scan = None
         self.__init_voxel(db_connection)
 

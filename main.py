@@ -7,6 +7,7 @@ from classes.MeshLite import MeshLite
 from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.VoxelModelDB import VoxelModelDB
+from classes.VoxelModelLite import VoxelModelLite
 from db_models.dem_models_table import DemTypeEnum
 from utils.logs.console_log_config import console_logger
 from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
@@ -21,8 +22,6 @@ from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
 from utils.scan_utils.scan_plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly, ScanPlotterMeshPlotly
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 from utils.scan_utils.scan_serializers.ScanJsonSerializer import ScanJsonSerializer
-from utils.segmented_mdl_utils.segmented_models_expoters.__DxfExporter import DxfExporter
-from utils.segmented_mdl_utils.segmented_models_expoters.__PlyExporter import PlyExporter
 from utils.segmented_mdl_utils.segmented_models_expoters.sm_to_scan.CellCenterSegmentedModelToScan import \
     CellCenterSegmentedModelToScan
 from utils.segmented_mdl_utils.segmented_models_expoters.sm_to_scan.SegmentModelToScan import SegmentedModelToScan
@@ -48,14 +47,17 @@ def main():
     create_db()
 
     scan_for_mesh = ScanDB("4skld.txt")
-    scan_for_mesh.load_scan_from_file(file_name="src/4skld_0629.txt")
+    scan_for_mesh.load_scan_from_file(file_name="src/4skld_1.txt")
 
     # scan_for_mesh.plot(plotter=ScanPlotterPointsPlotly())
-    vm = VoxelModelDB(scan_for_mesh, 4, is_2d_vxl_mdl=True)
+    # vm = VoxelModelDB(scan_for_mesh, 4, is_2d_vxl_mdl=True)
+    vm = VoxelModelLite(scan_for_mesh, 4, is_2d_vxl_mdl=True)
     # vm.plot()
-    sm = PlaneModelDB(vm)
-    sm.plot()
-    sm.plot_mse()
+    vm = vm.save_to_db()
+    dm = BiModelDB(vm, DemTypeEnum.PLANE)
+    dm.plot()
+
+
     # scan = ScanDB("4skld_0629")
     # scan.load_scan_from_file(file_name="src/4skld_0629.txt")
     # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)

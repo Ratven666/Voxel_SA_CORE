@@ -41,6 +41,31 @@ class VoxelModelABC(ABC):
         vm_type = "2D" if self.is_2d_vxl_mdl else "3D"
         return f"VM_{vm_type}_Sc:{scan.scan_name}_st:{self.step}_dx:{self.dx:.2f}_dy:{self.dy:.2f}_dz:{self.dz:.2f}"
 
+    def _calc_vxl_md_metric(self, scan):
+        """
+        Рассчитывает границы воксельной модели и максимальное количество вокселей
+        исходя из размера вокселя и границ скана
+        :param scan: скан на основе которого рассчитываются границы модели
+        :return: None
+        """
+        if len(scan) == 0:
+            return None
+        self.min_X = (scan.min_X // self.step * self.step) - ((1 - self.dx) % 1 * self.step)
+        self.min_Y = (scan.min_Y // self.step * self.step) - ((1 - self.dy) % 1 * self.step)
+        self.min_Z = (scan.min_Z // self.step * self.step) - ((1 - self.dz) % 1 * self.step)
+
+        self.max_X = (scan.max_X // self.step + 1) * self.step + ((self.dx % 1) * self.step)
+        self.max_Y = (scan.max_Y // self.step + 1) * self.step + ((self.dy % 1) * self.step)
+        self.max_Z = (scan.max_Z // self.step + 1) * self.step + ((self.dz % 1) * self.step)
+
+        self.X_count = round((self.max_X - self.min_X) / self.step)
+        self.Y_count = round((self.max_Y - self.min_Y) / self.step)
+        if self.is_2d_vxl_mdl:
+            self.Z_count = 1
+        else:
+            self.Z_count = round((self.max_Z - self.min_Z) / self.step)
+        self.len = self.X_count * self.Y_count * self.Z_count
+
     def __str__(self):
         return f"{self.__class__.__name__} " \
                f"[id: {self.id},\tName: {self.vm_name}\tLEN: (x:{self.X_count} * y:{self.Y_count} *" \
