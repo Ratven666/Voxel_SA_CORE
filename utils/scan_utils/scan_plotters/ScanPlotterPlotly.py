@@ -9,7 +9,7 @@ from utils.scan_utils.scan_plotters.ScanPlotterABC import ScanPlotterABC
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
 
 
-class ScanScanPlotterPlotly(ScanPlotterABC):
+class ScanPlotterPlotly(ScanPlotterABC):
     """
     Абстрактный класс для плоттера сканов в библиотеке plotly
     """
@@ -36,7 +36,7 @@ class ScanScanPlotterPlotly(ScanPlotterABC):
         pass
 
 
-class ScanPlotterPointsPlotly(ScanScanPlotterPlotly):
+class ScanPlotterPointsPlotly(ScanPlotterPlotly):
     """
     Отрисовка скана в виде облака точек через библиотеку plotly
     """
@@ -70,7 +70,7 @@ class ScanPlotterPointsPlotly(ScanScanPlotterPlotly):
         fig.show()
 
 
-class ScanPlotterMeshPlotly(ScanScanPlotterPlotly):
+class ScanPlotterMeshPlotly(ScanPlotterPlotly):
     """
     Отрисовка скана в виде триангуляции Делоне через библиотеку plotly
     """

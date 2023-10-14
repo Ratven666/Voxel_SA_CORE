@@ -3,6 +3,7 @@ from abc import abstractmethod
 
 from CONFIG import LOGGER
 from classes.ScanDB import ScanDB
+from utils.mesh_utils.mesh_plotters.MeshPlotterPlotly import MeshPlotterPlotly
 from utils.mesh_utils.mesh_triangulators.ScipyTriangulator import ScipyTriangulator
 
 
@@ -66,3 +67,11 @@ class MeshABC:
         self.mse = (svv / sr) ** 0.5
         self.r = sr
         return triangles.values()
+
+    def plot(self, plotter=MeshPlotterPlotly()):
+        """
+        Вывод отображения скана
+        :param plotter: объект определяющий логику отображения поверхности
+        :return: None
+        """
+        plotter.plot(self)

@@ -125,3 +125,5 @@ if __name__ == "__main__":
     tri = Triangle(p0, p1, p2)
     print(tri.get_z_from_xy(1, 1))
     print(tri.is_point_in_triangle(p))
+    for idx, point in enumerate(tri):
+        print(idx, point)

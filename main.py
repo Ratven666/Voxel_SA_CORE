@@ -16,6 +16,7 @@ from utils.mesh_utils.mesh_exporters.PlyMeshExporter import PlyMeshExporter
 from utils.mesh_utils.mesh_exporters.PlyMseMeshExporter import PlyMseMeshExporter
 from utils.mesh_utils.mesh_filters.MaxEdgeLengthMeshFilter import MaxEdgeLengthMeshFilter
 from utils.mesh_utils.mesh_filters.MaxMseTriangleMeshFilter import MaxMseTriangleMeshFilter
+from utils.mesh_utils.mesh_plotters.MeshPlotterPlotly import MeshPlotterPlotly
 from utils.scan_utils.scan_filters.ScanFilterByCellMSE import ScanFilterByCellMSE
 from utils.scan_utils.scan_filters.ScanFilterByModelMSE import ScanFilterByModelMSE
 from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
@@ -57,10 +58,10 @@ def main():
     # vm = VoxelModelDB(scan_for_mesh, 4, is_2d_vxl_mdl=True)
     # vm = VoxelModelLite(scan_for_mesh, 1, is_2d_vxl_mdl=True)
     # vm.plot()
-    # scan = VoxelDownsamplingScanSampler(grid_step=10,
-    #                                     is_2d_sampling=True,
-    #                                     average_the_data=True).do_sampling(scan_for_mesh)
-    # scan.save_to_db()
+    scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=5,
+                                        is_2d_sampling=True,
+                                        average_the_data=True).do_sampling(scan_for_mesh)
+    scan_for_mesh.save_to_db()
     # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=None))
 
 
@@ -68,11 +69,12 @@ def main():
     # scan.load_scan_from_file(file_name="src/4skld_0629.txt")
     # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
     #
-    mesh = MeshLite(scan_for_mesh)
+    mesh = MeshDB(scan_for_mesh)
     vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
-    mesh_sm = MeshSegmentModelDB(vm, mesh)
-    mesh.calk_mesh_mse(mesh_sm)
-    mesh = mesh.save_to_db()
+    # mesh_sm = MeshSegmentModelDB(vm, mesh)
+    # mesh.calk_mesh_mse(mesh_sm)
+    mesh.plot(plotter=MeshPlotterPlotly(max_mse=0.35))
+    # mesh = mesh.save_to_db()
     print(mesh)
     for t in mesh:
         print(t)
