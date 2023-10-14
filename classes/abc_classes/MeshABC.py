@@ -1,12 +1,16 @@
+import logging
 from abc import abstractmethod
 
+from CONFIG import LOGGER
 from classes.ScanDB import ScanDB
 from utils.mesh_utils.mesh_triangulators.ScipyTriangulator import ScipyTriangulator
 
 
 class MeshABC:
+    logger = logging.getLogger(LOGGER)
 
     def __init__(self, scan, scan_triangulator=ScipyTriangulator):
+        self.id = None
         self.scan = scan
         self.scan_triangulator = scan_triangulator
         self.mesh_name = self.__name_generator()
@@ -45,8 +49,6 @@ class MeshABC:
                             triangle.r = 1
                     triangles[triangle.id] = triangle
                     break
-                else:
-                    continue
         for triangle in triangles.values():
             if triangle.r is not None:
                 try:

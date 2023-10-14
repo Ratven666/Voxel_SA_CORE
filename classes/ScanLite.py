@@ -1,6 +1,7 @@
 from sqlalchemy import select, desc
 from sqlalchemy.exc import IntegrityError
 
+from classes.ScanDB import ScanDB
 from classes.abc_classes.PointABC import PointABC
 from classes.abc_classes.ScanABC import ScanABC
 from utils.scan_utils.Scan_metrics import update_scan_borders, insert_scan_in_db_from_scan
@@ -97,8 +98,11 @@ class ScanLite(ScanABC):
                 points_scans.append({"point_id": point.id, "scan_id": self.id})
             try:
                 insert_scan_in_db_from_scan(self, db_connection)
-                db_connection.execute(Tables.points_db_table.insert(), points)
-                db_connection.execute(Tables.points_scans_db_table.insert(), points_scans)
+                if len(points) > 0:
+                    db_connection.execute(Tables.points_db_table.insert(), points)
+                    db_connection.execute(Tables.points_scans_db_table.insert(), points_scans)
                 db_connection.commit()
+                return self
             except IntegrityError:
-                self.logger.info("Скан с таким именем уже есть в БД!")
+                self.logger.warning("Скан с таким именем уже есть в БД!")
+                return ScanDB(self.scan_name)

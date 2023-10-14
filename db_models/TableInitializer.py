@@ -46,7 +46,6 @@ class TableInitializer(metaclass=SingletonMeta):
         self.bi_cell_db_table = create_bi_cell_db_table(self.__db_metadata)
         self.meshes_db_table = create_meshes_db_table(self.__db_metadata)
 
-
         self.mesh_cell_db_table = create_mesh_cell_db_table(self.__db_metadata)
         self.triangles_db_table = create_triangles_db_table(self.__db_metadata)
 

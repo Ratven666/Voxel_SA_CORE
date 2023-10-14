@@ -8,10 +8,10 @@ from utils.start_db import Tables, engine
 
 
 class MeshDB(MeshABC):
-    # """
-    # Скан связанный с базой данных
-    # Точки при переборе скана берутся напрямую из БД
-    # """
+    """
+    Поверхность связанная с базой данных
+    Треугольники при переборе поверхности берутся напрямую из БД
+    """
     db_table = Tables.meshes_db_table
 
     def __init__(self, scan, scan_triangulator=ScipyTriangulator, db_connection=None):
@@ -23,6 +23,13 @@ class MeshDB(MeshABC):
         return iter(SqlLiteMeshIterator(self))
 
     def calk_mesh_mse(self, mesh_segment_model, base_scan=None, clear_previous_mse=False):
+        """
+        Рассчитывает СКП и степени свободы поверхности и заносит данные в БД
+        :param mesh_segment_model: Сегментированная модель поверхности
+        :param base_scan: Скан относительно которого будет рассчитываться СКП
+        :param clear_previous_mse: Предварительное удаление ранее рассчитанных СКП
+        :return: None
+        """
         if clear_previous_mse is True:
             self.clear_mesh_mse()
         triangles = super().calk_mesh_mse(mesh_segment_model, base_scan)
@@ -41,6 +48,9 @@ class MeshDB(MeshABC):
             db_connection.commit()
 
     def clear_mesh_mse(self):
+        """
+        Удаляет записи о СКП и степенях свободы поверхности и ее треугольников из БД
+        """
         with engine.connect() as db_connection:
             for triangle in self:
                 stmt = update(Tables.triangles_db_table)\
@@ -56,12 +66,15 @@ class MeshDB(MeshABC):
             db_connection.commit()
 
     def delete_mesh(self, db_connection=None):
+        """
+        Удаляет запись поверхности и ее треугольники из БД
+        """
         self.delete_mesh_by_id(self.id, db_connection=db_connection)
 
     @classmethod
     def delete_mesh_by_id(cls, mesh_id, db_connection=None):
         """
-        Удаляет запись поверхности из БД
+        Удаляет запись поверхности и ее треугольники из БД по id
         :param mesh_id: id поверхности которую требуется удалить из БД
         :param db_connection: Открытое соединение с БД
         :return: None
@@ -81,7 +94,7 @@ class MeshDB(MeshABC):
     @classmethod
     def get_mesh_from_id(cls, mesh_id: int):
         """
-        Возвращает объект повепхности по id
+        Возвращает объект поверхности по id
         :param mesh_id: id поверхности которую требуется загрузить и вернуть из БД
         :return: объект MeshDB с заданным id
         """
@@ -95,6 +108,9 @@ class MeshDB(MeshABC):
                 raise ValueError("Нет поверхности с таким id!!!")
 
     def __load_triangle_data_to_db(self, db_conn, triangulation):
+        """
+        Загружает рассчитаные треугольники в БД
+        """
         triangle_data = []
         for triangle in triangulation.faces:
             triangle_data.append({"point_0_id": triangulation.points_id[triangle[0]],
@@ -106,7 +122,7 @@ class MeshDB(MeshABC):
 
     def __init_mesh(self, db_connection=None, triangulation=None):
         """
-        Инициализирует поверхности при запуске
+        Инициализирует поверхность при запуске
         Если поверхность с таким именем уже есть в БД - запускает копирование данных из БД в атрибуты поверхности
         Если такой поверхности нет - создает новую запись в БД
         :param db_connection: Открытое соединение с БД

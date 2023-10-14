@@ -47,25 +47,35 @@ from utils.voxel_utils.voxel_model_serializers.VoxelModelJsonSerializer import V
 def main():
     create_db()
 
-    scan_for_mesh = ScanDB("4skld.txt")
-    scan_for_mesh.load_scan_from_file(file_name="src/4skld_0629.txt")
+    scan_for_mesh = ScanDB("4skld")
+    scan_for_mesh.load_scan_from_file(file_name="src/4skld_1.txt")
+
+    scan = ScanDB("4skld_full")
+    scan.load_scan_from_file(file_name="src/4skld_0629.txt")
 
     # scan_for_mesh.plot(plotter=ScanPlotterPointsPlotly())
     # vm = VoxelModelDB(scan_for_mesh, 4, is_2d_vxl_mdl=True)
     # vm = VoxelModelLite(scan_for_mesh, 1, is_2d_vxl_mdl=True)
     # vm.plot()
-    scan = VoxelDownsamplingScanSampler(grid_step=10,
-                                        is_2d_sampling=True,
-                                        average_the_data=True).do_sampling(scan_for_mesh)
-    scan.save_to_db()
-    scan.plot(plotter=ScanPlotterPointsPlotly(sampler=None))
+    # scan = VoxelDownsamplingScanSampler(grid_step=10,
+    #                                     is_2d_sampling=True,
+    #                                     average_the_data=True).do_sampling(scan_for_mesh)
+    # scan.save_to_db()
+    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=None))
 
 
     # scan = ScanDB("4skld_0629")
     # scan.load_scan_from_file(file_name="src/4skld_0629.txt")
     # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
     #
-    # mesh = MeshLite(scan_for_mesh)
+    mesh = MeshLite(scan_for_mesh)
+    vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    mesh_sm = MeshSegmentModelDB(vm, mesh)
+    mesh.calk_mesh_mse(mesh_sm)
+    mesh = mesh.save_to_db()
+    print(mesh)
+    for t in mesh:
+        print(t)
     # print(mesh)
     # mesh_sm = MeshSegmentModelDB(vm, mesh)
     # mesh.calk_mesh_mse(mesh_sm)
