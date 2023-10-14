@@ -15,7 +15,7 @@ class VoxelModelABC(ABC):
         self.id = None
         self.is_2d_vxl_mdl = is_2d_vxl_mdl
         self.step = float(step)
-        self.dx, self.dy, self.dz = self.__dx_dy_formatter(dx, dy, dz)
+        self.dx, self.dy, self.dz = self.__dx_dy_dz_formatter(dx, dy, dz)
         self.vm_name: str = self.__name_generator(scan)
         self.len: int = 0
         self.X_count, self.Y_count, self.Z_count = None, None, None
@@ -26,7 +26,10 @@ class VoxelModelABC(ABC):
         self.base_scan = scan
 
     @staticmethod
-    def __dx_dy_formatter(dx, dy, dz):
+    def __dx_dy_dz_formatter(dx, dy, dz):
+        """
+        Приводит значения смещения воксельной модели в пределы от 0 до 1
+        """
         return dx % 1, dy % 1, dz % 1
 
     def __name_generator(self, scan):
@@ -36,7 +39,7 @@ class VoxelModelABC(ABC):
         :return: None
         """
         vm_type = "2D" if self.is_2d_vxl_mdl else "3D"
-        return f"VM_{vm_type}_Sc:{scan.scan_name}_st:{self.step}_dx:{self.dx:.2f}_dy:{self.dz:.2f}_dy:{self.dz:.2f}"
+        return f"VM_{vm_type}_Sc:{scan.scan_name}_st:{self.step}_dx:{self.dx:.2f}_dy:{self.dy:.2f}_dz:{self.dz:.2f}"
 
     def __str__(self):
         return f"{self.__class__.__name__} " \
@@ -55,7 +58,7 @@ class VoxelModelABC(ABC):
 
     def plot(self, plotter=VoxelModelPlotter()):
         """
-        Вывод отображения djrctkmyjq модели
+        Вывод отображения воксельной модели
         :param plotter: объект определяющий логику отображения модели
         :return: None
         """

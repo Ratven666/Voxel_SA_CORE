@@ -1,12 +1,9 @@
 from sqlalchemy import select, insert, desc
 
-from classes.abc_classes.ScanABC import ScanABC
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
 from utils.start_db import Tables, engine
 from utils.voxel_utils.voxel_model_iterators.VMRawIterator import VMRawIterator
 from utils.voxel_utils.voxel_model_separators.FastVMSeparator import FastVMSeparator
-from utils.voxel_utils.voxel_model_separators.VMBruteForceSeparatorWithoutVoxelScansPoints import \
-    VMBruteForceSeparatorWithoutVoxelScansPoints
 
 
 class VoxelModelDB(VoxelModelABC):
@@ -75,11 +72,11 @@ class VoxelModelDB(VoxelModelABC):
             return None
         self.min_X = (scan.min_X // self.step * self.step) - ((1 - self.dx) % 1 * self.step)
         self.min_Y = (scan.min_Y // self.step * self.step) - ((1 - self.dy) % 1 * self.step)
-        self.min_Z = (scan.min_Z // self.step * self.step) - ((1 - self.dy) % 1 * self.step)
+        self.min_Z = (scan.min_Z // self.step * self.step) - ((1 - self.dz) % 1 * self.step)
 
         self.max_X = (scan.max_X // self.step + 1) * self.step + ((self.dx % 1) * self.step)
         self.max_Y = (scan.max_Y // self.step + 1) * self.step + ((self.dy % 1) * self.step)
-        self.max_Z = (scan.max_Z // self.step + 1) * self.step + ((self.dy % 1) * self.step)
+        self.max_Z = (scan.max_Z // self.step + 1) * self.step + ((self.dz % 1) * self.step)
 
         self.X_count = round((self.max_X - self.min_X) / self.step)
         self.Y_count = round((self.max_Y - self.min_Y) / self.step)

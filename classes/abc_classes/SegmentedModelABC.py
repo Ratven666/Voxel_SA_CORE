@@ -35,6 +35,11 @@ class SegmentedModelABC(ABC):
         return f"{self.__class__.__name__} [ID: {self.id}]"
 
     def get_z_from_point(self, point):
+        """
+        Возвращает отметку z точки
+        :param point: объкт класса point
+        :return: отметка точки z
+        """
         cell = self.get_model_element_for_point(point)
         try:
             z = cell.get_z_from_xy(point.X, point.Y)
@@ -229,6 +234,10 @@ class SegmentedModelABC(ABC):
         self.logger.info(f"Расчет СКП высот в ячейках модели {self.model_name} завершен")
 
     def delete_model(self, db_connection=None):
+        """
+        Удаляет сегментированную модель и все ее элементы из базы данных
+        :param db_connection: открытое соединение с БД
+        """
         stmt_1 = delete(self.db_table).where(self.db_table.c.id == self.id)
         stmt_2 = delete(self.cell_type.db_table).where(self.cell_type.db_table.c.base_model_id == self.id)
         if db_connection is None:

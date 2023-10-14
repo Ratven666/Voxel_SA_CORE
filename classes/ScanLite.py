@@ -58,6 +58,10 @@ class ScanLite(ScanABC):
 
     @classmethod
     def create_from_scan_dict(cls, scan_dict):
+        """Создает объект ScanLite с метрикаи переданными в словаре без точек
+        :param scan_dict: словарь с метриками скана
+        :return: объект класса ScanLite
+        """
         scan_lite = cls(scan_dict["scan_name"])
         scan_lite.id = scan_dict["id"]
         scan_lite.len = scan_dict["len"]
@@ -66,6 +70,7 @@ class ScanLite(ScanABC):
         return scan_lite
 
     def save_to_db(self):
+        """Сохраняет объект ScanLite в базе данных вместе с точками"""
         with engine.connect() as db_connection:
             stmt = (select(Tables.points_db_table.c.id).order_by(desc("id")))
             last_point_id = db_connection.execute(stmt).first()

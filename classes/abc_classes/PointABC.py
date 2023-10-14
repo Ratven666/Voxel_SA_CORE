@@ -37,6 +37,9 @@ class PointABC(ABC):
         return False
 
     def get_dict(self):
+        """
+        Возвращаяет словарь с данными объекта
+        """
         return {"id": self.id,
                 "X": self.X, "Y": self.Y, "Z": self.Z,
                 "R": self.R, "G": self.G, "B": self.B}

@@ -14,6 +14,9 @@ class VoxelLite(VoxelABC):
 
     @classmethod
     def parse_voxel_from_data_row(cls, row):
+        """
+        Копирует данные из словаря в атрибуты вокселя
+        """
         voxel = cls(X=row[1], Y=row[2], Z=row[3], step=row[4], vxl_mdl_id=row[5])
         voxel.id = row[0]
         voxel.vxl_name = row[6]

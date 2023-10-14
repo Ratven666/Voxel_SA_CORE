@@ -26,12 +26,14 @@ class PlaneModelDB(SegmentedModelABC):
         self.logger.info(f"Начат расчет модели {self.model_name}")
         base_scan = ScanDB.get_scan_from_id(self.voxel_model.base_scan_id)
         self.__fit_planes(base_scan)
+        self.logger.info(f"Рассчитаны плоскости в модели {self.model_name}")
         self._calk_cell_mse(base_scan)
         self.__calk_abd_mse()
+        self.logger.info(f"Рассчитаны СКП модели {self.model_name}")
 
     def __fit_planes(self, base_scan):
         """
-        Расчитывает параметры апроксимирующих плоскостей по МНК
+        Расчитывает параметры аппроксимирующих плоскостей по МНК
         :param base_scan: базовй кан воксельной модели
         :return: None
         """

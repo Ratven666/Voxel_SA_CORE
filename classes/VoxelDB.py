@@ -12,8 +12,8 @@ class VoxelDB(VoxelABC):
 
     __slots__ = ["id", "X", "Y", "Z", "step", "vxl_mdl_id", "vxl_name", "scan_id", "len", "R", "G", "B", "scan"]
 
-    def __init__(self, X, Y, Z, step, vxl_mdl_id, db_connection=None):
-        super().__init__(X, Y, Z, step, vxl_mdl_id)
+    def __init__(self, x, y, z, step, vxl_mdl_id, db_connection=None):
+        super().__init__(x, y, z, step, vxl_mdl_id)
         self.scan = None
         self.__init_voxel(db_connection)
 
@@ -61,7 +61,6 @@ class VoxelDB(VoxelABC):
                 db_conn.execute(stmt)
                 db_conn.commit()
                 self.__init_voxel(db_conn)
-
         if db_connection is None:
             with engine.connect() as db_connection:
                 init_logic(db_connection)

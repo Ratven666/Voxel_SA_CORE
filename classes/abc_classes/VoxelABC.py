@@ -11,11 +11,11 @@ class VoxelABC(ABC):
 
     logger = logging.getLogger(LOGGER)
 
-    def __init__(self, X, Y, Z, step, vxl_mdl_id):
+    def __init__(self, x, y, z, step, vxl_mdl_id):
         self.id = None
-        self.X = X
-        self.Y = Y
-        self.Z = Z
+        self.X = x
+        self.Y = y
+        self.Z = z
         self.step = step
         self.vxl_mdl_id = vxl_mdl_id
         self.vxl_name = self.__name_generator()
@@ -24,6 +24,9 @@ class VoxelABC(ABC):
         self.R, self.G, self.B = 0, 0, 0
 
     def get_dict(self):
+        """
+        Возвращаяет словарь с данными объекта
+        """
         return {"id": self.id,
                 "X": self.X, "Y": self.Y, "Z": self.Z,
                 "step": self.step,

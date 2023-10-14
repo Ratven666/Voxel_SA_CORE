@@ -42,9 +42,8 @@ class ScanDB(ScanABC):
             db_connection.execute(stmt)
             db_connection.commit()
 
-    def load_scan_from_file(self,
-                            scan_loader=ScanLoader(scan_parser=ScanTxtParser(chunk_count=POINTS_CHUNK_COUNT)),
-                            file_name=FILE_NAME):
+    def load_scan_from_file(self, file_name=FILE_NAME,
+                            scan_loader=ScanLoader(scan_parser=ScanTxtParser(chunk_count=POINTS_CHUNK_COUNT))):
         """
         Загружает точки в скан из файла
         Ведется запись в БД
@@ -93,7 +92,6 @@ class ScanDB(ScanABC):
                 db_conn.execute(stmt)
                 db_conn.commit()
                 self.__init_scan(db_conn)
-
         if db_connection is None:
             with engine.connect() as db_connection:
                 init_logic(db_connection)

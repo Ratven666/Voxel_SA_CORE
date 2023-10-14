@@ -17,7 +17,7 @@ class CellABC(ABC):
     @abstractmethod
     def get_z_from_xy(self, x, y):
         """
-        Рассчитывает отметку точки (x, y) в ячейке
+        Рассчитывает отметку z в точке (x, y) в ячейке
         :param x: координата x
         :param y: координата y
         :return: координата z для точки (x, y)
@@ -36,6 +36,9 @@ class CellABC(ABC):
 
     @abstractmethod
     def get_db_raw_data(self):
+        """
+        Возвращает словарь с данными атрибутов в ячейке
+        """
         pass
 
     @abstractmethod
