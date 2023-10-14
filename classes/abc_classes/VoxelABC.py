@@ -22,6 +22,7 @@ class VoxelABC(ABC):
         self.scan_id = None
         self.len = 0
         self.R, self.G, self.B = 0, 0, 0
+        self.container_dict = {}
 
     def get_dict(self):
         """

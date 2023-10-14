@@ -21,6 +21,7 @@ from utils.scan_utils.scan_filters.ScanFilterByModelMSE import ScanFilterByModel
 from utils.scan_utils.scan_filters.ScanFilterForTrees import ScanFilterForTrees
 from utils.scan_utils.scan_plotters.ScanPlotterPlotly import ScanPlotterPointsPlotly, ScanPlotterMeshPlotly
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
+from utils.scan_utils.scan_samplers.VoxelDownsamplingScanSampler import VoxelDownsamplingScanSampler
 from utils.scan_utils.scan_serializers.ScanJsonSerializer import ScanJsonSerializer
 from utils.segmented_mdl_utils.segmented_models_expoters.sm_to_scan.CellCenterSegmentedModelToScan import \
     CellCenterSegmentedModelToScan
@@ -47,15 +48,17 @@ def main():
     create_db()
 
     scan_for_mesh = ScanDB("4skld.txt")
-    scan_for_mesh.load_scan_from_file(file_name="src/4skld_1.txt")
+    scan_for_mesh.load_scan_from_file(file_name="src/4skld_0629.txt")
 
     # scan_for_mesh.plot(plotter=ScanPlotterPointsPlotly())
     # vm = VoxelModelDB(scan_for_mesh, 4, is_2d_vxl_mdl=True)
-    vm = VoxelModelLite(scan_for_mesh, 4, is_2d_vxl_mdl=True)
+    # vm = VoxelModelLite(scan_for_mesh, 1, is_2d_vxl_mdl=True)
     # vm.plot()
-    vm = vm.save_to_db()
-    dm = BiModelDB(vm, DemTypeEnum.PLANE)
-    dm.plot()
+    scan = VoxelDownsamplingScanSampler(grid_step=10,
+                                        is_2d_sampling=True,
+                                        average_the_data=True).do_sampling(scan_for_mesh)
+    scan.save_to_db()
+    scan.plot(plotter=ScanPlotterPointsPlotly(sampler=None))
 
 
     # scan = ScanDB("4skld_0629")

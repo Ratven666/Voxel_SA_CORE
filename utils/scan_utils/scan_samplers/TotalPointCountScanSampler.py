@@ -12,7 +12,7 @@ class TotalPointCountScanSampler(ScanSamplerABC):
 
     def do_sampling(self, scan):
         """
-        Запускает рпоцедуру разряжения
+        Запускает процедуру разрежения
         :param scan: Исходный скан
         :return: объкет ScanLite с метриками базового скана и оставшимися точками
         """
