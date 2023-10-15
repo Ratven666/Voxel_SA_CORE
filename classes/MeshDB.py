@@ -22,17 +22,15 @@ class MeshDB(MeshABC):
     def __iter__(self):
         return iter(SqlLiteMeshIterator(self))
 
-    def calk_mesh_mse(self, mesh_segment_model, base_scan=None, clear_previous_mse=False):
-        """
-        Рассчитывает СКП и степени свободы поверхности и заносит данные в БД
-        :param mesh_segment_model: Сегментированная модель поверхности
-        :param base_scan: Скан относительно которого будет рассчитываться СКП
-        :param clear_previous_mse: Предварительное удаление ранее рассчитанных СКП
-        :return: None
-        """
-        if clear_previous_mse is True:
-            self.clear_mesh_mse()
-        triangles = super().calk_mesh_mse(mesh_segment_model, base_scan)
+    def calk_mesh_mse(self, base_scan, voxel_size=None,
+                      clear_previous_mse=False,
+                      delete_temp_models=False):
+        triangles = super().calk_mesh_mse(base_scan=base_scan, voxel_size=voxel_size,
+                                          clear_previous_mse=clear_previous_mse,
+                                          delete_temp_models=delete_temp_models)
+        if triangles is None:
+            self.logger.warning(f"СКП модели {self.mesh_name} уже рассчитано!")
+            return
         with engine.connect() as db_connection:
             for triangle in triangles:
                 stmt = update(Tables.triangles_db_table)\

@@ -19,14 +19,29 @@ class MeshLite(MeshABC):
     def __iter__(self):
         return iter(self.triangles)
 
-    def calk_mesh_mse(self, mesh_segment_model, base_scan=None, clear_previous_mse=False):
-        triangles = super().calk_mesh_mse(mesh_segment_model, base_scan)
+    def clear_mesh_mse(self):
+        """
+        Удаляет данные о СКП и степенях свободы треугольников в поверхности
+        """
+        for triangle in self:
+            triangle.mse = None
+            triangle.r = None
+
+    def calk_mesh_mse(self, base_scan, voxel_size=None,
+                      clear_previous_mse=False,
+                      delete_temp_models=False):
+        triangles = super().calk_mesh_mse(base_scan=base_scan, voxel_size=voxel_size,
+                                          clear_previous_mse=clear_previous_mse,
+                                          delete_temp_models=delete_temp_models)
+        if triangles is None:
+            self.logger.warning(f"СКП модели {self.mesh_name} уже рассчитано!")
+            return
         self.triangles = list(triangles)
 
     def __init_mesh(self):
         triangulation = self.scan_triangulator(self.scan).triangulate()
         self.len = len(triangulation.faces)
-        fake_point_id = -1        # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Подумать над последстивиями ?!?!??!?!??!?!
+        fake_point_id = -1
         fake_triangle_id = -1
         for face in triangulation.faces:
             points = []
@@ -49,7 +64,9 @@ class MeshLite(MeshABC):
             self.triangles.append(triangle)
 
     def save_to_db(self):
-        """Сохраняет объект ScanLite в базе данных вместе с точками"""
+        """
+        Сохраняет объект ScanLite в базе данных вместе с точками
+        """
         with engine.connect() as db_connection:
             if self.id is None:
                 mesh_id_stmt = select(Tables.meshes_db_table.c.id).order_by(desc("id"))

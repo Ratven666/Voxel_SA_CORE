@@ -2,7 +2,9 @@ import logging
 from abc import abstractmethod
 
 from CONFIG import LOGGER
+from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.ScanDB import ScanDB
+from classes.VoxelModelDB import VoxelModelDB
 from utils.mesh_utils.mesh_plotters.MeshPlotterPlotly import MeshPlotterPlotly
 from utils.mesh_utils.mesh_triangulators.ScipyTriangulator import ScipyTriangulator
 
@@ -30,9 +32,36 @@ class MeshABC:
     def __name_generator(self):
         return f"MESH_{self.scan.scan_name}"
 
-    def calk_mesh_mse(self, mesh_segment_model, base_scan=None):
-        if base_scan is None:
-            base_scan = ScanDB.get_scan_from_id(mesh_segment_model.voxel_model.base_scan_id)
+    @abstractmethod
+    def clear_mesh_mse(self):
+        """
+        Удаляет данные о СКП и степенях свободы из поверхности
+        """
+        pass
+
+    def calk_mesh_mse(self, base_scan, voxel_size=None,
+                      clear_previous_mse=False,
+                      delete_temp_models=False):
+        """
+        Рассчитывает СКП поверхности и ее треугольников относительно базового скана
+        :param base_scan: базовый плотный  скан относительно которого считаются ошибки
+        :param voxel_size: размер ячейки вспомогательной воксельной модели
+        :param clear_previous_mse: предварительно удаление ранее рассчитаныых значений СКП и r
+        :param delete_temp_models: удаление промежуточных моделей
+        :return: список треугоьлников поверхности
+        """
+        if clear_previous_mse:
+            self.clear_mesh_mse()
+            self.r = None
+            self.mse = None
+        if self.mse is not None:
+            return None
+        if voxel_size is None:
+            area = (base_scan.max_X - base_scan.min_X) * (base_scan.max_Y - base_scan.min_Y)
+            voxel_size = area / self.scan.len
+            voxel_size = round((voxel_size // 0.05 + 1) * 0.05, 2)
+        vm = VoxelModelDB(base_scan, voxel_size, is_2d_vxl_mdl=True)
+        mesh_segment_model = MeshSegmentModelDB(vm, self)
         triangles = {}
         for point in base_scan:
             point.id = None
@@ -66,6 +95,9 @@ class MeshABC:
                 continue
         self.mse = (svv / sr) ** 0.5
         self.r = sr
+        if delete_temp_models:
+            vm.delete_model()
+            mesh_segment_model.delete_model()
         return triangles.values()
 
     def plot(self, plotter=MeshPlotterPlotly()):

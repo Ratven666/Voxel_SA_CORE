@@ -1,4 +1,4 @@
-from sqlalchemy import select, insert, desc
+from sqlalchemy import select, insert, desc, delete
 
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
 from utils.start_db import Tables, engine
@@ -10,7 +10,7 @@ class VoxelModelDB(VoxelModelABC):
     """
     Воксельная модель связанная с базой данных
     """
-
+    db_table = Tables.voxel_models_db_table
     def __init__(self, scan, step, dx=0.0, dy=0.0, dz=0.0, is_2d_vxl_mdl=True,
                  voxel_model_separator=FastVMSeparator()):
         super().__init__(scan, step, dx, dy, dz, is_2d_vxl_mdl)
@@ -83,3 +83,23 @@ class VoxelModelDB(VoxelModelABC):
             self.is_2d_vxl_mdl = True
         else:
             self.is_2d_vxl_mdl = False
+
+    def delete_model(self, db_connection=None):
+        """
+        Удаляет сегментированную модель и все ее элементы из базы данных
+        :param db_connection: открытое соединение с БД
+        """
+        stmt_1 = delete(self.db_table).where(self.db_table.c.id == self.id)
+        stmt_2 = delete(Tables.voxels_db_table).where(Tables.voxels_db_table.c.vxl_mdl_id == self.id)
+        if db_connection is None:
+            with engine.connect() as db_connection:
+                db_connection.execute(stmt_1)
+                db_connection.commit()
+                db_connection.execute(stmt_2)
+                db_connection.commit()
+        else:
+            db_connection.execute(stmt_1)
+            db_connection.commit()
+            db_connection.execute(stmt_2)
+            db_connection.commit()
+        self.logger.info(f"Удаление модели {self.vm_name} из БД завершено\n")
