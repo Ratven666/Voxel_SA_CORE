@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from CONFIG import MAX_POINT_SCAN_PLOT, LOGGER
 from utils.scan_utils.scan_plotters.ScanPlotterMPL import ScanScanPlotterMPL
 from utils.scan_utils.scan_samplers.TotalPointCountScanSampler import TotalPointCountScanSampler
+from utils.scan_utils.scan_savers.ScanTXTSaver import ScanTXTSaver
 
 
 class ScanABC(ABC):
@@ -33,6 +34,9 @@ class ScanABC(ABC):
     @abstractmethod
     def __iter__(self):
         pass
+
+    def save_scan_in_file(self, file_name=None, scan_saver=ScanTXTSaver()):
+        scan_saver.save_scan(self, file_name)
 
     def plot(self, plotter=ScanScanPlotterMPL(sampler=TotalPointCountScanSampler(MAX_POINT_SCAN_PLOT))):
         """

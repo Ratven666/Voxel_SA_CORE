@@ -12,6 +12,8 @@ class Triangle:
         self.point_2 = point_2
         self.r = r
         self.mse = mse
+        self.vv = 0
+        self.container_dict = {}
 
     def __str__(self):
         return f"{self.__class__.__name__} " \
@@ -57,7 +59,10 @@ class Triangle:
         c = -((self.point_1.X - self.point_0.X) * (self.point_2.Y - self.point_0.Y) -
               (self.point_2.X - self.point_0.X) * (self.point_1.Y - self.point_0.Y))
         d = -(self.point_0.X * a + self.point_0.Y * b + self.point_0.Z * c)
-        z = (a * x + b * y + d) / -c
+        try:
+            z = (a * x + b * y + d) / -c
+        except ZeroDivisionError:
+            return None
         return z
 
     def get_area(self):

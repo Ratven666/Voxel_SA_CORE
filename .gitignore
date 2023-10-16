@@ -142,3 +142,5 @@ test.py
 *.ply
 
 .DS_Store
+
+sampled_scan_generator.py

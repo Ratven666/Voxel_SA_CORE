@@ -56,9 +56,6 @@ class ScanDB(ScanABC):
         """
         scan_loader.load_data(self, file_name)
 
-    def save_scan_in_file(self, file_name=None, scan_saver=ScanTXTSaver()):
-        scan_saver.save_scan(self, file_name)
-
     @classmethod
     def get_scan_from_id(cls, scan_id: int):
         """

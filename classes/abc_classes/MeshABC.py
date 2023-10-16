@@ -29,6 +29,9 @@ class MeshABC:
         return f"{self.__class__.__name__} " \
                f"[mesh_name: {self.mesh_name},\tlen: {self.len} r: {self.r} mse: {self.mse}]"
 
+    def __len__(self):
+        return self.len
+
     def __name_generator(self):
         return f"MESH_{self.scan.scan_name}"
 
@@ -75,8 +78,10 @@ class MeshABC:
                             triangle.vv += (triangle.get_z_from_xy(point.X, point.Y) - point.Z) ** 2
                             triangle.r += 1
                         except (AttributeError, TypeError):
-                            triangle.vv = (triangle.get_z_from_xy(point.X, point.Y) - point.Z) ** 2
-                            triangle.r = 1
+                            z = triangle.get_z_from_xy(point.X, point.Y)
+                            if z is not None:
+                                triangle.vv = (z - point.Z) ** 2
+                                triangle.r = 1
                     triangles[triangle.id] = triangle
                     break
         for triangle in triangles.values():

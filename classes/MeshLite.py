@@ -19,10 +19,15 @@ class MeshLite(MeshABC):
     def __iter__(self):
         return iter(self.triangles)
 
+    def __len__(self):
+        return len(self.triangles)
+
     def clear_mesh_mse(self):
         """
         Удаляет данные о СКП и степенях свободы треугольников в поверхности
         """
+        self.mse = None
+        self.r = None
         for triangle in self:
             triangle.mse = None
             triangle.r = None

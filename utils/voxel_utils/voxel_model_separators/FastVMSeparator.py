@@ -152,7 +152,7 @@ class FastVMSeparator(VMSeparatorABC):
                            })
             voxel_counter += 1
         with engine.connect() as db_connection:
-            db_connection.execute(Tables.scans_db_table.insert(), scans)
+            # db_connection.execute(Tables.scans_db_table.insert(), scans)
             db_connection.execute(Tables.voxels_db_table.insert(), voxels)
             db_connection.commit()
         self.voxel_model.len = voxel_counter

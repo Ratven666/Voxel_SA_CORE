@@ -90,6 +90,18 @@ class MeshDB(MeshABC):
             db_connection.commit()
 
     @classmethod
+    def get_mesh_by_id(cls, mesh_id):
+        select_ = select(cls.db_table).where(cls.db_table.c.id == mesh_id)
+        with engine.connect() as db_connection:
+            db_mesh_data = db_connection.execute(select_).mappings().first()
+            if db_mesh_data is not None:
+                scan_id = db_mesh_data["base_scan_id"]
+                scan = ScanDB.get_scan_from_id(scan_id)
+                return cls(scan)
+            else:
+                raise ValueError("Нет поверхности с таким id!!!")
+
+    @classmethod
     def get_mesh_from_id(cls, mesh_id: int):
         """
         Возвращает объект поверхности по id

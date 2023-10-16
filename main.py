@@ -1,5 +1,6 @@
 import time
 
+from MeshMSEConst import MeshMSEConst
 from classes.BiModelDB import BiModelDB
 from classes.DemModelDB import DemModelDB
 from classes.MeshDB import MeshDB
@@ -49,41 +50,25 @@ def main():
     create_db()
 
     scan_for_mesh = ScanDB("4skld")
-    scan_for_mesh.load_scan_from_file(file_name="src/4skld_1.txt")
+    scan_for_mesh.load_scan_from_file(file_name="src/4skld_0629_05.txt")
+    mesh = MeshMSEConst(scan_for_mesh, max_border_length_m=20, max_triangle_mse_m=0.15, n=10,
+                        delete_temp_models=False)
+    mesh.plot()
+    scan = mesh.mesh.scan
+    scan.plot(plotter=ScanPlotterPointsPlotly())
+    PlyMeshExporter(mesh).export()
+    PlyMseMeshExporter(mesh).export()
 
-    scan = ScanDB("4skld_full")
-    scan.load_scan_from_file(file_name="src/4skld_0629.txt")
-    scan = VoxelDownsamplingScanSampler(grid_step=0.1,
-                                        is_2d_sampling=True,
-                                        average_the_data=False).do_sampling(scan_for_mesh)
-    scan = scan.save_to_db()
-    print(scan)
-
-    scan_for_mesh_2 = VoxelDownsamplingScanSampler(grid_step=5,
-                                        is_2d_sampling=True,
-                                        average_the_data=True).do_sampling(scan_for_mesh)
-    scan_for_mesh_2 = scan_for_mesh_2.save_to_db()
-    # scan.plot(plotter=ScanPlotterPointsPlotly(sampler=None))
-
-
-    # scan = ScanDB("4skld_0629")
-    # scan.load_scan_from_file(file_name="src/4skld_0629.txt")
-    # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
+    # mesh_2 = MeshLite(scan)
+    # mesh_2.calk_mesh_mse(scan_for_mesh)
+    # mesh_2.plot()
     #
-    mesh = MeshDB(scan_for_mesh)
-    mesh_2 = MeshLite(scan_for_mesh_2)
-    mesh.calk_mesh_mse(scan, clear_previous_mse=True, delete_temp_models=True)
-    mesh_2.calk_mesh_mse(scan, clear_previous_mse=True, delete_temp_models=True)
-    mesh_2.save_to_db()
-    # vm = VoxelModelDB(scan, 0.25, dx=0, dy=0, dz=0, is_2d_vxl_mdl=True)
-    # mesh_sm = MeshSegmentModelDB(vm, mesh)
-    # mesh.calk_mesh_mse(mesh_sm)
+    # sampled_scan = VoxelDownsamplingScanSampler(grid_step=20,
+    #                                                  is_2d_sampling=True,
+    #                                                  average_the_data=False).do_sampling(scan_for_mesh)
+    # sampled_scan.plot(plotter=ScanPlotterPointsPlotly())
 
-    # mesh = mesh.save_to_db()
-    print(mesh)
-    print(mesh_2)
-    mesh.plot(plotter=MeshPlotterPlotly(max_mse=0.15))
-    mesh_2.plot(plotter=MeshPlotterPlotly(max_mse=0.15))
+
     # print(mesh)
     # mesh_sm = MeshSegmentModelDB(vm, mesh)
     # mesh.calk_mesh_mse(mesh_sm)

@@ -102,7 +102,7 @@ class ScanLite(ScanABC):
                     db_connection.execute(Tables.points_db_table.insert(), points)
                     db_connection.execute(Tables.points_scans_db_table.insert(), points_scans)
                 db_connection.commit()
-                return self
+                return ScanDB(self.scan_name)
             except IntegrityError:
                 self.logger.warning("Скан с таким именем уже есть в БД!")
                 return ScanDB(self.scan_name)
