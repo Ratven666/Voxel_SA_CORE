@@ -88,3 +88,19 @@ class VoxelModelABC(ABC):
         :return: None
         """
         plotter.plot(self)
+
+    @classmethod
+    def get_step_by_voxel_count(cls, scan, voxel_count, is_2d_vxl_mdl=True, round_n=2):
+        x_len = scan.max_X - scan.min_X
+        y_len = scan.max_Y - scan.min_Y
+        z_len = scan.max_Z - scan.min_Z
+        if is_2d_vxl_mdl:
+            area = x_len * y_len
+            cell_area = area / voxel_count
+            step = round(cell_area ** 0.5, round_n)
+        else:
+            volume = x_len * y_len * z_len
+            cell_volume = volume / voxel_count
+            step = round(cell_volume ** (1 / 3), round_n)
+        return step
+

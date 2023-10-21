@@ -1,6 +1,5 @@
 import time
 
-from MeshMSEConst import MeshMSEConst
 from classes.BiModelDB import BiModelDB
 from classes.DemModelDB import DemModelDB
 from classes.MeshDB import MeshDB
@@ -9,6 +8,7 @@ from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
+from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
 from db_models.dem_models_table import DemTypeEnum
 from utils.logs.console_log_config import console_logger
 from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
@@ -49,15 +49,35 @@ from utils.voxel_utils.voxel_model_serializers.VoxelModelJsonSerializer import V
 def main():
     create_db()
 
-    scan_for_mesh = ScanDB("4skld")
-    scan_for_mesh.load_scan_from_file(file_name="src/4skld_0629_05.txt")
-    mesh = MeshMSEConst(scan_for_mesh, max_border_length_m=20, max_triangle_mse_m=0.15, n=10,
-                        delete_temp_models=False)
+    scan = ScanDB("SKLD_4")
+    scan.load_scan_from_file(file_name="src/SKLD_Right_05_05.txt")
+
+    # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=0.5).do_sampling(scan=scan)
+
+    # mesh = MeshDB(scan_for_mesh)
+    # mesh.calk_mesh_mse(scan)
+    # mesh.plot()
+    # scan_for_mesh.save_to_db()
+    # scan_for_mesh.plot(plotter=ScanPlotterPointsPlotly())
+    # mesh = MeshDB(scan_for_mesh)
+    # mesh.plot()
+
+    mse = 0.15
+
+    mesh = MeshMSEConstDB(scan, max_border_length_m=5, max_triangle_mse_m=mse, n=30, calk_with_brute_force=True)
+    new_mesh = MeshLite(scan)
+    b_t = []
+    for t in mesh:
+        if t.mse is not None and t.mse > mse:
+            print(t.mse)
+            b_t.append(t)
+    new_mesh.triangles = b_t
+    # new_mesh.plot()
     mesh.plot()
-    scan = mesh.mesh.scan
-    scan.plot(plotter=ScanPlotterPointsPlotly())
-    PlyMeshExporter(mesh).export()
-    PlyMseMeshExporter(mesh).export()
+    # scan = mesh.mesh.scan
+    # scan.plot(plotter=ScanPlotterPointsPlotly())
+    # PlyMeshExporter(mesh).export()
+    # PlyMseMeshExporter(mesh).export()
 
     # mesh_2 = MeshLite(scan)
     # mesh_2.calk_mesh_mse(scan_for_mesh)

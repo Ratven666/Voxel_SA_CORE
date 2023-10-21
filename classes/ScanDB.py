@@ -26,10 +26,11 @@ class ScanDB(ScanABC):
         return iter(ScanIterator(self))
 
     @staticmethod
-    def delete_scan(scan_id, db_connection=None):
+    def delete_scan_by_id(scan_id, db_connection=None):
         """
         Удаляет запись скана из БД
-        :param scan_id: id скана который требуется удалить из БД
+        :param scan_id: id
+        скана который требуется удалить из БД
         :param db_connection: Открытое соединение с БД
         :return: None
         """

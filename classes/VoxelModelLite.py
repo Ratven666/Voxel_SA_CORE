@@ -33,10 +33,12 @@ class VMLiteSeparator(VMSeparatorABC):
         :return: None
         """
         self.voxel_model = voxel_model
+        id_generator = (id_ for id_ in range(1, len(self.voxel_model)+1))
         self.voxel_structure = [[[VoxelLite(voxel_model.min_X + x * voxel_model.step,
                                             voxel_model.min_Y + y * voxel_model.step,
                                             voxel_model.min_Z + z * voxel_model.step,
-                                            voxel_model.step, voxel_model.id)
+                                            voxel_model.step, voxel_model.id,
+                                            id_=-next(id_generator))
                                   for x in range(voxel_model.X_count)]
                                  for y in range(voxel_model.Y_count)]
                                 for z in range(voxel_model.Z_count)]

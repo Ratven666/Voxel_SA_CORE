@@ -1,7 +1,7 @@
 import logging
 from abc import abstractmethod
 
-from CONFIG import LOGGER
+from CONFIG import LOGGER, VOXEL_IN_VM
 from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.ScanDB import ScanDB
 from classes.VoxelModelDB import VoxelModelDB
@@ -60,9 +60,12 @@ class MeshABC:
         if self.mse is not None:
             return None
         if voxel_size is None:
-            area = (base_scan.max_X - base_scan.min_X) * (base_scan.max_Y - base_scan.min_Y)
-            voxel_size = area / self.scan.len
-            voxel_size = round((voxel_size // 0.05 + 1) * 0.05, 2)
+            # area = (base_scan.max_X - base_scan.min_X) * (base_scan.max_Y - base_scan.min_Y)
+            # voxel_size = area / self.scan.len
+            # voxel_size = round((voxel_size // 0.05 + 1) * 0.05, 2)
+            voxel_size = VoxelModelDB.get_step_by_voxel_count(base_scan, VOXEL_IN_VM,
+                                                              is_2d_vxl_mdl=True,
+                                                              round_n=2)
         vm = VoxelModelDB(base_scan, voxel_size, is_2d_vxl_mdl=True)
         mesh_segment_model = MeshSegmentModelDB(vm, self)
         triangles = {}

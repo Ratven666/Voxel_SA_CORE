@@ -5,6 +5,8 @@ FILE_NAME = "src/Pit_clean.txt"
 
 POINTS_CHUNK_COUNT = 100_000
 
+VOXEL_IN_VM = 100_000
+
 MAX_POINT_SCAN_PLOT = 10_000
 
 LOGGER = "console"
