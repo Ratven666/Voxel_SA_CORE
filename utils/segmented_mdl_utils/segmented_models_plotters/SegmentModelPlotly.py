@@ -120,8 +120,8 @@ class SegmentModelPlotly:
             return None
         x0 = self.model.voxel_model.min_X
         y0 = self.model.voxel_model.min_Y
-        i = (int((voxel.X - x0) / self.model.voxel_model.step)) * 2
-        j = (int((voxel.Y - y0) / self.model.voxel_model.step)) * 2
+        i = (int((voxel.X - x0 + 1e-9) / self.model.voxel_model.step)) * 2
+        j = (int((voxel.Y - y0 + 1e-9) / self.model.voxel_model.step)) * 2
         return i, j
 
     def __calk_sizes(self, width=800):

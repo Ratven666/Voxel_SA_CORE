@@ -43,9 +43,12 @@ class VoxelModelPlotter:
         Рассчитывает корректные подписи по осям модели на основе координат вокселя
         :return: словарь с полдписями для осей
         """
-        x_ticks = [self.voxel_model.min_X + idx*self.voxel_model.step for idx in range(self.voxel_model.X_count + 1)]
-        y_ticks = [self.voxel_model.min_Y + idx*self.voxel_model.step for idx in range(self.voxel_model.Y_count + 1)]
-        z_ticks = [self.voxel_model.min_Z + idx*self.voxel_model.step for idx in range(self.voxel_model.Z_count + 1)]
+        x_ticks = [round(self.voxel_model.min_X + idx*self.voxel_model.step, 4)
+                   for idx in range(self.voxel_model.X_count + 1)]
+        y_ticks = [round(self.voxel_model.min_Y + idx*self.voxel_model.step, 4)
+                   for idx in range(self.voxel_model.Y_count + 1)]
+        z_ticks = [round(self.voxel_model.min_Z + idx*self.voxel_model.step, 4)
+                   for idx in range(self.voxel_model.Z_count + 1)]
         return {"x_ticks": x_ticks, "y_ticks": y_ticks, "z_ticks": z_ticks}
 
     @staticmethod
@@ -70,9 +73,9 @@ class VoxelModelPlotter:
         x0 = self.voxel_model.min_X
         y0 = self.voxel_model.min_Y
         z0 = self.voxel_model.min_Z
-        i = int((voxel.X - x0) / self.voxel_model.step)
-        j = int((voxel.Y - y0) / self.voxel_model.step)
-        k = int((voxel.Z - z0) / self.voxel_model.step)
+        i = int((voxel.X - x0 + 1e-9) / self.voxel_model.step)
+        j = int((voxel.Y - y0 + 1e-9) / self.voxel_model.step)
+        k = int((voxel.Z - z0 + 1e-9) / self.voxel_model.step)
         return i, j, k
 
     @staticmethod

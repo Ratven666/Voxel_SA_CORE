@@ -50,12 +50,15 @@ def main():
     create_db()
 
     scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/pumpA - Cloud.las")
-    scan.plot()
+    scan.load_scan_from_file(file_name="src/bunny.las")
+    # scan.plot()
     #
 
-    vm = VoxelModelDB(scan, 0.005, is_2d_vxl_mdl=True)
+    vm = VoxelModelDB(scan, 0.002, is_2d_vxl_mdl=True)
     # vm.plot()
+
+    for idx, v in enumerate(vm):
+        print(idx, v)
 
     sm =DemModelDB(vm)
     sm.plot()
