@@ -50,30 +50,20 @@ def main():
     create_db()
 
     scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/SKLD_Right_05_05.txt")
+    scan.load_scan_from_file(file_name="src/SKLD_Right_05_05 - Cloud.las")
+    # scan.plot()
 
-    # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=0.5).do_sampling(scan=scan)
+    scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=1).do_sampling(scan=scan)
 
-    # mesh = MeshDB(scan_for_mesh)
-    # mesh.calk_mesh_mse(scan)
-    # mesh.plot()
+    mesh = MeshDB(scan_for_mesh)
+    mesh.calk_mesh_mse(scan)
+    mesh.plot()
     # scan_for_mesh.save_to_db()
     # scan_for_mesh.plot(plotter=ScanPlotterPointsPlotly())
     # mesh = MeshDB(scan_for_mesh)
     # mesh.plot()
 
-    mse = 0.15
 
-    mesh = MeshMSEConstDB(scan, max_border_length_m=5, max_triangle_mse_m=mse, n=30, calk_with_brute_force=True)
-    new_mesh = MeshLite(scan)
-    b_t = []
-    for t in mesh:
-        if t.mse is not None and t.mse > mse:
-            print(t.mse)
-            b_t.append(t)
-    new_mesh.triangles = b_t
-    # new_mesh.plot()
-    mesh.plot()
     # scan = mesh.mesh.scan
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # PlyMeshExporter(mesh).export()

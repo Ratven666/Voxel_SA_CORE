@@ -4,6 +4,7 @@ from CONFIG import FILE_NAME, POINTS_CHUNK_COUNT
 from classes.abc_classes.ScanABC import ScanABC
 from utils.scan_utils.ScanLoader import ScanLoader
 from utils.scan_utils.scan_iterators.ScanIterator import ScanIterator
+from utils.scan_utils.scan_parsers.ScanParser import ScanParser
 from utils.scan_utils.scan_parsers.ScanTxtParser import ScanTxtParser
 from utils.scan_utils.scan_savers.ScanTXTSaver import ScanTXTSaver
 from utils.start_db import Tables, engine
@@ -44,7 +45,7 @@ class ScanDB(ScanABC):
             db_connection.commit()
 
     def load_scan_from_file(self, file_name=FILE_NAME,
-                            scan_loader=ScanLoader(scan_parser=ScanTxtParser(chunk_count=POINTS_CHUNK_COUNT))):
+                            scan_loader=ScanLoader(scan_parser=ScanParser())):
         """
         Загружает точки в скан из файла
         Ведется запись в БД

@@ -3,6 +3,7 @@ import logging
 from CONFIG import LOGGER
 from classes.ImportedFileDB import ImportedFileDB
 from utils.scan_utils.Scan_metrics import update_scan_metrics, update_scan_in_db_from_scan
+from utils.scan_utils.scan_parsers.ScanParser import ScanParser
 from utils.scan_utils.scan_parsers.ScanParserABC import ScanParserABC
 from utils.scan_utils.scan_parsers.ScanTxtParser import ScanTxtParser
 from utils.start_db import engine, Tables
@@ -14,7 +15,7 @@ class ScanLoader:
     """
     __logger = logging.getLogger(LOGGER)
 
-    def __init__(self, scan_parser=ScanTxtParser()):
+    def __init__(self, scan_parser=ScanParser()):
         self.__scan_parser = scan_parser
 
     def load_data(self, scan, file_name: str):
