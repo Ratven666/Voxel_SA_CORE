@@ -1,6 +1,8 @@
 from CONFIG import FILE_NAME
 from utils.scan_utils.scan_parsers.ScanLasParser import ScanLasParser
 from utils.scan_utils.scan_parsers.ScanParserABC import ScanParserABC
+from utils.scan_utils.scan_parsers.ScanPtsParser import ScanPtsParser
+from utils.scan_utils.scan_parsers.ScanPtxParser import ScanPtxParser
 from utils.scan_utils.scan_parsers.ScanTxtParser import ScanTxtParser
 
 
@@ -16,6 +18,8 @@ class ScanParser(ScanParserABC):
         """
         parsers = {"txt": ScanTxtParser,
                    "las": ScanLasParser,
+                   "ptx": ScanPtxParser,
+                   "pts": ScanPtsParser,
                    }
         file_extension = file_name.split('.')[-1]
         self.__scan_parser = parsers[file_extension]

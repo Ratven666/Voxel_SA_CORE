@@ -50,14 +50,20 @@ def main():
     create_db()
 
     scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/SKLD_Right_05_05 - Cloud.las")
-    # scan.plot()
+    scan.load_scan_from_file(file_name="src/pumpA - Cloud.las")
+    scan.plot()
+    #
 
-    scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=1).do_sampling(scan=scan)
+    vm = VoxelModelDB(scan, 0.005, is_2d_vxl_mdl=True)
+    # vm.plot()
 
-    mesh = MeshDB(scan_for_mesh)
-    mesh.calk_mesh_mse(scan)
-    mesh.plot()
+    sm =DemModelDB(vm)
+    sm.plot()
+    # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=1).do_sampling(scan=scan)
+    #
+    # mesh = MeshDB(scan_for_mesh)
+    # mesh.calk_mesh_mse(scan)
+    # mesh.plot()
     # scan_for_mesh.save_to_db()
     # scan_for_mesh.plot(plotter=ScanPlotterPointsPlotly())
     # mesh = MeshDB(scan_for_mesh)

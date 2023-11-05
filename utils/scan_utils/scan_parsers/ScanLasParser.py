@@ -44,7 +44,7 @@ class ScanLasParser(ScanParserABC):
                 points_to_db = []
                 for point in points:
                     xyz = self.__get_xyz((point[0], point[1], point[2]), offsets=offsets, scales=scales)
-                    rgb = self.__get_rgb((point[9], point[10], point[11]))
+                    rgb = self.__get_rgb((point[-3], point[-2], point[-1]))
                     self.__last_point_id += 1
                     point = {"id": self.__last_point_id,
                              "X": xyz[0], "Y": xyz[1], "Z": xyz[2],
