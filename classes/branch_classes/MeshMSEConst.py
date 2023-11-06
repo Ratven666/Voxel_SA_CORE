@@ -19,9 +19,15 @@ class MeshMSEConstDB:
     logger = logging.getLogger(LOGGER)
     db_table = Tables.meshes_db_table
 
-    BORDER_LEN_COEF = 0.7
+    BORDER_LEN_COEFFICIENT = 0.7
 
-    def __init__(self, scan, max_border_length_m, max_triangle_mse_m, n=5, is_2d=True, calk_with_brute_force=False):
+    def __init__(self, scan,
+                 max_border_length_m,
+                 max_triangle_mse_m,
+                 n=5,
+                 is_2d=True,
+                 calk_with_brute_force=False,
+                 ):
         self.scan = scan
         self.max_border_length = max_border_length_m
         self.max_triangle_mse = max_triangle_mse_m
@@ -99,7 +105,7 @@ class MeshMSEConstDB:
         Выполняет предвариельные рассчеты
         @return: None
         """
-        border_length = self.BORDER_LEN_COEF * self.max_border_length / 2 ** 0.5
+        border_length = self.BORDER_LEN_COEFFICIENT * self.max_border_length / 2 ** 0.5
         self.sampled_scan = VoxelDownsamplingScanSampler(grid_step=border_length,
                                                          is_2d_sampling=self.is_2d,
                                                          average_the_data=False).do_sampling(self.scan)
@@ -166,7 +172,6 @@ class MeshMSEConstDB:
         self.mesh = MeshDB(self.sampled_scan)
         self.mesh.calk_mesh_mse(self.scan, delete_temp_models=True)
         MaxEdgeLengthMeshFilter(self.mesh, self.max_border_length).filter_mesh()
-
 
     @staticmethod
     def __get_new_triangles(prior_mesh, new_mesh):

@@ -65,6 +65,10 @@ class SegmentedModelABC(ABC):
             model_key = f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
             self._model_structure[model_key] = element_class(voxel, self)
 
+    @staticmethod
+    def get_key_for_voxel(voxel):
+        return f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
+
     def get_model_element_for_point(self, point):
         """
         Возвращает ячейку содержащую точку point

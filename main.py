@@ -6,9 +6,15 @@ from classes.MeshDB import MeshDB
 from classes.MeshLite import MeshLite
 from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.PlaneModelDB import PlaneModelDB
+from classes.Point import Point
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
+from classes.branch_classes.terrain_indexes.MyTerrainRuggednessIndex import MyTerrainRuggednessIndex
+from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexABSValue import TerrainRuggednessIndexABSValue
+from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassic import TerrainRuggednessIndexClassic
+from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassicModify import \
+    TerrainRuggednessIndexClassicModify
 from db_models.dem_models_table import DemTypeEnum
 from utils.logs.console_log_config import console_logger
 from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
@@ -50,18 +56,21 @@ def main():
     create_db()
 
     scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/bunny.las")
-    # scan.plot()
+    scan.load_scan_from_file(file_name="src/SKLD_Right_05.txt")
+    # scan.plot(plotter=ScanPlotterPointsPlotly())
     #
 
-    vm = VoxelModelDB(scan, 0.002, is_2d_vxl_mdl=True)
-    # vm.plot()
-
-    for idx, v in enumerate(vm):
-        print(idx, v)
+    vm = VoxelModelDB(scan, 1.5, is_2d_vxl_mdl=True)
 
     sm =DemModelDB(vm)
-    sm.plot()
+
+    tri = TerrainRuggednessIndexABSValue(sm, full_neighbours=False)
+
+    # sm.plot()
+    tri.plot()
+
+    # vm.plot()
+
     # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=1).do_sampling(scan=scan)
     #
     # mesh = MeshDB(scan_for_mesh)
