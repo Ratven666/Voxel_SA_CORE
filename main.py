@@ -10,6 +10,7 @@ from classes.Point import Point
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
+from classes.branch_classes.statistic_clasess.SmMseTriComparator import SmMseTriComparator
 from classes.branch_classes.terrain_indexes.MyTerrainRuggednessIndex import MyTerrainRuggednessIndex
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexABSValue import TerrainRuggednessIndexABSValue
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassic import TerrainRuggednessIndexClassic
@@ -60,14 +61,25 @@ def main():
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     #
 
-    vm = VoxelModelDB(scan, 1.5, is_2d_vxl_mdl=True)
+    STEP = 5
 
-    sm =DemModelDB(vm)
+    vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
+    vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
 
-    tri = TerrainRuggednessIndexABSValue(sm, full_neighbours=False)
+    dem = DemModelDB(vm_1)
+    sm_2 =PlaneModelDB(vm_2)
+
+    # sm = BiModelDB(vm, DemTypeEnum.DEM)
+
+    tri = MyTerrainRuggednessIndex(dem, full_neighbours=False)
 
     # sm.plot()
-    tri.plot()
+    # tri.plot()
+
+    comparator = SmMseTriComparator(tri, sm_2)
+    # print(comparator)
+    print(comparator.correlation)
+    comparator.plot()
 
     # vm.plot()
 

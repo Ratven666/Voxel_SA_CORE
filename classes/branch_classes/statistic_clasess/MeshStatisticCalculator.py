@@ -3,7 +3,7 @@ from os import remove, path
 import pandas as pd
 import seaborn as sns
 
-from classes.branch_classes.CsvMeshDataExporter import CsvMeshDataExporter
+from classes.branch_classes.statistic_clasess.CsvMeshDataExporter import CsvMeshDataExporter
 
 
 class MeshStatisticCalculator:
