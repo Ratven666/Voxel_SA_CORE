@@ -2,6 +2,7 @@ from classes.BiCellDB import BiCellDB
 from classes.DemModelDB import DemModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.Point import Point
+from classes.Polynomial2ModelDB import Polynomial2ModelDB
 from classes.ScanDB import ScanDB
 from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
 from db_models.dem_models_table import DemTypeEnum
@@ -15,7 +16,9 @@ class BiModelDB(SegmentedModelABC):
     __base_models_classes = {"BI_DEM_WITH_MSE": DemModelDB,
                              "BI_DEM_WITHOUT_MSE": DemModelDB,
                              "BI_PLANE_WITH_MSE": PlaneModelDB,
-                             "BI_PLANE_WITHOUT_MSE": PlaneModelDB
+                             "BI_PLANE_WITHOUT_MSE": PlaneModelDB,
+                             "BI_POLYNOMIAL_2_WITH_MSE": Polynomial2ModelDB,
+                             "BI_POLYNOMIAL_2_WITHOUT_MSE": Polynomial2ModelDB,
                              }
 
     def __init__(self, voxel_model, base_model_type: DemTypeEnum, enable_mse=True):

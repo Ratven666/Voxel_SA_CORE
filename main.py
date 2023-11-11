@@ -7,6 +7,7 @@ from classes.MeshLite import MeshLite
 from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.Point import Point
+from classes.Polynomial2ModelDB import Polynomial2ModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
@@ -43,6 +44,7 @@ from utils.segmented_mdl_utils.segmented_models_filters.SMFilterByMaxMSE import 
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterByMaxPercentile import SMFilterByMaxPercentile
 from utils.segmented_mdl_utils.segmented_models_filters.SMFilterPercentile import SMFilterPercentile
 from utils.segmented_mdl_utils.segmented_models_plotters.HistMSEPlotterPlotly import HistMSEPlotterPlotly
+from utils.segmented_mdl_utils.segmented_models_plotters.Poly2ModelPlotterMPL import Poly2ModelPlotterMPL
 from utils.segmented_mdl_utils.segmented_models_plotters.SegmentModelPlotly import SegmentModelPlotly
 from utils.segmented_mdl_utils.segmented_models_serializers.SegmentedModelJsonSerializer import \
     SegmentedModelJsonSerializer
@@ -61,34 +63,38 @@ def main():
     create_db()
 
     scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/Pit - Cloud 0,20.txt")
+    scan.load_scan_from_file(file_name="src/SKLD_Right_05 - Cloud.las")
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # scan.plot()
     #
 
-    STEP = 3
+    STEP = 0.5
 
-    vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
+    # vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
 
-    dem = DemModelDB(vm_1)
+    dem = DemModelDB(vm_2)
     sm_2 =PlaneModelDB(vm_2)
-    # sm_2 =DemModelDB(vm_2)
+    # sm_2.plot()
+
+    sm_2 =Polynomial2ModelDB(vm_2)
+    sm_2.plot(plotter=Poly2ModelPlotterMPL(grid=1))
+    # sm_2.plot()
 
     # sm = BiModelDB(vm, DemTypeEnum.DEM)
 
-    tri = PlaneCurvatureAbsIndex(dem, full_neighbours=True)
+    # tri = PlaneCurvatureAbsIndex(dem, full_neighbours=True)
     # tri = MaxAbsCurvatureIndex(dem, full_neighbours=True)
     # tri = MyTerrainRuggednessIndex(dem, full_neighbours=True)
 
 
     # sm.plot()
-    tri.plot()
-
-    comparator = SmMseTriComparator(tri, sm_2)
-    # # print(comparator)
-    print(comparator.correlation)
-    comparator.plot()
+    # tri.plot()
+    #
+    # comparator = SmMseTriComparator(tri, sm_2)
+    # # # print(comparator)
+    # print(comparator.correlation)
+    # comparator.plot()
 
     # vm.plot()
 
