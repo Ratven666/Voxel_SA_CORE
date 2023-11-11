@@ -11,7 +11,11 @@ from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
 from classes.branch_classes.statistic_clasess.SmMseTriComparator import SmMseTriComparator
+from classes.branch_classes.terrain_indexes.MaxAbsCurvatureIndex import MaxAbsCurvatureIndex
+from classes.branch_classes.terrain_indexes.MeanAbsCurvatureIndex import MeanAbsCurvatureIndex
 from classes.branch_classes.terrain_indexes.MyTerrainRuggednessIndex import MyTerrainRuggednessIndex
+from classes.branch_classes.terrain_indexes.ProfileCurvatureAbsIndex import ProfileCurvatureAbsIndex, \
+    PlaneCurvatureAbsIndex
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexABSValue import TerrainRuggednessIndexABSValue
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassic import TerrainRuggednessIndexClassic
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassicModify import \
@@ -57,27 +61,32 @@ def main():
     create_db()
 
     scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/SKLD_Right_05.txt")
+    scan.load_scan_from_file(file_name="src/Pit - Cloud 0,20.txt")
     # scan.plot(plotter=ScanPlotterPointsPlotly())
+    # scan.plot()
     #
 
-    STEP = 5
+    STEP = 3
 
     vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
 
     dem = DemModelDB(vm_1)
     sm_2 =PlaneModelDB(vm_2)
+    # sm_2 =DemModelDB(vm_2)
 
     # sm = BiModelDB(vm, DemTypeEnum.DEM)
 
-    tri = MyTerrainRuggednessIndex(dem, full_neighbours=False)
+    tri = PlaneCurvatureAbsIndex(dem, full_neighbours=True)
+    # tri = MaxAbsCurvatureIndex(dem, full_neighbours=True)
+    # tri = MyTerrainRuggednessIndex(dem, full_neighbours=True)
+
 
     # sm.plot()
-    # tri.plot()
+    tri.plot()
 
     comparator = SmMseTriComparator(tri, sm_2)
-    # print(comparator)
+    # # print(comparator)
     print(comparator.correlation)
     comparator.plot()
 
