@@ -48,13 +48,18 @@ class Polynomial2CellDB(CellABC):
         return None
 
     def get_mse_z_from_xy(self, x, y):
-        raise NotImplementedError
-        # try:
-        #     mse_z = ((x ** 2) * (self.m_a ** 2) + (y ** 2) * (self.m_b ** 2) + self.m_d ** 2) ** 0.5
-        #     return mse_z
-        # except TypeError:
-        #     pass
-        # return None
+        x = x - (self.voxel.X + self.voxel.step / 2)
+        y = y - (self.voxel.Y + self.voxel.step / 2)
+        try:
+            mse_z = (((2 * x) ** 2) * (self.m_a ** 2) +
+                     ((2 * y) ** 2) * (self.m_b ** 2) +
+                     ((x * y) ** 2) * (self.m_c ** 2) +
+                     (x ** 2) * (self.m_d ** 2) +
+                     (y ** 2) * (self.m_e ** 2) +
+                     self.m_f ** 2) ** 0.5
+            return mse_z
+        except TypeError:
+            return None
 
     def get_db_raw_data(self):
         return {"voxel_id": self.voxel.id,

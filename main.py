@@ -68,17 +68,22 @@ def main():
     # scan.plot()
     #
 
-    STEP = 0.5
+    STEP = 1
 
     # vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
 
-    dem = DemModelDB(vm_2)
+    # dem = DemModelDB(vm_2)
     sm_2 =PlaneModelDB(vm_2)
+    bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=True)
+    bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=False)
+    bi_plane = BiModelDB(vm_2, DemTypeEnum.POLYNOMIAL_2, enable_mse=True)
+    # bi_plane = BiModelDB(vm_2, DemTypeEnum.POLYNOMIAL_2, enable_mse=False)
+    bi_plane.plot()
     # sm_2.plot()
 
-    sm_2 =Polynomial2ModelDB(vm_2)
-    sm_2.plot(plotter=Poly2ModelPlotterMPL(grid=1))
+    # sm_2 =Polynomial2ModelDB(vm_2)
+    # sm_2.plot(plotter=Poly2ModelPlotterMPL(grid=1))
     # sm_2.plot()
 
     # sm = BiModelDB(vm, DemTypeEnum.DEM)

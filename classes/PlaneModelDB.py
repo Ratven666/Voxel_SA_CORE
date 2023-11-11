@@ -84,6 +84,8 @@ class PlaneModelDB(SegmentedModelABC):
         """
         for point in base_scan:
             cell = self.get_model_element_for_point(point)
+            point.X = point.X - (cell.voxel.X + cell.voxel.step / 2)
+            point.Y = point.Y - (cell.voxel.Y + cell.voxel.step / 2)
             try:
                 cell.a1 += point.X ** 2
                 cell.b1 += point.X * point.Y

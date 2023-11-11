@@ -29,6 +29,8 @@ class PlaneCellDB(CellABC):
         :param y: координата y
         :return: координата z для точки (x, y)
         """
+        x = x - (self.voxel.X + self.voxel.step / 2)
+        y = y - (self.voxel.Y + self.voxel.step / 2)
         try:
             z = self.a * x + self.b * y + self.d
             return z
@@ -37,12 +39,13 @@ class PlaneCellDB(CellABC):
         return None
 
     def get_mse_z_from_xy(self, x, y):
+        x = x - (self.voxel.X + self.voxel.step / 2)
+        y = y - (self.voxel.Y + self.voxel.step / 2)
         try:
             mse_z = ((x ** 2) * (self.m_a ** 2) + (y ** 2) * (self.m_b ** 2) + self.m_d ** 2) ** 0.5
             return mse_z
         except TypeError:
-            pass
-        return None
+            return None
 
     def get_db_raw_data(self):
         return {"voxel_id": self.voxel.id,
