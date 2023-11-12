@@ -13,7 +13,7 @@ class DEMIndexABC(ABC):
         self.full_neighbours = full_neighbours
         self.model_indexes = np.full((self.dem_model.voxel_model.Y_count,
                                       self.dem_model.voxel_model.X_count), None)
-        self.__calk_model_indexes()
+        self._calk_model_indexes()
         self.i, self.j = 0, 0
 
     def __iter__(self):
@@ -31,7 +31,7 @@ class DEMIndexABC(ABC):
         self.i, self.j = 0, 0
         raise StopIteration
 
-    def __get_cell_neighbour_structure(self, cell):
+    def _get_cell_neighbour_structure(self, cell):
         """
         Создает структуру соседних ячеек относительно ячейки cell
         :param cell: чентральная ячейка относительно которой ищутся соседи
@@ -57,7 +57,8 @@ class DEMIndexABC(ABC):
                     neighbour_structure[x][y] = None
         return neighbour_structure
 
-    def __get_indexes(self, cell):
+
+    def _get_indexes(self, cell):
         """
         Рассчитывает индексы вокселя внутри модели по трем осям
         на основании координат вокселя, его размера и области модели
@@ -74,16 +75,16 @@ class DEMIndexABC(ABC):
         j = int((voxel.Y - y0 + 1e-9) / self.dem_model.voxel_model.step)
         return i, j
 
-    def __calk_model_indexes(self):
+    def _calk_model_indexes(self):
         for cell in self.dem_model:
-            cell_index = self.calk_index_value(self.__get_cell_neighbour_structure(cell))
-            i, j = self.__get_indexes(cell)
+            cell_index = self.calk_index_value(self._get_cell_neighbour_structure(cell))
+            i, j = self._get_indexes(cell)
             self.model_indexes[j][i] = cell_index
 
     def get_index_for_point(self, point):
         cell = self.dem_model.get_model_element_for_point(point)
         try:
-            i, j = self.__get_indexes(cell)
+            i, j = self._get_indexes(cell)
         except TypeError:
             return None
         return self.model_indexes[j][i]

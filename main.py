@@ -12,15 +12,10 @@ from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
 from classes.branch_classes.statistic_clasess.SmMseTriComparator import SmMseTriComparator
-from classes.branch_classes.terrain_indexes.MaxAbsCurvatureIndex import MaxAbsCurvatureIndex
-from classes.branch_classes.terrain_indexes.MeanAbsCurvatureIndex import MeanAbsCurvatureIndex
-from classes.branch_classes.terrain_indexes.MyTerrainRuggednessIndex import MyTerrainRuggednessIndex
-from classes.branch_classes.terrain_indexes.ProfileCurvatureAbsIndex import ProfileCurvatureAbsIndex, \
-    PlaneCurvatureAbsIndex
-from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexABSValue import TerrainRuggednessIndexABSValue
-from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassic import TerrainRuggednessIndexClassic
-from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexClassicModify import \
-    TerrainRuggednessIndexClassicModify
+from classes.branch_classes.terrain_indexes.TerrainCurvaturesIndexesABC import MeanCurvatureIndex, \
+    MaxAbsCurvatureIndex, ProfileCurvatureIndex, PlaneCurvatureIndex
+from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexes import TerrainRuggednessIndexClassicModify, \
+    TerrainRuggednessIndexClassic, MyTerrainRuggednessIndex, TerrainRuggednessIndexABSValue
 from db_models.dem_models_table import DemTypeEnum
 from utils.logs.console_log_config import console_logger
 from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
@@ -62,24 +57,58 @@ from utils.voxel_utils.voxel_model_serializers.VoxelModelJsonSerializer import V
 def main():
     create_db()
 
-    scan = ScanDB("SKLD_4")
-    scan.load_scan_from_file(file_name="src/SKLD_Right_05 - Cloud.las")
+    scan = ScanDB("K_3")
+    scan.load_scan_from_file(file_name="src/3_do-big_BF.txt")
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # scan.plot()
-    #
 
     STEP = 1
+    MAX_EDGE = STEP * 1.5
 
-    # vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
+    scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
+    mesh = MeshDB(scan_for_mesh)
+    # # mesh.calk_mesh_mse(scan)
+    #
+    MaxEdgeLengthMeshFilter(mesh, max_edge_length=MAX_EDGE).filter_mesh()
+    # # mesh.calk_mesh_mse(base_scan=scan)
+    #
+    vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
+    # # vm_2.plot()
+    #
+    dem = DemModelDB(vm_2)
+    dem_03 = DemModelDB(vm_1)
+    # plane =PlaneModelDB(vm_2)
+    parab = Polynomial2ModelDB(vm_2)
+    #
+    mesh_sm = MeshSegmentModelDB(vm_2, mesh)
+    # mesh_sm.plot_mse()
+    #
+    #
+    curv_dem = PlaneCurvatureIndex(dem_model=dem, abs_value=False, full_neighbours=True)
+    curv_dem.plot()
+    curv_dem_03 = PlaneCurvatureIndex(dem_model=dem_03, abs_value=False, full_neighbours=True)
+    curv_dem_03.plot()
+    curv_parab = PlaneCurvatureIndex(dem_model=parab, abs_value=False, full_neighbours=True)
+    curv_parab.plot()
+    comparator_1 = SmMseTriComparator(curv_dem, mesh_sm)
+    comparator_2 = SmMseTriComparator(curv_dem_03, mesh_sm)
+    comparator_3 = SmMseTriComparator(curv_parab, mesh_sm)
+    # comparator_4 = SmMseTriComparator(curv, parab)
+    # comparator_1.plot()
+    # comparator_2.plot()
+    # comparator_3.plot()
+    # comparator_4.plot()
+    print("comparator 1", comparator_1.correlation)
+    print("comparator 2", comparator_2.correlation)
+    print("comparator 3", comparator_3.correlation)
+    # print("comparator 4", comparator_4.correlation)
 
-    # dem = DemModelDB(vm_2)
-    sm_2 =PlaneModelDB(vm_2)
-    bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=True)
-    bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=False)
-    bi_plane = BiModelDB(vm_2, DemTypeEnum.POLYNOMIAL_2, enable_mse=True)
-    # bi_plane = BiModelDB(vm_2, DemTypeEnum.POLYNOMIAL_2, enable_mse=False)
-    bi_plane.plot()
+    # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=True)
+    # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=False)
+    # bi_plane = BiModelDB(vm_2, DemTypeEnum.POLYNOMIAL_2, enable_mse=True)
+    # # bi_plane = BiModelDB(vm_2, DemTypeEnum.POLYNOMIAL_2, enable_mse=False)
+    # bi_plane.plot()
     # sm_2.plot()
 
     # sm_2 =Polynomial2ModelDB(vm_2)
@@ -91,7 +120,6 @@ def main():
     # tri = PlaneCurvatureAbsIndex(dem, full_neighbours=True)
     # tri = MaxAbsCurvatureIndex(dem, full_neighbours=True)
     # tri = MyTerrainRuggednessIndex(dem, full_neighbours=True)
-
 
     # sm.plot()
     # tri.plot()
@@ -113,7 +141,6 @@ def main():
     # mesh = MeshDB(scan_for_mesh)
     # mesh.plot()
 
-
     # scan = mesh.mesh.scan
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # PlyMeshExporter(mesh).export()
@@ -127,7 +154,6 @@ def main():
     #                                                  is_2d_sampling=True,
     #                                                  average_the_data=False).do_sampling(scan_for_mesh)
     # sampled_scan.plot(plotter=ScanPlotterPointsPlotly())
-
 
     # print(mesh)
     # mesh_sm = MeshSegmentModelDB(vm, mesh)

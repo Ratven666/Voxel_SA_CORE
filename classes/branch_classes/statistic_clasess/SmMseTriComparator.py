@@ -54,15 +54,4 @@ class SmMseTriComparator:
                           ratio=3,
                                  )
         sns_plot.set_axis_labels("TRI", "MSE")
-        sns_plot.savefig(".")
-
-    # def plot(self):
-    #     import seaborn as sns
-    #     sns.set_theme(style="ticks")
-    #     sns_plot = sns.lmplot(data=self.df, x="tri", y="mse",
-    #                           # s=10,
-    #                           markers="+",
-    #                           scatter_kws=dict(s=10, linewidths=.7, edgecolors='black'))
-    #     sns_plot.set_axis_labels("TRI", "MSE")
-    #     sns_plot.savefig(".")
-
+        sns_plot.savefig(f"{self.s_model.model_name}.")
