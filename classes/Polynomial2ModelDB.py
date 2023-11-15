@@ -32,7 +32,7 @@ class Polynomial2ModelDB(SegmentedModelABC):
         self.logger.info(f"Рассчитаны СКП модели {self.model_name}")
 
     def __fit_polynomials(self, base_scan):
-        self.__calk_matrix_params(base_scan)
+        self._calk_matrix_params(base_scan)
         for cell in self:
             try:
                 m_n = np.array([[cell.aa, cell.ab, cell.ac, cell.ad, cell.ae, cell.af],
@@ -70,7 +70,7 @@ class Polynomial2ModelDB(SegmentedModelABC):
             except AttributeError:
                 continue
 
-    def __calk_matrix_params(self, base_scan):
+    def _calk_matrix_params(self, base_scan):
         """
         Расчитывает коэфициенты матрицы нормальных уравнений
         :param base_scan: базовый скан воксельной модели

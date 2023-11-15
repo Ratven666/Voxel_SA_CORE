@@ -7,6 +7,7 @@ from classes.MeshLite import MeshLite
 from classes.MeshSegmentModelDB import MeshSegmentModelDB
 from classes.PlaneModelDB import PlaneModelDB
 from classes.Point import Point
+from classes.Polynomial2Model3x3DB import Polynomial2Model3x3DB
 from classes.Polynomial2ModelDB import Polynomial2ModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
@@ -58,50 +59,64 @@ def main():
     create_db()
 
     scan = ScanDB("K_3")
-    scan.load_scan_from_file(file_name="src/3_do-big_BF.txt")
+    scan.load_scan_from_file(file_name="src/SKLD_Right_05.txt")
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # scan.plot()
 
-    STEP = 1
+    STEP = 10
     MAX_EDGE = STEP * 1.5
 
-    scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
-    mesh = MeshDB(scan_for_mesh)
-    # # mesh.calk_mesh_mse(scan)
-    #
-    MaxEdgeLengthMeshFilter(mesh, max_edge_length=MAX_EDGE).filter_mesh()
+    # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
+    # mesh = MeshDB(scan_for_mesh)
+    # # # mesh.calk_mesh_mse(scan)
+    # #
+    # MaxEdgeLengthMeshFilter(mesh, max_edge_length=MAX_EDGE).filter_mesh()
     # # mesh.calk_mesh_mse(base_scan=scan)
     #
-    vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
+    # vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
+    parab = Polynomial2ModelDB(vm_2)
+    # parab.plot(plotter=Poly2ModelPlotterMPL())
+    parab3x3 = Polynomial2Model3x3DB(vm_2)
+    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
+
+    plane = PlaneModelDB(vm_2)
+
+
     # # vm_2.plot()
     #
-    dem = DemModelDB(vm_2)
-    dem_03 = DemModelDB(vm_1)
-    # plane =PlaneModelDB(vm_2)
-    parab = Polynomial2ModelDB(vm_2)
-    #
-    mesh_sm = MeshSegmentModelDB(vm_2, mesh)
-    # mesh_sm.plot_mse()
-    #
-    #
-    curv_dem = PlaneCurvatureIndex(dem_model=dem, abs_value=False, full_neighbours=True)
-    curv_dem.plot()
-    curv_dem_03 = PlaneCurvatureIndex(dem_model=dem_03, abs_value=False, full_neighbours=True)
-    curv_dem_03.plot()
-    curv_parab = PlaneCurvatureIndex(dem_model=parab, abs_value=False, full_neighbours=True)
-    curv_parab.plot()
-    comparator_1 = SmMseTriComparator(curv_dem, mesh_sm)
-    comparator_2 = SmMseTriComparator(curv_dem_03, mesh_sm)
-    comparator_3 = SmMseTriComparator(curv_parab, mesh_sm)
-    # comparator_4 = SmMseTriComparator(curv, parab)
-    # comparator_1.plot()
-    # comparator_2.plot()
-    # comparator_3.plot()
-    # comparator_4.plot()
-    print("comparator 1", comparator_1.correlation)
-    print("comparator 2", comparator_2.correlation)
-    print("comparator 3", comparator_3.correlation)
+    # dem = DemModelDB(vm_2)
+    # dem_03 = DemModelDB(vm_1)
+    # # plane =PlaneModelDB(vm_2)
+    # parab = Polynomial2ModelDB(vm_2)
+    # #
+    # mesh_sm = MeshSegmentModelDB(vm_2, mesh)
+    # # mesh_sm.plot_mse()
+    # #
+    # #
+    # curv_dem = MeanCurvatureIndex(dem_model=dem,
+    #                                     # abs_value=True,
+    #                                     full_neighbours=True)
+    # curv_dem.plot()
+    # curv_dem_03 = MeanCurvatureIndex(dem_model=dem_03,
+    #                                        # abs_value=True,
+    #                                        full_neighbours=True)
+    # curv_dem_03.plot()
+    # curv_parab = MeanCurvatureIndex(dem_model=parab,
+    #                                       # abs_value=True,
+    #                                       full_neighbours=True)
+    # curv_parab.plot()
+    # comparator_1 = SmMseTriComparator(curv_dem, mesh_sm)
+    # comparator_2 = SmMseTriComparator(curv_dem_03, mesh_sm)
+    # comparator_3 = SmMseTriComparator(curv_parab, mesh_sm)
+    # # comparator_4 = SmMseTriComparator(curv, parab)
+    # # comparator_1.plot()
+    # # comparator_2.plot()
+    # # comparator_3.plot()
+    # # comparator_4.plot()
+    # print("comparator 1", comparator_1.correlation)
+    # print("comparator 2", comparator_2.correlation)
+    # print("comparator 3", comparator_3.correlation)
     # print("comparator 4", comparator_4.correlation)
 
     # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=True)
