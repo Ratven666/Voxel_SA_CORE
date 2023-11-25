@@ -8,9 +8,10 @@ from classes.branch_classes.terrain_indexes.DEMIndexPlotterPlotly import DEMInde
 
 class DEMIndexABC(ABC):
 
-    def __init__(self, dem_model, full_neighbours):
+    def __init__(self, dem_model, full_neighbours=False):
         self.dem_model = dem_model
         self.full_neighbours = full_neighbours
+        self.index_name = None
         self.model_indexes = np.full((self.dem_model.voxel_model.Y_count,
                                       self.dem_model.voxel_model.X_count), None)
         self._calk_model_indexes()

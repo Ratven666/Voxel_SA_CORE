@@ -12,9 +12,9 @@ from classes.Polynomial2ModelDB import Polynomial2ModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
-from classes.branch_classes.statistic_clasess.SmMseTriComparator import SmMseTriComparator
+from classes.branch_classes.statistic_clasess.SmDemIndexesComparator import SmDemIndexesComparator
 from classes.branch_classes.terrain_indexes.TerrainCurvaturesIndexesABC import MeanCurvatureIndex, \
-    MaxAbsCurvatureIndex, ProfileCurvatureIndex, PlaneCurvatureIndex
+    MaxAbsCurvatureIndex, ProfileCurvatureIndex, PlaneCurvatureIndex, SlopeFullIndex
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexes import TerrainRuggednessIndexClassicModify, \
     TerrainRuggednessIndexClassic, MyTerrainRuggednessIndex, TerrainRuggednessIndexABSValue
 from db_models.dem_models_table import DemTypeEnum
@@ -63,7 +63,7 @@ def main():
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # scan.plot()
 
-    STEP = 10
+    STEP = 1
     MAX_EDGE = STEP * 1.5
 
     # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
@@ -75,63 +75,20 @@ def main():
     #
     # vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
-    parab = Polynomial2ModelDB(vm_2)
-    # parab.plot(plotter=Poly2ModelPlotterMPL())
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=None)
-    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.1)
 
-    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.25)
-    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.5)
-    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.75)
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=1)
-    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0)
-    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
-
-
-    plane = PlaneModelDB(vm_2)
     dem = DemModelDB(vm_2)
-    # bi_mdl = BiModelDB()
+    mean_curv_dem = MeanCurvatureIndex(dem_model=dem,
+                                       full_neighbours=True)
+    slope_dem = SlopeFullIndex(dem_model=dem,
+                               )
+    tri = TerrainRuggednessIndexClassicModify(dem_model=dem,
+                                              )
 
-
-    # # vm_2.plot()
-    #
-    # dem = DemModelDB(vm_2)
-    # dem_03 = DemModelDB(vm_1)
-    # # plane =PlaneModelDB(vm_2)
-    # parab = Polynomial2ModelDB(vm_2)
-    # #
-    # mesh_sm = MeshSegmentModelDB(vm_2, mesh)
-    # # mesh_sm.plot_mse()
-    # #
-    # #
-    # curv_dem = MeanCurvatureIndex(dem_model=dem,
-    #                                     # abs_value=True,
-    #                                     full_neighbours=True)
-    # curv_dem.plot()
-    # curv_dem_03 = MeanCurvatureIndex(dem_model=dem_03,
-    #                                        # abs_value=True,
-    #                                        full_neighbours=True)
-    # curv_dem_03.plot()
-    # curv_parab = MeanCurvatureIndex(dem_model=parab,
-    #                                       # abs_value=True,
-    #                                       full_neighbours=True)
-    # curv_parab.plot()
-    # comparator_1 = SmMseTriComparator(curv_dem, mesh_sm)
-    # comparator_2 = SmMseTriComparator(curv_dem_03, mesh_sm)
-    # comparator_3 = SmMseTriComparator(curv_parab, mesh_sm)
-    # # comparator_4 = SmMseTriComparator(curv, parab)
-    # # comparator_1.plot()
-    # # comparator_2.plot()
-    # # comparator_3.plot()
-    # # comparator_4.plot()
-    # print("comparator 1", comparator_1.correlation)
-    # print("comparator 2", comparator_2.correlation)
-    # print("comparator 3", comparator_3.correlation)
-    # print("comparator 4", comparator_4.correlation)
+    comparator = SmDemIndexesComparator(dem,
+                                        mean_curv_dem,
+                                        slope_dem,
+                                        tri)
+    print(comparator.correlations_mse_for_dem_indexes)
 
     # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=True)
     # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=False)

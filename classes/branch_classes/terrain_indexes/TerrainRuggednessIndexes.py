@@ -47,6 +47,7 @@ class TerrainRuggednessIndexABC(DEMIndexABC):
 class TerrainRuggednessIndexClassic(TerrainRuggednessIndexABC):
     def __init__(self, dem_model, full_neighbours=True):
         super().__init__(dem_model, full_neighbours=True)
+        self.index_name = "TRI_Classic"
 
     def _do_prepare_calculation(self, neighbour):
 
@@ -61,11 +62,14 @@ class TerrainRuggednessIndexClassicModify(TerrainRuggednessIndexClassic):
     def __init__(self, dem_model, full_neighbours=False):
         super().__init__(dem_model, full_neighbours)
         self.full_neighbours = full_neighbours
+        self.index_name = "TRI_Classic_Modify"
 
 
 class TerrainRuggednessIndexABSValue(TerrainRuggednessIndexABC):
     def __init__(self, dem_model, full_neighbours=False):
         super().__init__(dem_model, full_neighbours)
+        self.index_name = "TRI_ABS_Value"
+
 
     def _do_prepare_calculation(self, neighbour):
         self.value += abs(neighbour - self.base_val)
@@ -78,6 +82,8 @@ class TerrainRuggednessIndexABSValue(TerrainRuggednessIndexABC):
 class MyTerrainRuggednessIndex(TerrainRuggednessIndexABC):
     def __init__(self, dem_model, full_neighbours=False):
         super().__init__(dem_model, full_neighbours)
+        self.index_name = "My_TRI"
+
 
     def _do_prepare_calculation(self, neighbour):
         self.value += (neighbour - self.base_val)

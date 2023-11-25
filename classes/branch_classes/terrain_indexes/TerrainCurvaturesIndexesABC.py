@@ -83,11 +83,14 @@ class TerrainCurvaturesIndexesABC(DEMIndexABC):
             return None
         if self.full_neighbours is False or self.len == 9:
             self._calc_curvature_index()
-            result =  self._get_result()
+            result = self._get_result()
             return abs(result) if self.abs_value else result
 
 
 class MeanCurvatureIndex(TerrainCurvaturesIndexesABC):
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False):
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Mean_Curvature_Index"
 
     def _calc_curvature_index(self):
         self.curvature_index = -self.params["A"] - self.params["B"]
@@ -97,6 +100,11 @@ class MeanCurvatureIndex(TerrainCurvaturesIndexesABC):
 
 
 class MaxAbsCurvatureIndex(TerrainCurvaturesIndexesABC):
+
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False):
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Max_Abs_Curvature_Index"
+
     def _calc_curvature_index(self):
         self.curvature_max = -self.params["A"] - self.params["B"] + \
                              ((self.params["A"] - self.params["B"]) ** 2 + self.params["C"] ** 2) ** 0.5
@@ -107,11 +115,14 @@ class MaxAbsCurvatureIndex(TerrainCurvaturesIndexesABC):
         curvature = self.curvature_max \
             if abs(self.curvature_min) < abs(self.curvature_max) \
             else self.curvature_min
-        # curvature = max(abs(self.curvature_min), abs(self.curvature_max))
         return curvature
 
 
 class ProfileCurvatureIndex(TerrainCurvaturesIndexesABC):
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False):
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Profile_Curvature_Index"
+
     def _calc_curvature_index(self):
         self.prof_c = (-200 * (self.params["A"] * self.params["D"] ** 2 +
                                self.params["B"] * self.params["E"] ** 2 +
@@ -124,6 +135,10 @@ class ProfileCurvatureIndex(TerrainCurvaturesIndexesABC):
 
 
 class PlaneCurvatureIndex(TerrainCurvaturesIndexesABC):
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False):
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Plane_Curvature_Index"
+
     def _calc_curvature_index(self):
         self.plan_c = (200 * (self.params["B"] * self.params["D"] ** 2 +
                               self.params["A"] * self.params["E"] ** 2 +
@@ -132,3 +147,43 @@ class PlaneCurvatureIndex(TerrainCurvaturesIndexesABC):
 
     def _get_result(self):
         return self.plan_c
+
+
+class SlopeXIndex(TerrainCurvaturesIndexesABC):
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False):
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Slope_X_Index"
+
+    def _calc_curvature_index(self):
+        self.slope_x = self.params["D"]
+
+    def _get_result(self):
+        return self.slope_x
+
+
+class SlopeYIndex(TerrainCurvaturesIndexesABC):
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False):
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Slope_Y_Index"
+
+    def _calc_curvature_index(self):
+        self.slope_y = self.params["E"]
+
+    def _get_result(self):
+        return self.slope_y
+
+
+class SlopeFullIndex(TerrainCurvaturesIndexesABC):
+    def __init__(self, dem_model, abs_value=True, full_neighbours=False, in_degrees=True):
+        self.in_degrees = in_degrees
+        super().__init__(dem_model, abs_value, full_neighbours)
+        self.index_name = "Slope_Full_Index"
+
+    def _calc_curvature_index(self):
+        from math import atan
+        self.slope_full = atan((self.params["E"] ** 2 + self.params["E"] ** 2) ** 0.5)
+
+    def _get_result(self):
+        from math import degrees
+        result = degrees(self.slope_full) if self.in_degrees else self.slope_full
+        return result
