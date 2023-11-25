@@ -13,24 +13,18 @@ class BiModelDB(SegmentedModelABC):
     Билинейно-интерполяционная модель связанная с базой данных
     """
 
-    __base_models_classes = {"BI_DEM_WITH_MSE": DemModelDB,
-                             "BI_DEM_WITHOUT_MSE": DemModelDB,
-                             "BI_PLANE_WITH_MSE": PlaneModelDB,
-                             "BI_PLANE_WITHOUT_MSE": PlaneModelDB,
-                             "BI_POLYNOMIAL_2_WITH_MSE": Polynomial2ModelDB,
-                             "BI_POLYNOMIAL_2_WITHOUT_MSE": Polynomial2ModelDB,
-                             }
-
-    def __init__(self, voxel_model, base_model_type: DemTypeEnum, enable_mse=True):
+    def __init__(self, base_model, enable_mse=True):
+        self.base_model = base_model
+        self.voxel_model = base_model.voxel_model
         if enable_mse:
-            self.model_type = f"BI_{base_model_type.name}_WITH_MSE"
+            self.model_type = f"BI_{base_model.model_type}_WITH_MSE"
         else:
-            self.model_type = f"BI_{base_model_type.name}_WITHOUT_MSE"
-        self.model_name = f"{self.model_type}_from_{voxel_model.vm_name}"
+            self.model_type = f"BI_{base_model.model_type}_WITHOUT_MSE"
+        self.model_name = f"{self.model_type}_from_{base_model.voxel_model.vm_name}"
         self.mse_data = None
         self.__enable_mse = enable_mse
         self.cell_type = BiCellDB
-        super().__init__(voxel_model, self.cell_type)
+        super().__init__(base_model.voxel_model, self.cell_type)
 
     def _calk_segment_model(self):
         """
@@ -179,8 +173,8 @@ class BiModelDB(SegmentedModelABC):
         :param element_class: Тип элемента базовой модели (ывбирается из словаря self.__base_models_classes)
         :return: None
         """
-        base_segment_model = self.__base_models_classes[self.model_type](self.voxel_model)
-        for cell in base_segment_model:
+        # base_segment_model = self.__base_models_classes[self.model_type](self.voxel_model)
+        for cell in self.base_model:
             try:
                 voxel = cell.voxel
             except AttributeError:

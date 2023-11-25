@@ -256,3 +256,4 @@ class SegmentedModelABC(ABC):
             db_connection.execute(stmt_2)
             db_connection.commit()
         self.logger.info(f"Удаление модели {self.model_name} из БД завершено\n")
+        return self
