@@ -25,12 +25,13 @@ def scan_border_filter(file_path, borders_dict):
 
 if __name__ == "__main__":
 
-    FILE_NAME = os.path.join("..", "src", "3_do-big.txt")
+    FILE_NAME = os.path.join("..", "src", "11_do-big.txt")
 
-    BORDERS_DICT = {"min_x": 76706,
-                    "max_x": 76910,
-                    "min_y": 81608,
-                    "max_y": 81812}
+    BORDERS_DICT = {"min_x": 76337,
+                    "max_x": 76557,
+                    "min_y": 81580,
+                    "max_y": 81800,
+                    }
 
     scan_border_filter(FILE_NAME, BORDERS_DICT)
     # print(get_new_file_path(FILE_NAME))

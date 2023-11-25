@@ -7,14 +7,30 @@ from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
 
 class Polynomial2Model3x3DB(Polynomial2ModelDB):
 
-    def __init__(self, voxel_model):
-        self.model_type = DemTypeEnum.POLYNOMIAL_2_3x3
-        self.model_name = f"{self.model_type.name}_from_{voxel_model.vm_name}"
+    def __init__(self, voxel_model, buffer_zone=None):
+        self.buffer_zone = buffer_zone
+        self.model_type = f"{DemTypeEnum.POLYNOMIAL_2.name}_3x3_buffer_zone_{self.buffer_zone}"
+        self.model_name = f"{self.model_type}_from_{voxel_model.vm_name}"
         self.mse_data = None
         self.cell_type = Polynomial2CellDB
         SegmentedModelABC.__init__(self, voxel_model, self.cell_type)
 
     def _find_cells_for_point(self, point):
+        points = self.__find_points_for_cells_search(point)
+        cells = []
+        for point in points:
+            cell = self.get_model_element_for_point(point)
+            if cell is not None:
+                cells.append(cell)
+        return cells
+
+    def __find_points_for_cells_search(self, point):
+        if self.buffer_zone is None:
+            return self.__points_for_3x3_zone(point)
+        else:
+            return self.__points_for_custom_buffer_zone(point)
+
+    def __points_for_3x3_zone(self, point):
         x, y, z = point.X, point.Y, point.Z
         step = self.voxel_model.step
         points = [Point(X=x - step, Y=y - step, Z=z, R=1, G=1, B=1),
@@ -26,12 +42,40 @@ class Polynomial2Model3x3DB(Polynomial2ModelDB):
                   Point(X=x - step, Y=y + step, Z=z, R=1, G=1, B=1),
                   Point(X=x, Y=y + step, Z=z, R=1, G=1, B=1),
                   Point(X=x + step, Y=y + step, Z=z, R=1, G=1, B=1)]
-        cells = []
-        for point in points:
-            cell = self.get_model_element_for_point(point)
-            if cell is not None:
-                cells.append(cell)
-        return cells
+        return points
+
+    def __points_for_custom_buffer_zone(self, point):
+        if self.buffer_zone < 0 or self.buffer_zone > 1:
+            raise ValueError(f"Значение buffer_zone должно быть в пределах от 0 до 1 переданно ({self.buffer_zone})")
+        x, y, z = point.X, point.Y, point.Z
+        step = self.voxel_model.step
+        x0 = x // step * step
+        y0 = y // step * step
+        buffer = self.buffer_zone * step
+        points = [point]
+        d_left, d_right = x - x0, x0 + step - x
+        d_down, d_up = y - y0, y0 + step - y
+        r_left_down = (d_left ** 2 + d_down ** 2) ** 0.5
+        r_left_up = (d_left ** 2 + d_up ** 2) ** 0.5
+        r_right_down = (d_right ** 2 + d_down ** 2) ** 0.5
+        r_right_up = (d_right ** 2 + d_up ** 2) ** 0.5
+        if r_left_down <= buffer:
+            points.append(Point(X=x - step, Y=y - step, Z=z, R=1, G=1, B=1))
+        if d_down <= buffer:
+            points.append(Point(X=x, Y=y - step, Z=z, R=1, G=1, B=1))
+        if r_right_down <= buffer:
+            points.append(Point(X=x + step, Y=y - step, Z=z, R=1, G=1, B=1))
+        if d_left <= buffer:
+            points.append(Point(X=x - step, Y=y, Z=z, R=1, G=1, B=1))
+        if d_right <= buffer:
+            points.append(Point(X=x + step, Y=y, Z=z, R=1, G=1, B=1))
+        if r_left_up <= buffer:
+            points.append(Point(X=x - step, Y=y + step, Z=z, R=1, G=1, B=1))
+        if d_up <= buffer:
+            points.append(Point(X=x, Y=y + step, Z=z, R=1, G=1, B=1))
+        if r_right_up <= buffer:
+            points.append(Point(X=x + step, Y=y + step, Z=z, R=1, G=1, B=1))
+        return points
 
     def _calk_matrix_params(self, base_scan):
         """
@@ -42,11 +86,11 @@ class Polynomial2Model3x3DB(Polynomial2ModelDB):
         for point in base_scan:
             cells = self._find_cells_for_point(point)
             for cell in cells:
-                X = point.X - (cell.voxel.X + cell.voxel.step / 2)
-                Y = point.Y - (cell.voxel.Y + cell.voxel.step / 2)
-                a, b = X ** 2, Y ** 2
-                c = X * Y
-                d, e, f = X, Y, 1
+                x = point.X - (cell.voxel.X + cell.voxel.step / 2)
+                y = point.Y - (cell.voxel.Y + cell.voxel.step / 2)
+                a, b = x ** 2, y ** 2
+                c = x * y
+                d, e, f = x, y, 1
                 try:
                     cell.aa += a * a
                     cell.ab += a * b

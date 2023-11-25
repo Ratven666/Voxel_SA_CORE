@@ -10,8 +10,8 @@ class DemModelDB(SegmentedModelABC):
     """
 
     def __init__(self, voxel_model):
-        self.model_type = DemTypeEnum.DEM
-        self.model_name = f"{self.model_type.name}_from_{voxel_model.vm_name}"
+        self.model_type = DemTypeEnum.DEM.name
+        self.model_name = f"{self.model_type}_from_{voxel_model.vm_name}"
         self.mse_data = None
         self.cell_type = DemCellDB
         super().__init__(voxel_model, self.cell_type)

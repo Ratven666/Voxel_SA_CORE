@@ -77,10 +77,24 @@ def main():
     vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
     parab = Polynomial2ModelDB(vm_2)
     # parab.plot(plotter=Poly2ModelPlotterMPL())
-    parab3x3 = Polynomial2Model3x3DB(vm_2)
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=None)
+    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.1)
+
+    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.25)
+    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.5)
+    # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0.75)
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=1)
+    parab3x3 = Polynomial2Model3x3DB(vm_2, buffer_zone=0)
     # parab3x3.plot(plotter=Poly2ModelPlotterMPL(grid=2))
 
+
     plane = PlaneModelDB(vm_2)
+    dem = DemModelDB(vm_2)
+    # bi_mdl = BiModelDB()
 
 
     # # vm_2.plot()

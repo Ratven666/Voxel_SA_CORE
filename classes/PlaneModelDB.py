@@ -12,8 +12,8 @@ class PlaneModelDB(SegmentedModelABC):
     """
 
     def __init__(self, voxel_model):
-        self.model_type = DemTypeEnum.PLANE
-        self.model_name = f"{self.model_type.name}_from_{voxel_model.vm_name}"
+        self.model_type = DemTypeEnum.PLANE.name
+        self.model_name = f"{self.model_type}_from_{voxel_model.vm_name}"
         self.mse_data = None
         self.cell_type = PlaneCellDB
         super().__init__(voxel_model, self.cell_type)

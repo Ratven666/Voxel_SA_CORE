@@ -9,8 +9,8 @@ from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
 class MeshSegmentModelDB(SegmentedModelABC):
 
     def __init__(self, voxel_model, mesh):
-        self.model_type = DemTypeEnum.MESH
-        self.model_name = f"{self.model_type.name}_from_{voxel_model.vm_name}"
+        self.model_type = DemTypeEnum.MESH.name
+        self.model_name = f"{self.model_type}_from_{voxel_model.vm_name}"
         self.mse_data = None
         self.cell_type = MeshCellDB
         self.mesh = mesh

@@ -12,4 +12,3 @@ class DemTypeEnum(enum.Enum):
     BI_POLYNOMIAL_2_WITH_MSE = 8
     BI_POLYNOMIAL_2_WITHOUT_MSE = 9
     MESH = 10
-    POLYNOMIAL_2_3x3 = 11

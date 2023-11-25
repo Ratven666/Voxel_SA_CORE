@@ -12,8 +12,8 @@ class Polynomial2ModelDB(SegmentedModelABC):
     """
 
     def __init__(self, voxel_model):
-        self.model_type = DemTypeEnum.POLYNOMIAL_2
-        self.model_name = f"{self.model_type.name}_from_{voxel_model.vm_name}"
+        self.model_type = DemTypeEnum.POLYNOMIAL_2.name
+        self.model_name = f"{self.model_type}_from_{voxel_model.vm_name}"
         self.mse_data = None
         self.cell_type = Polynomial2CellDB
         super().__init__(voxel_model, self.cell_type)
@@ -78,11 +78,11 @@ class Polynomial2ModelDB(SegmentedModelABC):
         """
         for point in base_scan:
             cell = self.get_model_element_for_point(point)
-            point.X = point.X - (cell.voxel.X + cell.voxel.step / 2)
-            point.Y = point.Y - (cell.voxel.Y + cell.voxel.step / 2)
-            a, b = point.X ** 2, point.Y ** 2
-            c = point.X * point.Y
-            d, e, f = point.X, point.Y, 1
+            x = point.X - (cell.voxel.X + cell.voxel.step / 2)
+            y = point.Y - (cell.voxel.Y + cell.voxel.step / 2)
+            a, b = x ** 2, y ** 2
+            c = x * y
+            d, e, f = x, y, 1
             try:
                 cell.aa += a * a
                 cell.ab += a * b
