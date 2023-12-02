@@ -36,7 +36,7 @@ class GridSegmentedModelToScan(SegmentedModelToScanABC):
 
     def export_to_scan(self, grid_densification=1):
         scan = ScanLite(f"Scan_{self.segmented_model.model_name}_step="
-                             f"{self.segmented_model.voxel_model.step / grid_densification}")
+                        f"{self.segmented_model.voxel_model.step / grid_densification}")
         for point in self._get_next_point_on_grid(grid_densification):
             scan.add_point(point)
         return scan

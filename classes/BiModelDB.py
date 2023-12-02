@@ -1,11 +1,7 @@
 from classes.BiCellDB import BiCellDB
-from classes.DemModelDB import DemModelDB
-from classes.PlaneModelDB import PlaneModelDB
 from classes.Point import Point
-from classes.Polynomial2ModelDB import Polynomial2ModelDB
 from classes.ScanDB import ScanDB
 from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
-from db_models.dem_models_table import DemTypeEnum
 
 
 class BiModelDB(SegmentedModelABC):
@@ -173,7 +169,6 @@ class BiModelDB(SegmentedModelABC):
         :param element_class: Тип элемента базовой модели (ывбирается из словаря self.__base_models_classes)
         :return: None
         """
-        # base_segment_model = self.__base_models_classes[self.model_type](self.voxel_model)
         for cell in self.base_model:
             try:
                 voxel = cell.voxel

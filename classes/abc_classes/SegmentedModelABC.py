@@ -23,7 +23,7 @@ class SegmentedModelABC(ABC):
         self.voxel_model = voxel_model
         self._model_structure = {}
         self._create_model_structure(element_class)
-        self.__init_model()
+        self._init_model()
 
     def __iter__(self):
         return iter(self._model_structure.values())
@@ -62,7 +62,8 @@ class SegmentedModelABC(ABC):
         :return: None
         """
         for voxel in self.voxel_model:
-            model_key = f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
+            # model_key = f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
+            model_key = self.get_key_for_voxel(voxel)
             self._model_structure[model_key] = element_class(voxel, self)
 
     @staticmethod
@@ -75,10 +76,16 @@ class SegmentedModelABC(ABC):
         :param point: точка для которой нужна соответствующая ячейка
         :return: объект ячейки модели, содержащая точку point
         """
-        X = point.X // self.voxel_model.step * self.voxel_model.step
-        Y = point.Y // self.voxel_model.step * self.voxel_model.step
+        # X = point.X // self.voxel_model.step * self.voxel_model.step
+        # Y = point.Y // self.voxel_model.step * self.voxel_model.step
+        vxl_md_X = int((point.X - self.voxel_model.min_X) // self.voxel_model.step)
+        vxl_md_Y = int((point.Y - self.voxel_model.min_Y) // self.voxel_model.step)
+        X = self.voxel_model.min_X + vxl_md_X * self.voxel_model.step
+        Y = self.voxel_model.min_Y + vxl_md_Y * self.voxel_model.step
         if self.voxel_model.is_2d_vxl_mdl is False:
-            Z = point.Z // self.voxel_model.step * self.voxel_model.step
+            vxl_md_Z = int((point.Z - self.voxel_model.min_Z) // self.voxel_model.step)
+            Z = self.voxel_model.min_Z + vxl_md_Z * self.voxel_model.step
+            # Z = point.Z // self.voxel_model.step * self.voxel_model.step
         else:
             Z = self.voxel_model.min_Z
         model_key = f"{X:.5f}_{Y:.5f}_{Z:.5f}"
@@ -177,7 +184,7 @@ class SegmentedModelABC(ABC):
         self.model_name = db_model_data["model_name"]
         self.mse_data = db_model_data["MSE_data"]
 
-    def __init_model(self):
+    def _init_model(self):
         """
         Инициализирует сегментированную модель при запуске
         Если модель для воксельной модели нужного типа уже есть в БД - запускает

@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from classes.ScanLite import ScanLite
-
 
 class SegmentedModelToScanABC(ABC):
 

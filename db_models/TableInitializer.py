@@ -11,6 +11,7 @@ from db_models.points_scans_table import create_points_scans_db_table
 from db_models.points_table import create_points_db_table
 from db_models.polynomial_2_cell_table import create_polynomial_2_cell_db_table
 from db_models.scans_table import create_scans_db_table
+from db_models.subsidence_cell_table import create_subsidence_cell_db_table
 from db_models.triangles_table import create_triangles_db_table
 from db_models.voxel_models_table import create_voxel_models_db_table
 from db_models.voxels_table import create_voxels_db_table
@@ -51,3 +52,4 @@ class TableInitializer(metaclass=SingletonMeta):
         self.mesh_cell_db_table = create_mesh_cell_db_table(self.__db_metadata)
         self.triangles_db_table = create_triangles_db_table(self.__db_metadata)
 
+        self.subsidence_cell_db_table = create_subsidence_cell_db_table(self.__db_metadata)

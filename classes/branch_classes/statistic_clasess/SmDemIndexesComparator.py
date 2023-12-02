@@ -63,18 +63,18 @@ class SmDemIndexesComparator:
     def plot(self):
         import seaborn as sns
         sns.set_theme(style="ticks")
-        sns_plot = sns.jointplot(x="tri", y="mse", data=self.df,
-                          kind="reg",
-                          truncate=True,
-                          # color="m",
-                                 scatter_kws=dict(s=2,
-                                                  # linewidths=.7,
-                                                  marker="+",
-                                                  ),
-                                 line_kws=dict(lw=4,
-                                               color='r',
-                                               ),
-                          ratio=3,
-                                 )
-        sns_plot.set_axis_labels("TRI", "MSE")
-        sns_plot.savefig(f"{self.s_model.model_name}.")
+        for dem_index_model in self.dem_indexes_models:
+            index_name = dem_index_model.index_name
+            sns_plot = sns.jointplot(x=index_name, y="mse", data=self.df,
+                                     kind="reg",
+                                     truncate=True,
+                                     scatter_kws=dict(s=2,
+                                                      marker="+",
+                                                      ),
+                                     line_kws=dict(lw=4,
+                                                   color='r',
+                                                   ),
+                                     ratio=3,
+                                     )
+            sns_plot.set_axis_labels(index_name, "MSE")
+            sns_plot.savefig(f"{self.s_model.model_name}_{index_name}.")

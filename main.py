@@ -12,6 +12,7 @@ from classes.Polynomial2ModelDB import Polynomial2ModelDB
 from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
+from classes.branch_classes.deformation_classes.SubsidenceModelDB import SubsidenceModelDB
 from classes.branch_classes.statistic_clasess.SmDemIndexesComparator import SmDemIndexesComparator
 from classes.branch_classes.terrain_indexes.TerrainCurvaturesIndexesABC import MeanCurvatureIndex, \
     MaxAbsCurvatureIndex, ProfileCurvatureIndex, PlaneCurvatureIndex, SlopeFullIndex
@@ -63,7 +64,7 @@ def main():
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # scan.plot()
 
-    STEP = 1
+    STEP = 5
     MAX_EDGE = STEP * 1.5
 
     # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
@@ -73,22 +74,39 @@ def main():
     # MaxEdgeLengthMeshFilter(mesh, max_edge_length=MAX_EDGE).filter_mesh()
     # # mesh.calk_mesh_mse(base_scan=scan)
     #
-    # vm_1 = VoxelModelDB(scan, step=STEP/3, is_2d_vxl_mdl=True)
-    vm_2 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
+    vm_1 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
+    vm_2 = VoxelModelDB(scan, step=STEP, dx=0.5, dy=0.5, is_2d_vxl_mdl=True)
+    # vm_2.plot()
 
-    dem = DemModelDB(vm_2)
-    mean_curv_dem = MeanCurvatureIndex(dem_model=dem,
-                                       full_neighbours=True)
-    slope_dem = SlopeFullIndex(dem_model=dem,
-                               )
-    tri = TerrainRuggednessIndexClassicModify(dem_model=dem,
-                                              )
+    dem = PlaneModelDB(vm_2)
+    # dem.plot()
+    dem = BiModelDB(dem)
+    # # dem.plot()
+    plane = PlaneModelDB(vm_1)
+    plane = BiModelDB(plane)
+    #
+    subs = SubsidenceModelDB(reference_model=dem,
+                             comparable_model=plane,
+                             resolution_m=2,
+                             )
 
-    comparator = SmDemIndexesComparator(dem,
-                                        mean_curv_dem,
-                                        slope_dem,
-                                        tri)
-    print(comparator.correlations_mse_for_dem_indexes)
+    subs.plot_subsidence_hist()
+
+
+
+    # mean_curv_dem = MeanCurvatureIndex(dem_model=dem,
+    #                                    full_neighbours=True)
+    # slope_dem = SlopeFullIndex(dem_model=dem,
+    #                            )
+    # tri = TerrainRuggednessIndexClassicModify(dem_model=dem,
+    #                                           )
+    #
+    # comparator = SmDemIndexesComparator(dem,
+    #                                     mean_curv_dem,
+    #                                     slope_dem,
+    #                                     tri)
+    # print(comparator.correlations_mse_for_dem_indexes)
+    # comparator.plot()
 
     # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=True)
     # bi_plane = BiModelDB(vm_2, DemTypeEnum.PLANE, enable_mse=False)
@@ -167,14 +185,6 @@ def main():
     # mesh.delete_mesh()
     # MeshDB.delete_mesh_by_id(1)
     # MeshDB.delete_mesh_by_id(2)
-
-    # dem = DemModelDB(vm)
-    # plane = PlaneModelDB(vm)
-    #
-    # bi_plane = BiModelDB(vm, DemTypeEnum.PLANE, enable_mse=True)
-    #
-    # dxf = DxfExporter(bi_plane, grid_densification=1, filtrate=True).export()
-    # ply = PlyExporter(bi_plane, grid_densification=1, filtrate=True).export()
 
 
 if __name__ == "__main__":

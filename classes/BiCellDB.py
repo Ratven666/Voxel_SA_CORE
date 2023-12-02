@@ -45,7 +45,8 @@ class BiCellDB(CellABC):
         return z
 
     def get_mse_z_from_xy(self, x, y):
-        raise NotImplementedError
+        # raise NotImplementedError
+        return self.mse
 
     def get_db_raw_data(self):
         return {"voxel_id": self.voxel.id,

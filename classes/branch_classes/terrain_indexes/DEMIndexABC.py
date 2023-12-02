@@ -58,7 +58,6 @@ class DEMIndexABC(ABC):
                     neighbour_structure[x][y] = None
         return neighbour_structure
 
-
     def _get_indexes(self, cell):
         """
         Рассчитывает индексы вокселя внутри модели по трем осям
