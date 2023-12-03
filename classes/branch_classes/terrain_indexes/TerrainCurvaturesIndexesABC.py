@@ -58,24 +58,30 @@ class TerrainCurvaturesIndexesABC(DEMIndexABC):
         :param cell: чентральная ячейка относительно которой ищутся соседи
         :return: 3х3 масив с ячейками относительно ячейки cell
         """
-        if isinstance(self.dem_model, DemModelDB):
-            return super()._get_cell_neighbour_structure(cell)
+        # if isinstance(self.dem_model, DemModelDB):
+        #     return super()._get_cell_neighbour_structure(cell)
         if isinstance(self.dem_model, Polynomial2ModelDB):
             neighbour_structure = [[None, None, None],
                                    [None, cell, None],
                                    [None, None, None]]
             return neighbour_structure
+        return super()._get_cell_neighbour_structure(cell)
 
     def _do_prepare_actions(self, cell_neighbour_structure):
-        if isinstance(self.dem_model, DemModelDB):
-            self.A, self.Z = self.__get_A_Z_matrix(cell_neighbour_structure)
-            self.params = self.__calc_paraboloid_params(self.A, self.Z)
-            self.len = len(self.A)
+        # if isinstance(self.dem_model, DemModelDB):
+        #     self.A, self.Z = self.__get_A_Z_matrix(cell_neighbour_structure)
+        #     self.params = self.__calc_paraboloid_params(self.A, self.Z)
+        #     self.len = len(self.A)
+        #     return
         if isinstance(self.dem_model, Polynomial2ModelDB):
             cell = cell_neighbour_structure[1][1]
             self.full_neighbours = False
             self.params = {"A": cell.a, "B": cell.b, "C": cell.c,
                            "D": cell.d, "E": cell.e, "F": cell.f}
+            return
+        self.A, self.Z = self.__get_A_Z_matrix(cell_neighbour_structure)
+        self.params = self.__calc_paraboloid_params(self.A, self.Z)
+        self.len = len(self.A)
 
     def calk_index_value(self, cell_neighbour_structure):
         self._do_prepare_actions(cell_neighbour_structure)

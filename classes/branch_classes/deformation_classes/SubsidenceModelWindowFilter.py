@@ -22,6 +22,27 @@ class SubsidenceModelWindowFilter:
     def __iter__(self):
         return iter(self._model_structure.values())
 
+    def get_model_element_for_point(self, point):
+        """
+        Возвращает ячейку содержащую точку point
+        :param point: точка для которой нужна соответствующая ячейка
+        :return: объект ячейки модели, содержащая точку point
+        """
+        vxl_md_X = int((point.X - self.voxel_model.min_X) // self.voxel_model.step)
+        vxl_md_Y = int((point.Y - self.voxel_model.min_Y) // self.voxel_model.step)
+        X = self.voxel_model.min_X + vxl_md_X * self.voxel_model.step
+        Y = self.voxel_model.min_Y + vxl_md_Y * self.voxel_model.step
+        if self.voxel_model.is_2d_vxl_mdl is False:
+            vxl_md_Z = int((point.Z - self.voxel_model.min_Z) // self.voxel_model.step)
+            Z = self.voxel_model.min_Z + vxl_md_Z * self.voxel_model.step
+        else:
+            Z = self.voxel_model.min_Z
+        model_key = f"{X:.5f}_{Y:.5f}_{Z:.5f}"
+        return self._model_structure.get(model_key, None)
+
+    # def get_model_element_for_point(self, point):
+    #     return self.subsidence_model.get_model_element_for_point(point)
+
     def _init_model(self):
         for cell in self.subsidence_model:
             cells = self._get_cells_in_window(cell)

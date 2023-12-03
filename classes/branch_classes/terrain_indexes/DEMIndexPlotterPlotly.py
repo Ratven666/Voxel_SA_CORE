@@ -94,7 +94,7 @@ class DEMIndexPlotterPlotly:
                    for idx in range(self.model.dem_model.voxel_model.Y_count)]
         return {"x_ticks": x_ticks, "y_ticks": y_ticks}
 
-    def __calk_sizes(self, width=800):
+    def __calk_sizes(self, width=1600):
         c = self.model.dem_model.voxel_model.Y_count / self.model.dem_model.voxel_model.X_count
         height = round(width * c)
         return width, height

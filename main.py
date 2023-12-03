@@ -69,7 +69,7 @@ def main():
     scan_1, scan_2 = separate_scan(base_scan=scan, count_of_scans=2, random_seed=42)
     print(scan_1)
     print(scan_2)
-    STEP = 5
+    STEP = 2.5
     MAX_EDGE = STEP * 1.5
 
     # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
@@ -84,25 +84,29 @@ def main():
     # vm_2 = VoxelModelDB(scan, step=STEP, dx=0.5, dy=0.5, is_2d_vxl_mdl=True)
     # vm_2.plot()
 
-    dem = PlaneModelDB(vm_2)
+    dem = DemModelDB(vm_2)
     # dem.plot()
     dem = BiModelDB(dem)
     # # dem.plot()
-    plane = PlaneModelDB(vm_1)
+    plane = DemModelDB(vm_1)
     plane = BiModelDB(plane)
     #
     subs = SubsidenceModelDB(reference_model=dem,
                              comparable_model=plane,
                              resolution_m=None,
                              )
-    subs.plot_heat_map()
+    # subs.plot_heat_map()
+
 
     # subs.plot_subsidence_hist()
     winddow_subs_3 = SubsidenceModelWindowFilter(subs, window_size=3)
-    winddow_subs_3.plot_heat_map()
+    # winddow_subs_3.plot_heat_map()
 
-    winddow_subs_5 = SubsidenceModelWindowFilter(subs, window_size=5)
-    winddow_subs_5.plot_heat_map()
+    # winddow_subs_5 = SubsidenceModelWindowFilter(subs, window_size=5)
+    # winddow_subs_5.plot_heat_map()
+
+    slope_dem = MeanCurvatureIndex(dem_model=winddow_subs_3)
+    slope_dem.plot()
 
 
     # mean_curv_dem = MeanCurvatureIndex(dem_model=dem,
