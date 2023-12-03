@@ -1,4 +1,4 @@
-from sqlalchemy import select, and_, insert
+from sqlalchemy import select, insert
 
 from classes.DemTypeEnum import DemTypeEnum
 from classes.Point import Point
@@ -6,10 +6,9 @@ from classes.ScanDB import ScanDB
 from classes.VoxelModelDB import VoxelModelDB
 from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
 from classes.branch_classes.deformation_classes.SubsidanсeCellDB import SubsidenceCellDB
-from classes.branch_classes.deformation_classes.SubsidenceHeatMapPlotlyPlotter import SubsidenceHeatMapPlotlyPlotter
-from classes.branch_classes.deformation_classes.SubsidenceHistSeabornPlotter import SubsidenceHistSeabornPlotter
-from classes.branch_classes.deformation_classes.SubsidenceModelPlotlyPlotter import SubsidenceModelPlotlyPlotter
-from utils.segmented_mdl_utils.segmented_models_plotters.HistMSEPlotterPlotly import HistMSEPlotterPlotly
+from classes.branch_classes.deformation_classes.plotters.SubsidenceHeatMapPlotlyPlotter import SubsidenceHeatMapPlotlyPlotter
+from classes.branch_classes.deformation_classes.plotters.SubsidenceHistSeabornPlotter import SubsidenceHistSeabornPlotter
+from classes.branch_classes.deformation_classes.plotters.SubsidenceModelPlotlyPlotter import SubsidenceModelPlotlyPlotter
 from utils.start_db import engine
 
 
@@ -18,6 +17,7 @@ class SubsidenceModelDB(SegmentedModelABC):
     def __init__(self, reference_model: SegmentedModelABC,
                  comparable_model: SegmentedModelABC,
                  resolution_m=None,
+                 border_subsidence=1
                  ):
         self.reference_model = reference_model
         self.comparable_model = comparable_model
@@ -28,6 +28,7 @@ class SubsidenceModelDB(SegmentedModelABC):
                               is_2d_vxl_mdl=reference_model.voxel_model.is_2d_vxl_mdl,
                               )
         self.resolution = resolution_m if resolution_m is not None else reference_model.voxel_model.step
+        self.border_subsidence = border_subsidence
         self.model_type = DemTypeEnum.SUBSIDENCE.name
         self.model_name = (f"{self.model_type}_ref_{reference_model.model_name}_{comparable_model.model_name}_"
                            f"res_{self.resolution}")
@@ -57,7 +58,11 @@ class SubsidenceModelDB(SegmentedModelABC):
                 ref_z = ref_cell.get_z_from_xy(x, y)
                 comp_z = comp_cell.get_z_from_xy(x, y)
                 if ref_z is not None and comp_z is not None:
-                    cell.subsidence = ref_z - comp_z
+                    subsidence = ref_z - comp_z
+                    if abs(subsidence) <= self.border_subsidence:
+                        cell.subsidence = subsidence
+                    else:
+                        cell.subsidence = None
                 ref_mse_z = ref_cell.get_mse_z_from_xy(x, y)
                 comp_mse_z = comp_cell.get_mse_z_from_xy(x, y)
                 if ref_mse_z is not None and comp_mse_z is not None:

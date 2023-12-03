@@ -13,12 +13,14 @@ from classes.VoxelModelDB import VoxelModelDB
 from classes.VoxelModelLite import VoxelModelLite
 from classes.branch_classes.MeshMSEConst import MeshMSEConstDB
 from classes.branch_classes.deformation_classes.SubsidenceModelDB import SubsidenceModelDB
+from classes.branch_classes.deformation_classes.SubsidenceModelWindowFilter import SubsidenceModelWindowFilter
 from classes.branch_classes.statistic_clasess.SmDemIndexesComparator import SmDemIndexesComparator
 from classes.branch_classes.terrain_indexes.TerrainCurvaturesIndexesABC import MeanCurvatureIndex, \
     MaxAbsCurvatureIndex, ProfileCurvatureIndex, PlaneCurvatureIndex, SlopeFullIndex
 from classes.branch_classes.terrain_indexes.TerrainRuggednessIndexes import TerrainRuggednessIndexClassicModify, \
     TerrainRuggednessIndexClassic, MyTerrainRuggednessIndex, TerrainRuggednessIndexABSValue
 from db_models.dem_models_table import DemTypeEnum
+from temp_utils.scan_separator import separate_scan
 from utils.logs.console_log_config import console_logger
 from utils.mesh_utils.mesh_exporters.DxfMeshExporter import DxfMeshExporter
 from utils.mesh_utils.mesh_exporters.MeshExporterABC import MeshExporterABC
@@ -64,6 +66,9 @@ def main():
     # scan.plot(plotter=ScanPlotterPointsPlotly())
     # scan.plot()
 
+    scan_1, scan_2 = separate_scan(base_scan=scan, count_of_scans=2, random_seed=42)
+    print(scan_1)
+    print(scan_2)
     STEP = 5
     MAX_EDGE = STEP * 1.5
 
@@ -74,8 +79,9 @@ def main():
     # MaxEdgeLengthMeshFilter(mesh, max_edge_length=MAX_EDGE).filter_mesh()
     # # mesh.calk_mesh_mse(base_scan=scan)
     #
-    vm_1 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
-    vm_2 = VoxelModelDB(scan, step=STEP, dx=0.5, dy=0.5, is_2d_vxl_mdl=True)
+    vm_1 = VoxelModelDB(scan_1, step=STEP, is_2d_vxl_mdl=True)
+    vm_2 = VoxelModelDB(scan_2, step=STEP, is_2d_vxl_mdl=True)
+    # vm_2 = VoxelModelDB(scan, step=STEP, dx=0.5, dy=0.5, is_2d_vxl_mdl=True)
     # vm_2.plot()
 
     dem = PlaneModelDB(vm_2)
@@ -87,11 +93,16 @@ def main():
     #
     subs = SubsidenceModelDB(reference_model=dem,
                              comparable_model=plane,
-                             resolution_m=2,
+                             resolution_m=None,
                              )
+    subs.plot_heat_map()
 
-    subs.plot_subsidence_hist()
+    # subs.plot_subsidence_hist()
+    winddow_subs_3 = SubsidenceModelWindowFilter(subs, window_size=3)
+    winddow_subs_3.plot_heat_map()
 
+    winddow_subs_5 = SubsidenceModelWindowFilter(subs, window_size=5)
+    winddow_subs_5.plot_heat_map()
 
 
     # mean_curv_dem = MeanCurvatureIndex(dem_model=dem,

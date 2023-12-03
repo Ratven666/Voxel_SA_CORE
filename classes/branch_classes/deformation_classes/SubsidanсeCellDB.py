@@ -1,6 +1,7 @@
 from sqlalchemy import insert
 
 from classes.abc_classes.CellABC import CellABC
+from classes.abc_classes.VoxelABC import VoxelABC
 from utils.start_db import Tables
 
 
@@ -8,7 +9,7 @@ class SubsidenceCellDB(CellABC):
     db_table = Tables.subsidence_cell_db_table
 
     def __init__(self, voxel, dem_model):
-        self.voxel = voxel
+        self.voxel: VoxelABC = voxel
         self.dem_model = dem_model
         self.voxel_id = None
         self.subsidence = None
@@ -58,8 +59,7 @@ class SubsidenceCellDB(CellABC):
         self.subsidence_mse = db_cell_data["subsidence_mse"]
 
     def __str__(self):
-        return f"{self.__class__.__name__} [ID: {self.voxel.id},\tavr_z: {self.subsidence:.3f}\t" \
-               f"MSE: {self.subsidence_mse:.3f}\tr: {self.r}]"
+        return f"{self.__class__.__name__} [ID: {self.voxel.id},\tsubsidence: {self.subsidence:.3f}]"
 
     def __repr__(self):
         return f"{self.__class__.__name__} [ID: {self.voxel.id}]"

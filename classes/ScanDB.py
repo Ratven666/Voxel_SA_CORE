@@ -71,7 +71,7 @@ class ScanDB(ScanABC):
             if db_scan_data is not None:
                 return cls(db_scan_data["scan_name"])
             else:
-                raise ValueError("Нет скана с таким id!!!")
+                raise ValueError(f"Нет скана с таким id - {scan_id}!!!")
 
     def __init_scan(self, db_connection=None):
         """
