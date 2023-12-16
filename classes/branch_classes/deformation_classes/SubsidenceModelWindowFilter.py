@@ -1,6 +1,7 @@
 from classes.Point import Point
-from classes.branch_classes.deformation_classes.SubsidanсeCellDB import SubsidenceCellDB
+from classes.branch_classes.deformation_classes.SubsidenceCellDB import SubsidenceCellDB
 from classes.branch_classes.deformation_classes.SubsidenceModelDB import SubsidenceModelDB
+
 from classes.branch_classes.deformation_classes.plotters.SubsidenceHeatMapPlotlyPlotter import \
     SubsidenceHeatMapPlotlyPlotter
 from classes.branch_classes.deformation_classes.plotters.SubsidenceHistSeabornPlotter import \
@@ -40,12 +41,8 @@ class SubsidenceModelWindowFilter:
         model_key = f"{X:.5f}_{Y:.5f}_{Z:.5f}"
         return self._model_structure.get(model_key, None)
 
-    # def get_model_element_for_point(self, point):
-    #     return self.subsidence_model.get_model_element_for_point(point)
-
     def _init_model(self):
         for cell in self.subsidence_model:
-            cells = self._get_cells_in_window(cell)
             filtered_cell = self._calk_filtered_cell(cell, self._mean_cell_filter)
             cell_key = self.subsidence_model.get_key_for_voxel(filtered_cell.voxel)
             self._model_structure[cell_key] = filtered_cell

@@ -62,7 +62,6 @@ class SegmentedModelABC(ABC):
         :return: None
         """
         for voxel in self.voxel_model:
-            # model_key = f"{voxel.X:.5f}_{voxel.Y:.5f}_{voxel.Z:.5f}"
             model_key = self.get_key_for_voxel(voxel)
             self._model_structure[model_key] = element_class(voxel, self)
 

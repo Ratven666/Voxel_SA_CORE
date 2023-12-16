@@ -5,7 +5,7 @@ from classes.abc_classes.VoxelABC import VoxelABC
 from utils.start_db import Tables
 
 
-class SubsidenceCellDB(CellABC):
+class __SubsidenceCellDB(CellABC):
     db_table = Tables.subsidence_cell_db_table
 
     def __init__(self, voxel, dem_model):

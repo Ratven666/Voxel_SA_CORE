@@ -1,4 +1,5 @@
 import time
+from statistics import mean
 
 from classes.BiModelDB import BiModelDB
 from classes.DemModelDB import DemModelDB
@@ -61,52 +62,63 @@ from utils.voxel_utils.voxel_model_serializers.VoxelModelJsonSerializer import V
 def main():
     create_db()
 
-    scan = ScanDB("K_3")
-    scan.load_scan_from_file(file_name="src/SKLD_Right_05.txt")
-    # scan.plot(plotter=ScanPlotterPointsPlotly())
-    # scan.plot()
+    scan_zz_2018 = ScanDB("ZZ_2018")
+    scan_zz_2018.load_scan_from_file(file_name="src/ZigZag_2018_ground_points.txt")
 
-    scan_1, scan_2 = separate_scan(base_scan=scan, count_of_scans=2, random_seed=42)
-    print(scan_1)
-    print(scan_2)
-    STEP = 2.5
+    scan_zz_2020 = ScanDB("ZZ_2020")
+    scan_zz_2020.load_scan_from_file(file_name="src/ZigZag_2020_ground_points.txt")
+
+    # scan = ScanDB("Scan")
+    # scan.load_scan_from_file(file_name="src/SKLD_Right_05.txt")
+    STEP = 1
     MAX_EDGE = STEP * 1.5
 
-    # scan_for_mesh = VoxelDownsamplingScanSampler(grid_step=STEP).do_sampling(scan=scan)
-    # mesh = MeshDB(scan_for_mesh)
-    # # # mesh.calk_mesh_mse(scan)
-    # #
-    # MaxEdgeLengthMeshFilter(mesh, max_edge_length=MAX_EDGE).filter_mesh()
-    # # mesh.calk_mesh_mse(base_scan=scan)
-    #
-    vm_1 = VoxelModelDB(scan_1, step=STEP, is_2d_vxl_mdl=True)
-    vm_2 = VoxelModelDB(scan_2, step=STEP, is_2d_vxl_mdl=True)
-    # vm_2 = VoxelModelDB(scan, step=STEP, dx=0.5, dy=0.5, is_2d_vxl_mdl=True)
-    # vm_2.plot()
 
-    dem = DemModelDB(vm_2)
-    # dem.plot()
-    dem = BiModelDB(dem)
-    # # dem.plot()
-    plane = DemModelDB(vm_1)
-    plane = BiModelDB(plane)
+    vm_1 = VoxelModelDB(scan_zz_2018, step=STEP, is_2d_vxl_mdl=True)
+    vm_2 = VoxelModelDB(scan_zz_2020, step=STEP, is_2d_vxl_mdl=True)
+
+    # vm1 = VoxelModelDB(scan, step=STEP, is_2d_vxl_mdl=True)
+    # vm2 = VoxelModelDB(scan, step=STEP, dx=0.5, dy=0.75, is_2d_vxl_mdl=True)
+    # vm.plot()
+
+
+    zz_2018_dem = BiModelDB(DemModelDB(vm_1))
+    zz_2020_dem = BiModelDB(DemModelDB(vm_2))
+    zz_2018_dem.plot()
+    zz_2020_dem.plot()
+    # dem1 = DemModelDB(voxel_model=vm1)
+    # dem2 = DemModelDB(voxel_model=vm2)
+    subs = SubsidenceModelDB(voxel_model=vm_1, reference_model=zz_2018_dem, comparable_model=zz_2020_dem)
+
+
+    # subs = SubsidenceModelDB(id_=2)
+    print(subs)
+    subs.window_size = 3
+    subs.subsidence_offset = 0
+
+
+
+    subs.plot_heat_map()
+
+
     #
-    subs = SubsidenceModelDB(reference_model=dem,
-                             comparable_model=plane,
-                             resolution_m=None,
-                             )
+    # subs = SubsidenceModelDB(reference_model=zz_2018_dem,
+    #                          comparable_model=zz_2020_dem,
+    #                          resolution_m=None,
+    #                          )
     # subs.plot_heat_map()
+    # subs.plot_subsidence_hist()
 
 
     # subs.plot_subsidence_hist()
-    winddow_subs_3 = SubsidenceModelWindowFilter(subs, window_size=3)
+    # winddow_subs_3 = SubsidenceModelWindowFilter(subs, window_size=3)
     # winddow_subs_3.plot_heat_map()
 
     # winddow_subs_5 = SubsidenceModelWindowFilter(subs, window_size=5)
     # winddow_subs_5.plot_heat_map()
 
-    slope_dem = MeanCurvatureIndex(dem_model=winddow_subs_3)
-    slope_dem.plot()
+    # slope_dem = MeanCurvatureIndex(dem_model=winddow_subs_3)
+    # slope_dem.plot()
 
 
     # mean_curv_dem = MeanCurvatureIndex(dem_model=dem,

@@ -10,7 +10,7 @@ class SubsidenceHeatMapPlotlyPlotter:
     def plot(self, model):
         self.model = model
 
-        mse = np.full((self.model.voxel_model.Y_count,
+        subsidence = np.full((self.model.voxel_model.Y_count,
                        self.model.voxel_model.X_count), None)
 
         for cell in self.model:
@@ -18,13 +18,14 @@ class SubsidenceHeatMapPlotlyPlotter:
                 i, j = self.__calk_indexes(cell)
             except TypeError:
                 continue
-            mse[j][i] = cell.subsidence
+            subs = cell.subsidence + self.model.subsidence_offset if cell.subsidence is not None else None
+            subsidence[j][i] = subs
 
         ax_ticks = self.__calk_ax_ticks()
         fig = go.Figure()
         fig.add_trace(go.Heatmap(x=ax_ticks["x_ticks"],
                                  y=ax_ticks["y_ticks"],
-                                 z=mse,
+                                 z=subsidence,
                                  colorscale="RdYlGn_r"
                                  )
                       )

@@ -1,5 +1,6 @@
 from sqlalchemy import select, insert, desc, delete
 
+from classes.ScanDB import ScanDB
 from classes.abc_classes.VoxelModelABC import VoxelModelABC
 from utils.start_db import Tables, engine
 from utils.voxel_utils.voxel_model_iterators.VMRawIterator import VMRawIterator
@@ -103,3 +104,17 @@ class VoxelModelDB(VoxelModelABC):
             db_connection.execute(stmt_2)
             db_connection.commit()
         self.logger.info(f"Удаление модели {self.vm_name} из БД завершено\n")
+
+    @classmethod
+    def get_voxel_model_by_id(cls, id_):
+        select_ = select(Tables.voxel_models_db_table).where(Tables.voxel_models_db_table.c.id == id_)
+        with engine.connect() as db_connection:
+            db_vm_data = db_connection.execute(select_).mappings().first()
+        if db_vm_data is None:
+            raise ValueError(f"VoxelModel с id={id_} нет в базе данных!")
+        scan = ScanDB.get_scan_from_id(db_vm_data["base_scan_id"])
+        step = db_vm_data["step"]
+        dx, dy, dz = db_vm_data["dx"], db_vm_data["dy"], db_vm_data["dz"]
+        is_2d_vxl_mdl = True if db_vm_data["Z_count"] == 1 else False
+        voxel_model = cls(scan=scan, step=step, dx=dx, dy=dy, dz=dz, is_2d_vxl_mdl=is_2d_vxl_mdl)
+        return voxel_model
