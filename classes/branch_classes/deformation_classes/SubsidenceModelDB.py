@@ -8,7 +8,10 @@ from classes.VoxelModelDB import VoxelModelDB
 from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
 from classes.branch_classes.deformation_classes.SubsidenceCellDB import SubsidenceCellDB
 from classes.branch_classes.deformation_classes.plotters.SubsidenceHeatMapPlotlyPlotter import \
-    SubsidenceHeatMapPlotlyPlotter
+    SubsidenceModelHeatMapPlotlyPlotter
+from classes.branch_classes.deformation_classes.plotters.SubsidenceModelPlotlyPlotter import \
+    SubsidenceModelPlotlyPlotter
+from classes.branch_classes.terrain_indexes.TerrainCurvaturesIndexesABC import SlopeFullIndex, MeanCurvatureIndex
 from utils.start_db import Tables, engine
 
 
@@ -16,12 +19,14 @@ class SubsidenceModelDB:
     logger = logging.getLogger(LOGGER)
     db_table = Tables.subsidence_models_db_table
 
-    def __init__(self, id_:int = None,
+    def __init__(self, id_: int = None,
                  voxel_model: VoxelModelDB = None,
                  window_size=1,
                  border_subsidence=1,
                  reference_model: SegmentedModelABC = None,
                  comparable_model: SegmentedModelABC = None,
+                 slope_calculator=SlopeFullIndex,
+                 curvature_calculator=MeanCurvatureIndex,
                  ):
         self.id_ = id_
         self.voxel_model = voxel_model
@@ -29,6 +34,8 @@ class SubsidenceModelDB:
         self.border_subsidence = border_subsidence
         self.reference_model = reference_model
         self.comparable_model = comparable_model
+        self.slope_calculator = slope_calculator
+        self.curvature_calculator = curvature_calculator
         self.base_voxel_model_id = None
         self.reference_model_id = None
         self.comparable_model_id = None
@@ -38,8 +45,9 @@ class SubsidenceModelDB:
         self._init_model()
 
     def __iter__(self):
-        return iter(SubsidenceModelWindowIterator(subsidence_model=self,
-                                                  filter_function=None))
+        return iter(self._model_structure.values())
+        # return iter(SubsidenceModelWindowIterator(subsidence_model=self,
+        #                                           filter_function=None))
 
     def __str__(self):
         return f"{self.__class__.__name__} [ID: {self.id_},\tmodel_name: {self.model_name}]"
@@ -74,6 +82,7 @@ class SubsidenceModelDB:
     def _calk_subsidence_model(self):
         self.logger.info(f"Начат расчет модели {self.model_name}")
         self._calk_subsidence()
+        self._calk_subs_derivative()
         self.logger.info(f"Завершен расчет модели {self.model_name}")
 
     def _calk_subsidence(self):
@@ -86,6 +95,8 @@ class SubsidenceModelDB:
             if ref_cell is not None and comp_cell is not None:
                 ref_z = ref_cell.get_z_from_xy(x, y)
                 comp_z = comp_cell.get_z_from_xy(x, y)
+                cell.reference_z = ref_z
+                cell.comparable_z = comp_z
                 if ref_z is not None and comp_z is not None:
                     subsidence = ref_z - comp_z
                     if abs(subsidence) <= self.border_subsidence:
@@ -96,6 +107,15 @@ class SubsidenceModelDB:
                 comp_mse_z = comp_cell.get_mse_z_from_xy(x, y)
                 if ref_mse_z is not None and comp_mse_z is not None:
                     cell.subsidence_mse = (ref_mse_z ** 2 + comp_mse_z ** 2) ** 0.5
+
+    def _calk_subs_derivative(self):
+        slope_index = self.slope_calculator(dem_model=self, abs_value=False, full_neighbours=False)
+        curvature_index = self.curvature_calculator(dem_model=self, full_neighbours=False)
+        for cell in self._model_structure.values():
+            x, y = cell.voxel.X + cell.voxel.step / 2, cell.voxel.Y + cell.voxel.step / 2
+            cell_center_point = Point(X=x, Y=y, Z=cell.voxel.Z, R=0, G=0, B=0)
+            cell.slope = slope_index.get_index_for_point(cell_center_point)
+            cell.curvature = curvature_index.get_index_for_point(cell_center_point)
 
     def _create_model_structure(self, element_class):
         """
@@ -120,7 +140,7 @@ class SubsidenceModelDB:
         :return: None
         """
         if (self.voxel_model is not None and
-            self.reference_model is not None and
+                self.reference_model is not None and
                 self.comparable_model is not None):
             select_ = select(self.db_table) \
                 .where(self.db_table.c.model_name == self.model_name)
@@ -207,7 +227,12 @@ class SubsidenceModelDB:
             else:
                 return 0
 
-    def plot_heat_map(self, plotter=SubsidenceHeatMapPlotlyPlotter()):
+    def plot_heat_map(self, data_type="subsidence", plotter=SubsidenceModelHeatMapPlotlyPlotter()):
+        if data_type not in ["subsidence", "slope", "curvature"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", \"curvature\"])")
+        plotter.plot(self, data_type)
+
+    def plot_surface(self, plotter=SubsidenceModelPlotlyPlotter()):
         plotter.plot(self)
 
 
@@ -279,4 +304,3 @@ class SubsidenceModelWindowIterator:
         if window_size % 2 == 1:
             return window_size
         raise ValueError(f"Window_size должен быть нечетным числом. Переданно - {window_size}")
-

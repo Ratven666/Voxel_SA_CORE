@@ -9,7 +9,11 @@ def create_subsidence_cell_db_table(metadata):
                                      Column("subsidence_model_id", Integer,
                                             ForeignKey("subsidence_models.id", ondelete="CASCADE"),
                                             primary_key=True),
+                                     Column("reference_z", Float),
+                                     Column("comparable_z", Float),
                                      Column("subsidence", Float),
                                      Column("subsidence_mse", Float, default=None),
+                                     Column("slope", Float, default=None),
+                                     Column("curvature", Float, default=None),
                                      )
     return subsidence_cell_db_table

@@ -18,19 +18,19 @@ def scan_border_filter(file_path, borders_dict):
                 y = float(line[1])
                 if borders_dict["min_x"] < x < borders_dict["max_x"]:
                     if borders_dict["min_y"] < y < borders_dict["max_y"]:
-                        point = (f"{x} {y} {float(line[2])} "
-                                 f"{int(line[3])} {int(line[4])} {int(line[5])}\n")
+                        point = (f"{x} {y} {float(line[2])}\n")
+                                 # f"{int(line[3])} {int(line[4])} {int(line[5])}\n")
                         file_write.write(point)
 
 
 if __name__ == "__main__":
 
-    FILE_NAME = os.path.join("..", "src", "11_do-big.txt")
+    FILE_NAME = os.path.join("..", "src", "осыпь_02.txt")
 
-    BORDERS_DICT = {"min_x": 76337,
-                    "max_x": 76557,
-                    "min_y": 81580,
-                    "max_y": 81800,
+    BORDERS_DICT = {"min_x": 2886,
+                    "max_x": 2962,
+                    "min_y": 10786,
+                    "max_y": 10862,
                     }
 
     scan_border_filter(FILE_NAME, BORDERS_DICT)

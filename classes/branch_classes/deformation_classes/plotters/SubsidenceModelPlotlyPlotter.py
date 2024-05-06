@@ -16,6 +16,12 @@ class SubsidenceModelPlotlyPlotter:
                      self.model.voxel_model.X_count * 2), None)
         mse = np.full((self.model.voxel_model.Y_count * 2,
                        self.model.voxel_model.X_count * 2), None)
+        subs = np.full((self.model.voxel_model.Y_count * 2,
+                       self.model.voxel_model.X_count * 2), None)
+        slope = np.full((self.model.voxel_model.Y_count * 2,
+                       self.model.voxel_model.X_count * 2), None)
+        curvature = np.full((self.model.voxel_model.Y_count * 2,
+                            self.model.voxel_model.X_count * 2), None)
 
         for cell in self.model:
             x0 = cell.voxel.X
@@ -26,14 +32,27 @@ class SubsidenceModelPlotlyPlotter:
                 i, j = self.__calk_indexes(cell)
             except TypeError:
                 continue
-            z[j][i] = cell.get_z_from_xy(x0 + 1e-9, y0 + 1e-9)
-            z[j + 1][i] = cell.get_z_from_xy(x0 + 1e-9, y0 + step - 1e-9)
-            z[j][i + 1] = cell.get_z_from_xy(x0 + step - 1e-9, y0 + 1e-9)
-            z[j + 1][i + 1] = cell.get_z_from_xy(x0 + step - 1e-9, y0 + step - 1e-9)
+            z[j][i] = cell.get_ref_z_from_xy(x0 + 1e-9, y0 + 1e-9)
+            z[j + 1][i] = cell.get_ref_z_from_xy(x0 + 1e-9, y0 + step - 1e-9)
+            z[j][i + 1] = cell.get_ref_z_from_xy(x0 + step - 1e-9, y0 + 1e-9)
+            z[j + 1][i + 1] = cell.get_ref_z_from_xy(x0 + step - 1e-9, y0 + step - 1e-9)
             mse[j][i] = cell.subsidence_mse
             mse[j + 1][i] = cell.subsidence_mse
             mse[j][i + 1] = cell.subsidence_mse
             mse[j + 1][i + 1] = cell.subsidence_mse
+            subs[j][i] = cell.subsidence
+            subs[j + 1][i] = cell.subsidence
+            subs[j][i + 1] = cell.subsidence
+            subs[j + 1][i + 1] = cell.subsidence
+            slope[j][i] = cell.slope
+            slope[j + 1][i] = cell.slope
+            slope[j][i + 1] = cell.slope
+            slope[j + 1][i + 1] = cell.slope
+            curvature[j][i] = cell.curvature
+            curvature[j + 1][i] = cell.curvature
+            curvature[j][i + 1] = cell.curvature
+            curvature[j + 1][i + 1] = cell.curvature
+
             x[i], x[i + 1] = x0, x0 + step
             y[j], y[j + 1] = y0, y0 + step
         fig = go.Figure()
@@ -41,13 +60,25 @@ class SubsidenceModelPlotlyPlotter:
         fig.add_trace(go.Surface(x=x,
                                  y=y,
                                  z=z,
-                                 surfacecolor=mse,
+                                 surfacecolor=subs,
                                  colorscale="RdYlGn_r"))
 
         fig.add_trace(go.Surface(x=x,
                                  y=y,
                                  z=z,
-                                 surfacecolor=z,
+                                 surfacecolor=slope,
+                                 colorscale="Rainbow_r"))
+
+        fig.add_trace(go.Surface(x=x,
+                                 y=y,
+                                 z=z,
+                                 surfacecolor=curvature,
+                                 colorscale="Rainbow_r"))
+
+        fig.add_trace(go.Surface(x=x,
+                                 y=y,
+                                 z=z,
+                                 surfacecolor=mse,
                                  colorscale="Rainbow_r"))
 
         button_layer_1_height = 1.02
@@ -56,12 +87,22 @@ class SubsidenceModelPlotlyPlotter:
                 dict(
                     buttons=list([
                         dict(
-                            args=[{"visible": [False, True]}],
-                            label="Elevation",
+                            args=[{"visible": [True, False, False, False]}],
+                            label="subsidence",
                             method="update"
                         ),
                         dict(
-                            args=[{"visible": [True, False]}],
+                            args=[{"visible": [False, True, False, False]}],
+                            label="slope",
+                            method="update"
+                        ),
+                        dict(
+                            args=[{"visible": [False, False, True, False]}],
+                            label="curvature",
+                            method="update"
+                        ),
+                        dict(
+                            args=[{"visible": [False, False, False, True]}],
                             label="MSE",
                             method="update"
                         )

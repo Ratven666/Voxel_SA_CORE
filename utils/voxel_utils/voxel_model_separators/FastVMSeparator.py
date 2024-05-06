@@ -14,7 +14,8 @@ class FastVMSeparator(VMSeparatorABC):
     полной воксельной структуры в оперативной памяти
     """
 
-    def __init__(self):
+    def __init__(self, drop_empty_voxel=True):
+        self.drop_empty_voxel = drop_empty_voxel
         self.voxel_model = None
         self.voxel_structure = None
 
@@ -124,7 +125,7 @@ class FastVMSeparator(VMSeparatorABC):
         scans = []
         voxel_counter = 0
         for voxel in iter(VMFullBaseIterator(self.voxel_model)):
-            if len(voxel) == 0:
+            if len(voxel) == 0 and self.drop_empty_voxel is True:
                 continue
             scan = voxel.scan
             scans.append({"id": scan.id,

@@ -3,7 +3,7 @@ from classes.branch_classes.deformation_classes.SubsidenceCellDB import Subsiden
 from classes.branch_classes.deformation_classes.SubsidenceModelDB import SubsidenceModelDB
 
 from classes.branch_classes.deformation_classes.plotters.SubsidenceHeatMapPlotlyPlotter import \
-    SubsidenceHeatMapPlotlyPlotter
+    SubsidenceModelHeatMapPlotlyPlotter
 from classes.branch_classes.deformation_classes.plotters.SubsidenceHistSeabornPlotter import \
     SubsidenceHistSeabornPlotter
 from classes.branch_classes.deformation_classes.plotters.SubsidenceModelPlotlyPlotter import \
@@ -14,9 +14,11 @@ class SubsidenceModelWindowFilter:
 
     def __init__(self, subsidence_model: SubsidenceModelDB, window_size: int):
         self.subsidence_model = subsidence_model
+        self.reference_model = subsidence_model.reference_model
         self.voxel_model = subsidence_model.voxel_model
         self.model_name = f"{self.subsidence_model.model_name}_w{window_size}"
         self.window_size = self._check_windows_size(window_size)
+        self.subsidence_offset = subsidence_model.subsidence_offset
         self._model_structure = {}
         self._init_model()
 
@@ -44,7 +46,7 @@ class SubsidenceModelWindowFilter:
     def _init_model(self):
         for cell in self.subsidence_model:
             filtered_cell = self._calk_filtered_cell(cell, self._mean_cell_filter)
-            cell_key = self.subsidence_model.get_key_for_voxel(filtered_cell.voxel)
+            cell_key = self.subsidence_model._get_key_for_voxel(filtered_cell.voxel)
             self._model_structure[cell_key] = filtered_cell
 
     def _calk_filtered_cell(self, cell: SubsidenceCellDB, filter_func):
@@ -59,15 +61,29 @@ class SubsidenceModelWindowFilter:
     @staticmethod
     def _mean_cell_filter(center_cell, cells):
         mean_subsidence = 0
-        counter = 0
+        mean_slope = 0
+        mean_curvature = 0
+        subs_counter = 0
+        slope_counter = 0
+        curvature_counter = 0
         for cell in cells:
             try:
                 mean_subsidence += cell.subsidence
-                counter += 1
+                subs_counter += 1
+                if cell.slope is not None:
+                    mean_slope += cell.slope
+                    slope_counter += 1
+                if cell.curvature is not None:
+                    mean_curvature += cell.curvature
+                    curvature_counter += 1
             except TypeError:
                 continue
-        mean_subsidence = mean_subsidence / counter if counter > 0 else None
+        mean_subsidence = mean_subsidence / subs_counter if subs_counter > 0 else None
+        mean_slope = mean_slope / slope_counter if slope_counter > 0 else None
+        mean_curvature = mean_curvature / curvature_counter if curvature_counter > 0 else None
         center_cell.subsidence = mean_subsidence
+        center_cell.slope = mean_slope
+        center_cell.curvature = mean_curvature
         return center_cell
 
     def _get_cells_in_window(self, central_cell: SubsidenceCellDB):
@@ -102,8 +118,11 @@ class SubsidenceModelWindowFilter:
         """
         plotter.plot(self)
 
-    def plot_heat_map(self, plotter=SubsidenceHeatMapPlotlyPlotter()):
-        plotter.plot(self)
-
     def plot_subsidence_hist(self, plotter=SubsidenceHistSeabornPlotter()):
         plotter.plot(self)
+
+    def plot_heat_map(self, data_type="subsidence", plotter=SubsidenceModelHeatMapPlotlyPlotter()):
+        if data_type not in ["subsidence", "slope", "curvature"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", \"curvature\"])")
+        plotter.plot(self, data_type)
+

@@ -187,7 +187,7 @@ class SlopeFullIndex(TerrainCurvaturesIndexesABC):
 
     def _calc_curvature_index(self):
         from math import atan
-        self.slope_full = atan((self.params["E"] ** 2 + self.params["E"] ** 2) ** 0.5)
+        self.slope_full = atan((self.params["D"] ** 2 + self.params["E"] ** 2) ** 0.5)
 
     def _get_result(self):
         from math import degrees
