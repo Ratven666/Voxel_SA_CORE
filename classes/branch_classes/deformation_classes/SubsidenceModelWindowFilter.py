@@ -12,13 +12,17 @@ from classes.branch_classes.deformation_classes.plotters.SubsidenceModelPlotlyPl
 
 class SubsidenceModelWindowFilter:
 
-    def __init__(self, subsidence_model: SubsidenceModelDB, window_size: int):
+    def __init__(self, subsidence_model: SubsidenceModelDB, window_size: int, border_subs=float("inf"),
+                 border_slope=float("inf"), border_curvature=float("inf")):
         self.subsidence_model = subsidence_model
         self.reference_model = subsidence_model.reference_model
         self.voxel_model = subsidence_model.voxel_model
         self.model_name = f"{self.subsidence_model.model_name}_w{window_size}"
         self.window_size = self._check_windows_size(window_size)
         self.subsidence_offset = subsidence_model.subsidence_offset
+        self.border_subs = border_subs
+        self.border_slope = border_slope
+        self.border_curvature = border_curvature
         self._model_structure = {}
         self._init_model()
 
@@ -46,6 +50,7 @@ class SubsidenceModelWindowFilter:
     def _init_model(self):
         for cell in self.subsidence_model:
             filtered_cell = self._calk_filtered_cell(cell, self._mean_cell_filter)
+            filtered_cell = self._check_border_values(filtered_cell)
             cell_key = self.subsidence_model._get_key_for_voxel(filtered_cell.voxel)
             self._model_structure[cell_key] = filtered_cell
 
@@ -57,6 +62,18 @@ class SubsidenceModelWindowFilter:
         cells = self._get_cells_in_window(new_cell)
         filtered_cell = filter_func(new_cell, cells)
         return filtered_cell
+
+    def _check_border_values(self, cell):
+        if cell.subsidence is not None:
+            cell.subsidence = cell.subsidence if abs(cell.subsidence) <= self.border_subs else self.border_subs
+                # else None
+        if cell.slope is not None:
+            cell.slope = cell.slope if abs(cell.slope) <= self.border_slope else self.border_slope
+            # else None
+        if cell.curvature is not None:
+            cell.curvature = cell.curvature if abs(cell.curvature) <= self.border_curvature else self.border_curvature
+            # else None
+        return cell
 
     @staticmethod
     def _mean_cell_filter(center_cell, cells):
@@ -118,8 +135,10 @@ class SubsidenceModelWindowFilter:
         """
         plotter.plot(self)
 
-    def plot_subsidence_hist(self, plotter=SubsidenceHistSeabornPlotter()):
-        plotter.plot(self)
+    def plot_subsidence_hist(self, data_type="subsidence", plotter=SubsidenceHistSeabornPlotter()):
+        if data_type not in ["subsidence", "slope", "curvature"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", \"curvature\"])")
+        plotter.plot(self, data_type)
 
     def plot_heat_map(self, data_type="subsidence", plotter=SubsidenceModelHeatMapPlotlyPlotter()):
         if data_type not in ["subsidence", "slope", "curvature"]:

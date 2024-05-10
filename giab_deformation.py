@@ -21,11 +21,13 @@ def main():
 
     scan_subs_1 = ScanDB("scan_subs_1")
     scan_subs_1.load_scan_from_file(file_name="src/осыпь_01_BF.txt")
+    # scan_subs_1.load_scan_from_file(file_name="src/ZigZag_2018_ground_points_BF.txt")
 
-    # scan_subs_1.plot()
-
+    # # scan_subs_1.plot()
+    #
     scan_subs_2 = ScanDB("scan_subs_2")
     scan_subs_2.load_scan_from_file(file_name="src/осыпь_02_BF.txt")
+    # scan_subs_2.load_scan_from_file(file_name="src/ZigZag_2020_ground_points_BF.txt")
 
     # scan_subs_2.plot(plotter=ScanPlotterMeshPlotly())
 
@@ -34,32 +36,45 @@ def main():
 
     # mesh_2.plot()
 
-    STEP = 3
+    STEP = 2
     #
     base_vm = VoxelModelDB(scan_subs_1, step=0.25, is_2d_vxl_mdl=True,
                            voxel_model_separator=FastVMSeparator(drop_empty_voxel=False))
     vm_1 = VoxelModelDB(scan_subs_1, step=STEP, is_2d_vxl_mdl=True)
     vm_2 = VoxelModelDB(scan_subs_2, step=STEP, is_2d_vxl_mdl=True)
     #
-    subs_1_dem = MeshSegmentModelDB(vm_1, MeshDB(scan_subs_1))
-    subs_2_dem = MeshSegmentModelDB(vm_2, MeshDB(scan_subs_2))
+    # subs_1_dem = MeshSegmentModelDB(vm_1, MeshDB(scan_subs_1))
+    # subs_2_dem = MeshSegmentModelDB(vm_2, MeshDB(scan_subs_2))
     #
-    # subs_1_dem = BiModelDB(DemModelDB(vm_1))
-    # subs_2_dem = BiModelDB(DemModelDB(vm_2))
+    # subs_1_dem = BiModelDB(PlaneModelDB(vm_1))
+    # subs_2_dem = BiModelDB(PlaneModelDB(vm_2))
+
+    subs_1_dem = BiModelDB(DemModelDB(vm_1))
+    subs_2_dem = BiModelDB(DemModelDB(vm_2))
     #
-    subs = SubsidenceModelDB(voxel_model=base_vm, border_subsidence=10, reference_model=subs_1_dem,
+    subs = SubsidenceModelDB(voxel_model=base_vm, border_subsidence=100, reference_model=subs_1_dem,
                              comparable_model=subs_2_dem,
                              # slope_calculator=SlopeFullIndex,
                              # curvature_calculator=CurvFromSlope,
                              )
-
-    subs = SubsidenceModelWindowFilter(subsidence_model=subs, window_size=5)
+    subs = SubsidenceModelWindowFilter(subsidence_model=subs, window_size=1,
+                                       border_subs=10,
+                                       border_slope=100,
+                                       border_curvature=15)
+    # subs = SubsidenceModelWindowFilter(subsidence_model=subs, window_size=3, border_subs=0.6,
+    #              border_slope=15, border_curvature=0.3)
+    # subs = SubsidenceModelWindowFilter(subsidence_model=subs, window_size=1, border_subs=0.6,
+    #              border_slope=30, border_curvature=0.6)
     #
-    subs.plot_heat_map(data_type="subsidence")
-    subs.plot_heat_map(data_type="slope")
-    subs.plot_heat_map(data_type="curvature")
+    # subs.plot_heat_map(data_type="subsidence")
+    # subs.plot_heat_map(data_type="slope")
+    # subs.plot_heat_map(data_type="curvature")
 
-    subs.plot_surface()
+    subs.plot_subsidence_hist(data_type="subsidence")
+    subs.plot_subsidence_hist(data_type="slope")
+    subs.plot_subsidence_hist(data_type="curvature")
+
+    # subs.plot_surface()
 
 
 if __name__ == "__main__":

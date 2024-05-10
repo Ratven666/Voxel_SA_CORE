@@ -46,8 +46,6 @@ class SubsidenceModelDB:
 
     def __iter__(self):
         return iter(self._model_structure.values())
-        # return iter(SubsidenceModelWindowIterator(subsidence_model=self,
-        #                                           filter_function=None))
 
     def __str__(self):
         return f"{self.__class__.__name__} [ID: {self.id_},\tmodel_name: {self.model_name}]"
@@ -57,7 +55,7 @@ class SubsidenceModelDB:
 
     def _init_subsidence_model_name(self):
         if self.reference_model is not None and self.comparable_model is not None:
-            return (f"Subsidence_mdl_ref_{self.reference_model.model_name}_"
+            return (f"Subsidence_mdl_{self.voxel_model.step}_ref_{self.reference_model.model_name}_"
                     f"{self.comparable_model.model_name}_window_size_{self.window_size}")
         return None
 

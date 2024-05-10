@@ -67,13 +67,13 @@ class SubsidenceModelPlotlyPlotter:
                                  y=y,
                                  z=z,
                                  surfacecolor=slope,
-                                 colorscale="Rainbow_r"))
+                                 colorscale="RdYlGn_r"))
 
         fig.add_trace(go.Surface(x=x,
                                  y=y,
                                  z=z,
                                  surfacecolor=curvature,
-                                 colorscale="Rainbow_r"))
+                                 colorscale="RdYlGn_r"))
 
         fig.add_trace(go.Surface(x=x,
                                  y=y,
