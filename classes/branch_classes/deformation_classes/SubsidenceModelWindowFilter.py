@@ -19,7 +19,6 @@ class SubsidenceModelWindowFilter:
         self.voxel_model = subsidence_model.voxel_model
         self.model_name = f"{self.subsidence_model.model_name}_w{window_size}"
         self.window_size = self._check_windows_size(window_size)
-        self.subsidence_offset = subsidence_model.subsidence_offset
         self.border_subs = border_subs
         self.border_slope = border_slope
         self.border_curvature = border_curvature
@@ -136,12 +135,14 @@ class SubsidenceModelWindowFilter:
         plotter.plot(self)
 
     def plot_subsidence_hist(self, data_type="subsidence", plotter=SubsidenceHistSeabornPlotter()):
-        if data_type not in ["subsidence", "slope", "curvature"]:
-            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", \"curvature\"])")
+        if data_type not in ["subsidence", "slope", "curvature", "subsidence_type"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", "
+                             f"\"slope\", \"curvature\", \"subsidence_type\"])")
         plotter.plot(self, data_type)
 
     def plot_heat_map(self, data_type="subsidence", plotter=SubsidenceModelHeatMapPlotlyPlotter()):
-        if data_type not in ["subsidence", "slope", "curvature"]:
-            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", \"curvature\"])")
+        if data_type not in ["subsidence", "slope", "curvature", "subsidence_type"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", "
+                             f"\"curvature\", \"subsidence_type\"])")
         plotter.plot(self, data_type)
 

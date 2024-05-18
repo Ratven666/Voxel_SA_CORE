@@ -16,6 +16,8 @@ class SubsidenceHistSeabornPlotter:
             return cell.slope
         elif data_type == "curvature":
             return cell.curvature
+        elif data_type == "subsidence_type":
+            return cell.subsidence_class
         else:
             return None
 
@@ -24,12 +26,14 @@ class SubsidenceHistSeabornPlotter:
                      "subsidence_mse": [],
                      "slope": [],
                      "curvature": [],
+                     "subsidence_type": [],
                      }
         for cell in self.model:
             data_dict["subsidence"].append(cell.subsidence)
             data_dict["slope"].append(cell.slope)
             data_dict["curvature"].append(cell.curvature)
             data_dict["subsidence_mse"].append(cell.subsidence_mse)
+            data_dict["subsidence_type"].append(cell.subsidence_class)
         self.df = pd.DataFrame(data_dict)
 
     def plot(self, model, data_type):

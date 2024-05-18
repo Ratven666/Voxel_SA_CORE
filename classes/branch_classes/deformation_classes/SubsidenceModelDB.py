@@ -1,14 +1,17 @@
 import logging
 
-from sqlalchemy import select, insert, desc
+from sqlalchemy import select, insert, desc, update
 
 from CONFIG import LOGGER
 from classes.Point import Point
 from classes.VoxelModelDB import VoxelModelDB
 from classes.abc_classes.SegmentedModelABC import SegmentedModelABC
 from classes.branch_classes.deformation_classes.SubsidenceCellDB import SubsidenceCellDB
+from classes.branch_classes.deformation_classes.SubsidenceGMMClassificator import SubsidenceGMMClassificator
 from classes.branch_classes.deformation_classes.plotters.SubsidenceHeatMapPlotlyPlotter import \
     SubsidenceModelHeatMapPlotlyPlotter
+from classes.branch_classes.deformation_classes.plotters.SubsidenceHistSeabornPlotter import \
+    SubsidenceHistSeabornPlotter
 from classes.branch_classes.deformation_classes.plotters.SubsidenceModelPlotlyPlotter import \
     SubsidenceModelPlotlyPlotter
 from classes.branch_classes.terrain_indexes.TerrainCurvaturesIndexesABC import SlopeFullIndex, MeanCurvatureIndex
@@ -27,6 +30,7 @@ class SubsidenceModelDB:
                  comparable_model: SegmentedModelABC = None,
                  slope_calculator=SlopeFullIndex,
                  curvature_calculator=MeanCurvatureIndex,
+                 subsidence_classificator=SubsidenceGMMClassificator,
                  ):
         self.id_ = id_
         self.voxel_model = voxel_model
@@ -36,11 +40,13 @@ class SubsidenceModelDB:
         self.comparable_model = comparable_model
         self.slope_calculator = slope_calculator
         self.curvature_calculator = curvature_calculator
+        self.subsidence_classificator = subsidence_classificator
         self.base_voxel_model_id = None
         self.reference_model_id = None
         self.comparable_model_id = None
-        self.subsidence_offset = 0
         self.model_name = self._init_subsidence_model_name()
+        self.stable_zone_m = None
+        self.stable_zone_std = None
         self._model_structure = {}
         self._init_model()
 
@@ -81,6 +87,9 @@ class SubsidenceModelDB:
         self.logger.info(f"Начат расчет модели {self.model_name}")
         self._calk_subsidence()
         self._calk_subs_derivative()
+        subs_class_obj = self.subsidence_classificator(self)
+        self.stable_zone_m = subs_class_obj.get_stable_zone_params_dict()["M"]
+        self.stable_zone_std = subs_class_obj.get_stable_zone_params_dict()["Std"]
         self.logger.info(f"Завершен расчет модели {self.model_name}")
 
     def _calk_subsidence(self):
@@ -142,7 +151,7 @@ class SubsidenceModelDB:
                 self.comparable_model is not None):
             select_ = select(self.db_table) \
                 .where(self.db_table.c.model_name == self.model_name)
-            with engine.connect() as db_connection:
+            with (engine.connect() as db_connection):
                 db_model_data = db_connection.execute(select_).mappings().first()
                 if db_model_data is not None:
                     self._create_model_structure(SubsidenceCellDB)
@@ -155,12 +164,19 @@ class SubsidenceModelDB:
                                                         reference_model_id=self.reference_model.id,
                                                         comparable_model_id=self.comparable_model.id,
                                                         model_name=self.model_name,
-                                                        subsidence_offset=self.subsidence_offset,
+                                                        stable_zone_m=self.stable_zone_m,
+                                                        stable_zone_std=self.stable_zone_std,
                                                         )
                     db_connection.execute(stmt)
                     db_connection.commit()
                     self.id_ = self._get_last_model_id()
                     self._calk_subsidence_model()
+                    stmt = update(self.db_table).where(self.db_table.c.id == self.id_) \
+                                                .values(stable_zone_m=self.stable_zone_m,
+                                                        stable_zone_std=self.stable_zone_std,
+                                                        )
+                    db_connection.execute(stmt)
+                    db_connection.commit()
                     self._save_cell_data_in_db(db_connection)
                     db_connection.commit()
                     self.logger.info(f"Расчет модели {self.model_name} завершен и загружен в БД\n")
@@ -192,7 +208,8 @@ class SubsidenceModelDB:
         self.reference_model_id = db_model_data["reference_model_id"]
         self.comparable_model_id = db_model_data["comparable_model_id"]
         self.model_name = db_model_data["model_name"]
-        self.subsidence_offset = db_model_data["subsidence_offset"]
+        self.stable_zone_m = db_model_data["stable_zone_m"]
+        self.stable_zone_std = db_model_data["stable_zone_std"]
 
     def _save_cell_data_in_db(self, db_connection):
         """
@@ -226,79 +243,86 @@ class SubsidenceModelDB:
                 return 0
 
     def plot_heat_map(self, data_type="subsidence", plotter=SubsidenceModelHeatMapPlotlyPlotter()):
-        if data_type not in ["subsidence", "slope", "curvature"]:
-            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", \"curvature\"])")
+        if data_type not in ["subsidence", "slope", "curvature", "subsidence_type"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", \"slope\", "
+                             f"\"curvature\", \"subsidence_type\"])")
+        plotter.plot(self, data_type)
+
+    def plot_subsidence_hist(self, data_type="subsidence", plotter=SubsidenceHistSeabornPlotter()):
+        if data_type not in ["subsidence", "slope", "curvature", "subsidence_type"]:
+            raise ValueError(f"Не верный тип данных {data_type} != ([\"subsidence\", "
+                             f"\"slope\", \"curvature\", \"subsidence_type\"])")
         plotter.plot(self, data_type)
 
     def plot_surface(self, plotter=SubsidenceModelPlotlyPlotter()):
         plotter.plot(self)
 
 
-class SubsidenceModelWindowIterator:
-
-    def __init__(self, subsidence_model: SubsidenceModelDB, filter_function=None):
-        self.subsidence_model = subsidence_model
-        self.window_size = self._check_windows_size(subsidence_model.window_size)
-        self.filter_function = self._mean_cell_filter if filter_function is None else filter_function
-        self.__iterator = None
-
-    def __iter__(self):
-        self.__iterator = iter(self.subsidence_model._model_structure.values())
-        return self
-
-    def __next__(self):
-        try:
-            cell = next(self.__iterator)
-            new_cell = self._get_cell_copy(cell)
-            cells = self._get_cells_in_window(central_cell=cell)
-            filtered_cell = self.filter_function(new_cell, cells)
-            return filtered_cell
-        except StopIteration:
-            raise StopIteration
-        finally:
-            pass
-
-    @staticmethod
-    def _mean_cell_filter(center_cell, cells):
-        mean_subsidence = 0
-        counter = 0
-        for cell in cells:
-            try:
-                mean_subsidence += cell.subsidence
-                counter += 1
-            except TypeError:
-                continue
-        mean_subsidence = mean_subsidence / counter if counter > 0 else None
-        center_cell.subsidence = mean_subsidence
-        return center_cell
-
-    def _get_cell_copy(self, cell):
-        new_cell = SubsidenceCellDB(cell.voxel, self.subsidence_model)
-        new_cell.voxel_id = cell.voxel_id
-        new_cell.subsidence = cell.subsidence
-        new_cell.subsidence_mse = cell.subsidence_mse
-        return new_cell
-
-    def _get_cells_in_window(self, central_cell: SubsidenceCellDB):
-        step = central_cell.voxel.step
-        c_point = Point(X=central_cell.voxel.X + step / 2,
-                        Y=central_cell.voxel.Y + step / 2,
-                        Z=0, R=0, G=0, B=0)
-        cells = []
-        x0 = c_point.X - (self.window_size // 2) * step
-        y0 = c_point.Y - (self.window_size // 2) * step
-        for i in range(self.window_size):
-            y = y0 + step * i
-            for j in range(self.window_size):
-                x = x0 + step * j
-                cell = (self.subsidence_model.
-                        get_model_element_for_point(Point(X=x, Y=y, Z=0, R=0, G=0, B=0)))
-                if cell is not None:
-                    cells.append(cell)
-        return cells
-
-    @staticmethod
-    def _check_windows_size(window_size):
-        if window_size % 2 == 1:
-            return window_size
-        raise ValueError(f"Window_size должен быть нечетным числом. Переданно - {window_size}")
+# class SubsidenceModelWindowIterator:
+#
+#     def __init__(self, subsidence_model: SubsidenceModelDB, filter_function=None):
+#         self.subsidence_model = subsidence_model
+#         self.window_size = self._check_windows_size(subsidence_model.window_size)
+#         self.filter_function = self._mean_cell_filter if filter_function is None else filter_function
+#         self.__iterator = None
+#
+#     def __iter__(self):
+#         self.__iterator = iter(self.subsidence_model._model_structure.values())
+#         return self
+#
+#     def __next__(self):
+#         try:
+#             cell = next(self.__iterator)
+#             new_cell = self._get_cell_copy(cell)
+#             cells = self._get_cells_in_window(central_cell=cell)
+#             filtered_cell = self.filter_function(new_cell, cells)
+#             return filtered_cell
+#         except StopIteration:
+#             raise StopIteration
+#         finally:
+#             pass
+#
+#     @staticmethod
+#     def _mean_cell_filter(center_cell, cells):
+#         mean_subsidence = 0
+#         counter = 0
+#         for cell in cells:
+#             try:
+#                 mean_subsidence += cell.subsidence
+#                 counter += 1
+#             except TypeError:
+#                 continue
+#         mean_subsidence = mean_subsidence / counter if counter > 0 else None
+#         center_cell.subsidence = mean_subsidence
+#         return center_cell
+#
+#     def _get_cell_copy(self, cell):
+#         new_cell = SubsidenceCellDB(cell.voxel, self.subsidence_model)
+#         new_cell.voxel_id = cell.voxel_id
+#         new_cell.subsidence = cell.subsidence
+#         new_cell.subsidence_mse = cell.subsidence_mse
+#         return new_cell
+#
+#     def _get_cells_in_window(self, central_cell: SubsidenceCellDB):
+#         step = central_cell.voxel.step
+#         c_point = Point(X=central_cell.voxel.X + step / 2,
+#                         Y=central_cell.voxel.Y + step / 2,
+#                         Z=0, R=0, G=0, B=0)
+#         cells = []
+#         x0 = c_point.X - (self.window_size // 2) * step
+#         y0 = c_point.Y - (self.window_size // 2) * step
+#         for i in range(self.window_size):
+#             y = y0 + step * i
+#             for j in range(self.window_size):
+#                 x = x0 + step * j
+#                 cell = (self.subsidence_model.
+#                         get_model_element_for_point(Point(X=x, Y=y, Z=0, R=0, G=0, B=0)))
+#                 if cell is not None:
+#                     cells.append(cell)
+#         return cells
+#
+#     @staticmethod
+#     def _check_windows_size(window_size):
+#         if window_size % 2 == 1:
+#             return window_size
+#         raise ValueError(f"Window_size должен быть нечетным числом. Переданно - {window_size}")

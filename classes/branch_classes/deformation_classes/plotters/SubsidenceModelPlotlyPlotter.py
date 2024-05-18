@@ -22,6 +22,8 @@ class SubsidenceModelPlotlyPlotter:
                        self.model.voxel_model.X_count * 2), None)
         curvature = np.full((self.model.voxel_model.Y_count * 2,
                             self.model.voxel_model.X_count * 2), None)
+        subsidence_class = np.full((self.model.voxel_model.Y_count * 2,
+                                   self.model.voxel_model.X_count * 2), None)
 
         for cell in self.model:
             x0 = cell.voxel.X
@@ -52,6 +54,10 @@ class SubsidenceModelPlotlyPlotter:
             curvature[j + 1][i] = cell.curvature
             curvature[j][i + 1] = cell.curvature
             curvature[j + 1][i + 1] = cell.curvature
+            subsidence_class[j][i] = cell.subsidence_class
+            subsidence_class[j + 1][i] = cell.subsidence_class
+            subsidence_class[j][i + 1] = cell.subsidence_class
+            subsidence_class[j + 1][i + 1] = cell.subsidence_class
 
             x[i], x[i + 1] = x0, x0 + step
             y[j], y[j + 1] = y0, y0 + step
@@ -81,31 +87,43 @@ class SubsidenceModelPlotlyPlotter:
                                  surfacecolor=mse,
                                  colorscale="Rainbow_r"))
 
+        fig.add_trace(go.Surface(x=x,
+                                 y=y,
+                                 z=z,
+                                 surfacecolor=subsidence_class,
+                                 colorscale=[[0, "red"], [0.5, "green"], [1, "blue"]]))
+                                 # colorscale="Rainbow_r"))
+
         button_layer_1_height = 1.02
         fig.update_layout(
             updatemenus=[
                 dict(
                     buttons=list([
                         dict(
-                            args=[{"visible": [True, False, False, False]}],
+                            args=[{"visible": [True, False, False, False, False]}],
                             label="subsidence",
                             method="update"
                         ),
                         dict(
-                            args=[{"visible": [False, True, False, False]}],
+                            args=[{"visible": [False, True, False, False, False]}],
                             label="slope",
                             method="update"
                         ),
                         dict(
-                            args=[{"visible": [False, False, True, False]}],
+                            args=[{"visible": [False, False, True, False, False]}],
                             label="curvature",
                             method="update"
                         ),
                         dict(
-                            args=[{"visible": [False, False, False, True]}],
+                            args=[{"visible": [False, False, False, True, False]}],
                             label="MSE",
                             method="update"
-                        )
+                        ),
+                        dict(
+                            args=[{"visible": [False, False, False, False, True]}],
+                            label="Class",
+                            method="update"
+                        ),
                     ]),
                     direction="down",
                     pad={"r": 10, "t": 10},

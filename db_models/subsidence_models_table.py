@@ -11,6 +11,7 @@ def create_subsidence_models_db_table(metadata):
                                        Column("comparable_model_id", Integer,
                                               ForeignKey("dem_models.id")),
                                        Column("model_name", String, nullable=False, unique=True),
-                                       Column("subsidence_offset", Float, default=0.0),
+                                       Column("stable_zone_m", Float),
+                                       Column("stable_zone_std", Float),
                                        )
     return subsidence_models_db_table

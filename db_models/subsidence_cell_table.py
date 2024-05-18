@@ -13,6 +13,7 @@ def create_subsidence_cell_db_table(metadata):
                                      Column("comparable_z", Float),
                                      Column("subsidence", Float),
                                      Column("subsidence_mse", Float, default=None),
+                                     Column("subsidence_class", Float, default=None),
                                      Column("slope", Float, default=None),
                                      Column("curvature", Float, default=None),
                                      )

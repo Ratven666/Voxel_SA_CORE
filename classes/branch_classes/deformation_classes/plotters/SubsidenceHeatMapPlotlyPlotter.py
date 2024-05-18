@@ -6,6 +6,8 @@ class SubsidenceModelHeatMapPlotlyPlotter:
 
     def __init__(self):
         self.model = None
+        self.colorscale = "RdYlGn_r"
+        self.showlabels = True
 
     def get_data_array(self, data_type):
         data_array = np.full((self.model.voxel_model.Y_count,
@@ -20,13 +22,25 @@ class SubsidenceModelHeatMapPlotlyPlotter:
             data_array[j][i] = data
         return data_array
 
-    def data_loader(self, cell, data_type):
+    def _chose_colorscale(self, data_type):
+        if data_type == "subsidence_type":
+            self.colorscale = [[0, "red"], [0.5, "green"], [1, "blue"]]
+            self.showlabels = False
+        else:
+            self.colorscale = "RdYlGn_r"
+            self.showlabels = True
+
+
+    @staticmethod
+    def data_loader(cell, data_type):
         if data_type == "subsidence":
-            return cell.subsidence + self.model.subsidence_offset if cell.subsidence is not None else None
+            return cell.subsidence if cell.subsidence is not None else None
         elif data_type == "slope":
             return cell.slope
         elif data_type == "curvature":
             return cell.curvature
+        elif data_type == "subsidence_type":
+            return cell.subsidence_class
         else:
             return None
 
@@ -34,13 +48,14 @@ class SubsidenceModelHeatMapPlotlyPlotter:
         self.model = model
 
         data_array = self.get_data_array(data_type)
+        self._chose_colorscale(data_type)
 
         ax_ticks = self.__calk_ax_ticks()
         fig = go.Figure()
         fig.add_trace(go.Heatmap(x=ax_ticks["x_ticks"],
                                  y=ax_ticks["y_ticks"],
                                  z=data_array,
-                                 colorscale="RdYlGn_r"
+                                 colorscale=self.colorscale
                                  )
                       )
         width, height = self.__calk_sizes()
@@ -65,7 +80,7 @@ class SubsidenceModelHeatMapPlotlyPlotter:
                             method="restyle"
                         ),
                         dict(
-                            args=[{"contours.showlabels": True, "type": "contour"}],
+                            args=[{f"contours.{self.showlabels}": True, "type": "contour"}],
                             label="Contours",
                             method="restyle"
                         ),

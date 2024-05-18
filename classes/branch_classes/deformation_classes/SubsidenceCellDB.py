@@ -16,6 +16,7 @@ class SubsidenceCellDB:
         self.comparable_z = None
         self.subsidence = None
         self.subsidence_mse = None
+        self.subsidence_class = None
         self.slope = None
         self.curvature = None
 
@@ -27,7 +28,7 @@ class SubsidenceCellDB:
         :return: координата z для точки (x, y)
         """
         try:
-            subs = self.subsidence + self.subsidence_model.subsidence_offset
+            subs = self.subsidence
         except TypeError:
             subs = None
         return subs
@@ -52,6 +53,7 @@ class SubsidenceCellDB:
                 "comparable_z": self.comparable_z,
                 "subsidence": self.subsidence,
                 "subsidence_mse": self.subsidence_mse,
+                "subsidence_class": self.subsidence_class,
                 "slope": self.slope,
                 "curvature": self.curvature,
                 }
@@ -68,6 +70,7 @@ class SubsidenceCellDB:
                                             comparable_z=self.comparable_z,
                                             subsidence=self.subsidence,
                                             subsidence_mse=self.subsidence_mse,
+                                            subsidence_class=self.subsidence_class,
                                             slope=self.slope,
                                             curvature=self.curvature,
                                             )
@@ -98,6 +101,7 @@ class SubsidenceCellDB:
         self.comparable_z = db_cell_data["comparable_z"]
         self.subsidence = db_cell_data["subsidence"]
         self.subsidence_mse = db_cell_data["subsidence_mse"]
+        self.subsidence_class = db_cell_data["subsidence_class"]
         self.slope = db_cell_data["slope"]
         self.curvature = db_cell_data["curvature"]
 
